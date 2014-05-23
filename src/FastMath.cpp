@@ -471,6 +471,9 @@ float GAMMA(const float x, const enum FastMethod fm)
 //The coefficient j must be a non-negative integer
 float POCHHAMMER(const float x, const int j)
 {
+	if (j == 0)
+		return 1.0f;
+
 	assert (j >= 0);
 
 	float y = 0.0f;
@@ -483,7 +486,7 @@ float POCHHAMMER(const float x, const int j)
 //Approximates the Gauss Hypergeometric Function sol=2F1(a,b,c,z(x))
 //The tolerance describes convergence of the series
 //The precision 'p' describes how many terms are used in the series
-bool _2F1(float (*z)(const float &x), float &sol, const float &x, const float a, const float b, const float c, const float tol, const enum Precision p)
+bool _2F1(float (*z)(const float &x), float * const sol, const float &x, const float a, const float b, const float c, const float tol, const enum Precision p)
 {
 	//No null pointers
 	assert (z != NULL);
@@ -494,23 +497,28 @@ bool _2F1(float (*z)(const float &x), float &sol, const float &x, const float a,
 	if (c - a - b <= 0.0f || ABS(round(c - a - b) - (c - a - b), STL) < TOL)
 		return success;
 
+	//Series will not converge in this region
+	if (ABS(z(x), STL) >= 1.0f)
+		return success;
+
 	//Valid region for power series approximation
-	if (z(x) <= 1.0f) {
-		int nterms;
-		int i;
+	int nterms;
+	int i;
 
-		if (p == LOW_PRECISION)
-			nterms = 3;
-		else if (p == HIGH_PRECISION)
-			nterms = 5;
-		else if (p == VERY_HIGH_PRECISION)
-			nterms = 7;
+	if (p == LOW_PRECISION)
+		nterms = 3;
+	else if (p == HIGH_PRECISION)
+		nterms = 5;
+	else if (p == VERY_HIGH_PRECISION)
+		nterms = 7;
 
-		for (i = 0; i < nterms; i++)
-			sol += POCHHAMMER(a, i) * POCHHAMMER(b, i) * POW(z(x), static_cast<float>(i), STL) / (POCHHAMMER(c, i) * GAMMA(i + 1, STL));
-	} else if (z(x) > 1.0f) {
-		//Use transformation described in notes
-	}
+	for (i = 0; i < nterms; i++)
+		*sol += POCHHAMMER(a, i) * POCHHAMMER(b, i) * POW(z(x), static_cast<float>(i), STL) / (POCHHAMMER(c, i) * GAMMA(i + 1, STL));
+
+	if (ABS(POW(z(x), static_cast<float>(nterms), FAST), STL) > tol)
+		return success;
+	else
+		success = true;
 
 	return success;
 }
