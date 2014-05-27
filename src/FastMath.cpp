@@ -494,8 +494,8 @@ bool _2F1(float (*z)(const float &x), float * const sol, const float &x, const f
 	bool success = false;
 
 	//The value c - a - b must be greater than zero and not an integer
-	if (c - a - b <= 0.0f || ABS(round(c - a - b) - (c - a - b), STL) < TOL)
-		return success;
+	//if (c - a - b <= 0.0f || ABS(round(c - a - b) - (c - a - b), STL) < TOL)
+	//	return success;
 
 	//Series will not converge in this region
 	if (ABS(z(x), STL) >= 1.0f)
@@ -510,14 +510,15 @@ bool _2F1(float (*z)(const float &x), float * const sol, const float &x, const f
 	else if (p == HIGH_PRECISION)
 		nterms = 5;
 	else if (p == VERY_HIGH_PRECISION)
-		nterms = 7;
+		//nterms = 7;
+		nterms = 15;
 
 	for (i = 0; i < nterms; i++)
 		*sol += POCHHAMMER(a, i) * POCHHAMMER(b, i) * POW(z(x), static_cast<float>(i), STL) / (POCHHAMMER(c, i) * GAMMA(i + 1, STL));
 
-	if (ABS(POW(z(x), static_cast<float>(nterms), FAST), STL) > tol)
+	/*if (ABS(POW(z(x), static_cast<float>(nterms), FAST), STL) < tol)
 		return success;
-	else
+	else*/
 		success = true;
 
 	return success;

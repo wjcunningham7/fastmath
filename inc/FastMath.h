@@ -81,9 +81,9 @@ enum FastMethod {
 //Number of Terms in Series
 enum Precision {
 	DEFAULT = 0,
-	LOW_PRECISION = 0,	//O(x^4)
-	HIGH_PRECISION = 1,	//O(x^6)
-	VERY_HIGH_PRECISION = 2	//O(x^10)
+	LOW_PRECISION = 0,
+	HIGH_PRECISION = 1,
+	VERY_HIGH_PRECISION = 2
 };
 
 //Power Functions
