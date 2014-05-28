@@ -271,11 +271,11 @@ float ACOS(const float x, const enum FastMethod fm, const enum Precision p)
 		//Series from Integration (for |x| < 1)
 		float _x2 = POW2(x, EXACT);
 		if (p == LOW_PRECISION)
-			y = ACOS_I0 + x * (ACOS_I3 * _x2 + ACOS_I1);
-		else if (p == HIGH_PRECISION)
 			y = ACOS_I0 + x * (_x2 * (ACOS_I5 * _x2 + ACOS_I3) + ACOS_I1);
-		else if (p == VERY_HIGH_PRECISION)
+		else if (p == HIGH_PRECISION)
 			y = ACOS_I0 + x * (_x2 * (_x2 * (_x2 * (ACOS_I9 * _x2 + ACOS_I7) + ACOS_I5) + ACOS_I3) + ACOS_I1);
+		else if (p == VERY_HIGH_PRECISION)
+			y = ACOS_I0 + x * (_x2 * (_x2 * (_x2 * (_x2 * (_x2 * (_x2 * (ACOS_I15 * _x2 + ACOS_I13) + ACOS_I11) + ACOS_I9) + ACOS_I7) + ACOS_I5) + ACOS_I3) + ACOS_I1);
 	}
 
 	return y;
@@ -310,19 +310,19 @@ float ATAN(const float x, const enum FastMethod fm, const enum Precision p)
 		if (ABS(x, STL) < 1.0f) {
 			float _x2 = POW2(x, EXACT);
 			if (p == LOW_PRECISION)
-				y = x * (ATAN_H3 * _x2 + ATAN_H1);
-			else if (p == HIGH_PRECISION)
 				y = x * (_x2 * (ATAN_H5 * _x2 + ATAN_H3) + ATAN_H1);
-			else if (p == VERY_HIGH_PRECISION)
+			else if (p == HIGH_PRECISION)
 				y = x * (_x2 * (_x2 * (_x2 * (ATAN_H9 * _x2 + ATAN_H7) + ATAN_H5) + ATAN_H3) + ATAN_H1);
+			else if (p == VERY_HIGH_PRECISION)
+				y = x * (_x2 * (_x2 * (_x2 * (_x2 * (_x2 * (_x2 * (ATAN_H15 * _x2 + ATAN_H13) + ATAN_H11) + ATAN_H9) + ATAN_H7) + ATAN_H5) + ATAN_H3) + ATAN_H1);
 		} else {
 			float _x2minus = 1.0 / POW2(x, EXACT);
 			if (p == LOW_PRECISION)
-				y = ATAN_I0 * SGN(x, DEF) + (ATAN_I3 * _x2minus + ATAN_I1) / x;
-			else if (p == HIGH_PRECISION)
 				y = ATAN_I0 * SGN(x, DEF) + (_x2minus * (ATAN_I5 * _x2minus + ATAN_I3) + ATAN_I1) / x;
-			else if (p == VERY_HIGH_PRECISION)
+			else if (p == HIGH_PRECISION)
 				y = ATAN_I0 * SGN(x, DEF) + (_x2minus * (_x2minus * (_x2minus * (ATAN_I9 * _x2minus + ATAN_I7) + ATAN_I5) + ATAN_I3) + ATAN_I1) / x;
+			else if (p == VERY_HIGH_PRECISION)
+				y = ATAN_I0 * SGN(x, DEF) + (_x2minus * (_x2minus * (_x2minus * (_x2minus * (_x2minus * (_x2minus * (ATAN_I15 * _x2minus + ATAN_I13) + ATAN_I11) + ATAN_I9) + ATAN_I7) + ATAN_I5) + ATAN_I3) + ATAN_I1) / x;
 		}
 	}
 
@@ -388,20 +388,16 @@ float ASINH(const float x, const enum FastMethod fm, const enum Precision p)
 	if (fm == STL)
 		//Defined in <math.h>
 		y = asinhf(x);
-	else if (fm == CHEBYSHEV)
-		//Chebyshev Approximation
-		//Not implemented yet
-		y = x;
 	else if (fm == INTEGRATION) {
 		//Series from Integration (for |x| < 1)
 		//assert (ABS(x, STL) < 1.0f);
 		float _x2 = POW2(x, EXACT);
 		if (p == LOW_PRECISION)
-			y = x * (ASINH_I3 * _x2 + ASINH_I1);
-		else if (p == HIGH_PRECISION)
 			y = x * (_x2 * (ASINH_I5 * _x2 + ASINH_I3) + ASINH_I1);
-		else if (p == VERY_HIGH_PRECISION)
+		else if (p == HIGH_PRECISION)
 			y = x * (_x2 * (_x2 * (_x2 * (ASINH_I9 * _x2 + ASINH_I7) + ASINH_I5) + ASINH_I3) + ASINH_I1);
+		else if (p == VERY_HIGH_PRECISION)
+			y = x * (_x2 * (_x2 * (_x2 * (_x2 * (_x2 * (_x2 * (ASINH_I15 * _x2 + ASINH_I13) + ASINH_I11) + ASINH_I9) + ASINH_I7) + ASINH_I5) + ASINH_I3) + ASINH_I1);
 	}
 
 	return y;
@@ -420,21 +416,17 @@ float ACOSH(const float x, const enum FastMethod fm, const enum Precision p)
 	if (fm == STL)
 		//Defined in <math.h>
 		y = acoshf(x);
-	else if (fm == CHEBYSHEV)
-		//Chebyshev Approximation
-		//Not implemented yet
-		y = x;
 	else if (fm == INTEGRATION) {
 		//Series from Integration (for x > 1)
 		//assert (ABS(x, STL) > 1.0f);
 		float _x2minus = 1.0f / POW2(x, EXACT);
 		y += LOG(2.0f * x, STL);
 		if (p == LOW_PRECISION)
-			y += _x2minus * (ACOSH_I4 * _x2minus + ACOSH_I2);
-		else if (p == HIGH_PRECISION)
 			y += _x2minus * (_x2minus * (ACOSH_I6 * _x2minus + ACOSH_I4) + ACOSH_I2);
-		else if (p == VERY_HIGH_PRECISION)
+		else if (p == HIGH_PRECISION)
 			y += _x2minus * (_x2minus * (_x2minus * (_x2minus * (ACOSH_I10 * _x2minus + ACOSH_I8) + ACOSH_I6) + ACOSH_I4) + ACOSH_I2);
+		else if (p == VERY_HIGH_PRECISION)
+			y += _x2minus * (_x2minus * (_x2minus * (_x2minus * (_x2minus * (_x2minus * (ACOSH_I14 * _x2minus + ACOSH_I12) + ACOSH_I10) + ACOSH_I8) + ACOSH_I6) + ACOSH_I4) + ACOSH_I2);
 	}
 
 	return y;
