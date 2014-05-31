@@ -16,7 +16,7 @@ enum FastIntMethod {
 };
 
 struct IntData {
-	IntData() : workspace(NULL), table(NULL), /*cworkspace(NULL),*/ lower(0.001), upper(1.0), tol(1e-3), abserr(0.0), alpha(-0.8), beta(-0.3), mu(0), nu(0), key(0), nintervals(100), neval(0), limit(10) {}
+	IntData() : workspace(NULL), table(NULL), /*cworkspace(NULL),*/ lower(0.0), upper(1.0), tol(1e-3), abserr(0.0), alpha(-0.8), beta(-0.3), mu(0), nu(0), key(0), nintervals(100), neval(0), limit(10) {}
 	
 	gsl_integration_workspace *workspace;
 	gsl_integration_qaws_table *table;

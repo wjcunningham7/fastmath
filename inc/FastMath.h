@@ -131,6 +131,6 @@ float ACOSH(const float x, const enum FastMethod fm, const enum Precision p);
 //Statistical Functions
 float GAMMA(const float x, const enum FastMethod fm);
 float POCHHAMMER(const float x, const int j);
-bool _2F1(float (*z)(const float &x), float * const sol, const float &x, const float a, const float b, const float c, const float tol, const enum Precision p);
+bool _2F1(float (*z)(const float &x), float * const sol, const float &x, const float a, const float b, const float c, const float tol, const int nterms);
 
 #endif

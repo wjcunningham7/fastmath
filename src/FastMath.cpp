@@ -275,7 +275,7 @@ float ACOS(const float x, const enum FastMethod fm, const enum Precision p)
 		else if (p == HIGH_PRECISION)
 			y = ACOS_I0 + x * (_x2 * (_x2 * (_x2 * (ACOS_I9 * _x2 + ACOS_I7) + ACOS_I5) + ACOS_I3) + ACOS_I1);
 		else if (p == VERY_HIGH_PRECISION)
-			y = ACOS_I0 + x * (_x2 * (_x2 * (_x2 * (_x2 * (_x2 * (_x2 * (ACOS_I15 * _x2 + ACOS_I13) + ACOS_I11) + ACOS_I9) + ACOS_I7) + ACOS_I5) + ACOS_I3) + ACOS_I1);
+			y = ACOS_I0 + x * (_x2 * (_x2 * (_x2 * (_x2 * (_x2 * (/*_x2 * (ACOS_I15 * _x2 + ACOS_I13) +*/ ACOS_I11) + ACOS_I9) + ACOS_I7) + ACOS_I5) + ACOS_I3) + ACOS_I1);
 	}
 
 	return y;
@@ -477,8 +477,7 @@ float POCHHAMMER(const float x, const int j)
 
 //Approximates the Gauss Hypergeometric Function sol=2F1(a,b,c,z(x))
 //The tolerance describes convergence of the series
-//The precision 'p' describes how many terms are used in the series
-bool _2F1(float (*z)(const float &x), float * const sol, const float &x, const float a, const float b, const float c, const float tol, const enum Precision p)
+bool _2F1(float (*z)(const float &x), float * const sol, const float &x, const float a, const float b, const float c, const float tol, const int nterms)
 {
 	//No null pointers
 	assert (z != NULL);
@@ -493,18 +492,7 @@ bool _2F1(float (*z)(const float &x), float * const sol, const float &x, const f
 	if (ABS(z(x), STL) >= 1.0f)
 		return success;
 
-	//Valid region for power series approximation
-	int nterms;
 	int i;
-
-	if (p == LOW_PRECISION)
-		nterms = 3;
-	else if (p == HIGH_PRECISION)
-		nterms = 5;
-	else if (p == VERY_HIGH_PRECISION)
-		//nterms = 7;
-		nterms = 15;
-
 	for (i = 0; i < nterms; i++)
 		*sol += POCHHAMMER(a, i) * POCHHAMMER(b, i) * POW(z(x), static_cast<float>(i), STL) / (POCHHAMMER(c, i) * GAMMA(i + 1, STL));
 
