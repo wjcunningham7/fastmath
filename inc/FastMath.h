@@ -11,8 +11,13 @@
 // Krioukov Research Group //
 /////////////////////////////
 
-#define TOL (1e-28)
+//Used for Unit Testing
+#define FM_DEBUG false
 
+//Machine Epsilon
+#define FM_TOL (1e-28)
+
+//Useful Constants
 #define HALF_PI  1.57079632679489661923f
 #define TWO_PI   6.28318530717958647692f
 
@@ -92,7 +97,8 @@ enum FastMethod {
 	EXACT = 7	//Exact solution
 };
 
-//Number of Terms in Series
+//Defines Number of Terms in Series for
+//Selected Power Series Approximations
 enum Precision {
 	DEFAULT = 0,
 	LOW_PRECISION = 0,
@@ -131,6 +137,8 @@ float ACOSH(const float x, const enum FastMethod fm, const enum Precision p);
 //Statistical Functions
 float GAMMA(const float x, const enum FastMethod fm);
 float POCHHAMMER(const float x, const int j);
-bool _2F1(float (*z)(const float &x), float * const sol, const float &x, const float a, const float b, const float c, const float tol, const int nterms);
+
+//Gauss Hypergeometric Function
+void _2F1(float (*z)(const float &x, void * const param), const float &x, void * const param, const float a, const float b, const float c, float * const sol, float * const err, const int nterms);
 
 #endif
