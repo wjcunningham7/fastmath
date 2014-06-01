@@ -1,0 +1,13 @@
+/////////////////////////////
+//(C) Will Cunningham 2014 //
+// Northeastern University //
+// Krioukov Research Group //
+/////////////////////////////
+
+NOTE:  These functions are currently under active revision.  Double check the code before use, and compare your results to another method before implementing in your code.  Please flag known bugs on Github.
+
+=========
+|Summary|
+=========
+
+This repository contains the FastMath library.  The primary functions are defined in ./src/FastMath.cpp and ./src/FastNumInt.cpp.  The latter makes use of GSL numerical integration functions.  A static library may be created in ./lib with the command 'make lib', assuming the object files already have been created in ./obj.  The binary executablesin the ./bin folder, titled 'BenchFastMath' and 'BenchFastNumInt' provide quantitative information on the speed and precision of each function defined in this repository.
