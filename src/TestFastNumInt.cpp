@@ -5,7 +5,7 @@
 
 double tauToEtaUniverse(double tau, void *params)
 {
-	return POW(SINH(1.5*tau, STL), (-2.0f / 3.0f), STL);
+	return POW(SINH(1.5f * tau, STL), (-2.0f / 3.0f), STL);
 }
 
 int main(int argc, char **argv)

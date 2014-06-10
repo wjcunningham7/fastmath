@@ -6,6 +6,9 @@
 
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_integration.h>
+#include <nintlib/nintlib.hpp>
+
+#define FNI_DEBUG true
 
 enum FastIntMethod {
 	QNG,
@@ -44,6 +47,6 @@ struct IntData {
 
 double integrate1D(double (*f)(double x, void *params), void *params, struct IntData *idata, enum FastIntMethod fim);
 
-double integrate2D(double (*f)(double x, double y, void *params), void *params, double lx, double ly, double ux, double uy, double tol, int m);
+double integrate2D(double (*f)(int dim, double x[]), double lx, double ly, double ux, double uy, long &seed, int m);
 
 #endif

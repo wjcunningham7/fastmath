@@ -4,8 +4,10 @@
 //Numerical Integration
 double integrate1D(double (*f)(double x, void *params), void *params, struct IntData *idata, enum FastIntMethod fim)
 {
-	assert (f != NULL);
-	assert (idata != NULL);
+	if (FNI_DEBUG) {
+		assert (f != NULL);
+		assert (idata != NULL);
+	}
 
 	gsl_function F;
 	F.function = *f;
@@ -34,11 +36,44 @@ double integrate1D(double (*f)(double x, void *params), void *params, struct Int
 	return result;
 }
 
-double integrate2D(double (*f)(double x, double y, void *params), void *params, double lx, double ly, double ux, double uy, double tol, int m)
+//NINTLIB C++ Library
+//Multi-Dimensional Quadrature
+double integrate2D(double (*f)(int dim, double x[]), double lx, double ly, double ux, double uy, long &seed, int m)
 {
-	assert (f != NULL);
+	if (FNI_DEBUG) {
+		assert (f != NULL);
+		assert (m == 0);
+	}
 
+	double *lower;
+	double *upper;
 	double result = 0.0;
+
+	int dim = 2;
+	int test = 2;;
+	int neval;
+	int i;
+
+	if (m == 0) {
+		lower = (double*)malloc(sizeof(double) * dim);
+		upper = (double*)malloc(sizeof(double) * dim);
+
+		lower[0] = lx;
+		lower[1] = ly;
+
+		upper[0] = ux;
+		upper[1] = uy;
+
+		neval = i4_power(8, test) * 10000;
+		int _seed = (int)seed;
+		result = monte_carlo_nd(*f, dim, lower, upper, neval, &_seed);
+
+		free(lower);
+		lower = NULL;
+
+		free(upper);
+		upper = NULL;
+	}
 
 	return result;
 }
