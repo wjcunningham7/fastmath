@@ -50,7 +50,7 @@ double integrate2D(double (*f)(int dim, double x[]), double lx, double ly, doubl
 	double result = 0.0;
 
 	int dim = 2;
-	int test = 2;;
+	int test = 2;
 	int neval;
 	int i;
 

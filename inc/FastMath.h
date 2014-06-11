@@ -136,9 +136,10 @@ float ACOSH(const float x, const enum FastMethod fm, const enum Precision p);
 
 //Statistical Functions
 float GAMMA(const float x, const enum FastMethod fm);
+float LOGGAMMA(const float x, const enum FastMethod fm);
 float POCHHAMMER(const float x, const int j);
 
 //Gauss Hypergeometric Function
-void _2F1(float (*z)(const float &x, void * const param), const float &x, void * const param, const float a, const float b, const float c, float * const sol, float * const err, const int nterms);
+void _2F1(float (*z)(const float &x, void * const param), const float &x, void * const param, const float a, const float b, const float c, float * const sol, float * const err, int * const nterms);
 
 #endif

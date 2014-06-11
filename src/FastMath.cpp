@@ -485,13 +485,51 @@ float GAMMA(const float x, const enum FastMethod fm)
 
 	float y = 0.0f;
 
-	if (fm == STL)
+	if (x > 10.0f) {
+		//Use Stirling's Approximation
+		y = 1.0f + 1.0f / (12.0f * x) + 1.0f / (288.0f * POW2(x, EXACT));
+		y *= SQRT(2.0f * M_PI * x, STL) * POW(x / M_E, x, STL);
+	} else if (fm == STL)
 		//Defined in <math.h>
 		y = tgamma(x);
 	else if (fm == BOOST)
 		//Lanczos Approximation
 		//Defined in Boost library
 		y = boost::math::tgamma1pm1(x);
+
+	return y;
+}
+
+//Approximation of ln(gamma(x))
+float LOGGAMMA(const float x, const enum FastMethod fm)
+{
+	if (x == 1.0f || x == 2.0f)
+		return 0.0f;
+
+	if (FM_DEBUG) {
+		assert (fm == STL || fm == BOOST);
+		//Gamma(0) is undefined
+		assert (x != 0.0f);
+		assert (!(x > 0.0f && ABS(floor(x) - x, STL) < FM_TOL));
+		assert (!(x < 0.0f && ABS(ceil(x) - x, STL) < FM_TOL));
+		//Gamma not defined for negative integers
+		assert (!(x < 0.0f && ABS(x - round(x), STL) < FM_TOL));
+		//Log not defined for negative numbers
+		assert (!(x < 0.0f && static_cast<int>(-1 * floor(x)) % 2 == 1));
+	}
+
+	float y = 0.0f;
+
+	if (x > 10.0f) {
+		//Use Stirling's Approximation
+		y = x * LOG(x, STL) - x + 0.5f * LOG(2.0f * M_PI * x, STL);
+	} else if (fm == STL)
+		//Defined in <math.h>
+		y = LOG(tgamma(x), STL);
+	else if (fm == BOOST)
+		//Lanczos Approximation
+		//Defined in Boost library
+		y = LOG(boost::math::tgamma1pm1(x), STL);
 
 	return y;
 }
@@ -508,7 +546,10 @@ float POCHHAMMER(const float x, const int j)
 
 	float y = 0.0f;
 
-	y = GAMMA(x + j, STL) / GAMMA(x, STL);
+	if (x > 10.0f || j > 10)
+		y = exp(LOGGAMMA(x + j, STL) - LOGGAMMA(x, STL));
+	else
+		y = GAMMA(x + j, STL) / GAMMA(x, STL);
 
 	return y;
 }
@@ -518,7 +559,7 @@ float POCHHAMMER(const float x, const int j)
 //The solution is stored in the memory location at 'sol'
 //The actual error is stored in the memory location at 'err'
 //The number of terms used in the power series is given by 'nterms'
-void _2F1(float (*z)(const float &x, void * const param), const float &x, void * const param, const float a, const float b, const float c, float * const sol, float * const err, const int nterms)
+void _2F1(float (*z)(const float &x, void * const param), const float &x, void * const param, const float a, const float b, const float c, float * const sol, float * const err, int * const nterms)
 {
 	if (FM_DEBUG) {
 		//No null pointers
@@ -528,15 +569,24 @@ void _2F1(float (*z)(const float &x, void * const param), const float &x, void *
 	}
 	
 	//Series will not converge in this region
-	if (ABS(z(x, param), STL) >= 1.0f) {
+	if (ABS((*z)(x, param), STL) >= 1.0f) {
 		*sol = NAN;
 		*err = NAN;
 	}
 
+	if (*nterms == -1) {
+		*nterms = static_cast<int>(LOG(*err, STL) / LOG(ABS((*z)(x, param), STL), STL));
+	}
+
 	int i;
-	for (i = 0; i < nterms; i++)
-		*sol += POCHHAMMER(a, i) * POCHHAMMER(b, i) * POW(z(x, param), static_cast<float>(i), STL) / (POCHHAMMER(c, i) * GAMMA(i + 1, STL));
+	*sol = 0.0f;
+	for (i = 0; i < *nterms; i++) {
+		if (i < 15)
+			*sol += POCHHAMMER(a, i) * POCHHAMMER(b, i) * POW((*z)(x, param), static_cast<float>(i), STL) / (POCHHAMMER(c, i) * GAMMA(i + 1, STL));
+		else
+			*sol += POW((*z)(x, param), static_cast<float>(i), STL) * exp(LOGGAMMA(a + i, STL) - LOGGAMMA(a, STL) + LOGGAMMA(b + i, STL) - LOGGAMMA(b, STL) - LOGGAMMA(c + i, STL) + LOGGAMMA(c, STL) - LOGGAMMA(i + 1, STL));
+	}
 
 	//Estimate the magnitude of the error
-	*err = ABS(POW(z(x, param), static_cast<float>(nterms), FAST), STL);
+	*err = ABS(POW((*z)(x, param), static_cast<float>(*nterms), FAST), STL);
 }
