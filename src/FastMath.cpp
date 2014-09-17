@@ -165,11 +165,11 @@ float LOG(const float x, const enum FastMethod fm)
 //Returns sign(x)
 float SGN(const float x, const enum FastMethod fm)
 {	
-	if (FM_DEBUG) {
-		//Cannot be zero
-		assert (ABS(round(x) - x, STL) > FM_TOL);
+	if (FM_DEBUG)
 		assert (fm == DEF || fm == BITWISE);
-	}
+
+	if (ABS(round(x) - x, STL) < FM_TOL)
+		return 0.0f;
 
 	float y = 1.0f;
 
