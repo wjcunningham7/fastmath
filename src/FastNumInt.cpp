@@ -64,7 +64,7 @@ double integrate2D(double (*f)(int dim, double x[]), double lx, double ly, doubl
 		upper[0] = ux;
 		upper[1] = uy;
 
-		neval = i4_power(16, test) * 10000;
+		neval = i4_power(8, test) * 50000;
 		int _seed = (int)seed;
 		result = monte_carlo_nd(*f, dim, lower, upper, neval, &_seed);
 

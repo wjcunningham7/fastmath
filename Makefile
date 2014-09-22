@@ -6,8 +6,8 @@ LIBDIR	:= ./lib
 DATDIR	:= ./dat
 
 CXX	:= /usr/bin/g++
-INCD	:= -I $(INCDIR)
-LIBS	:= -L $(LD_LIBRARY_PATH) -lm -lnint -lgsl -lgslcblas
+INCD	:= -I $(INCDIR) -I /home/cunningham.wi/local/inc
+LIBS	:= -L $(LD_LIBRARY_PATH) -L /home/cunningham.wi/local/lib64 -lm -lnint -lgsl -lgslcblas
 
 FLAGS	:= -O3 -g
 
@@ -43,7 +43,7 @@ bin3 : $(OBJS3)
 	$(CXX) -o $(BIN3) $(OBJS3) $(INCD) $(LIBS)
 
 clean:
-	rm -f $(BIN) $(OBJDIR)/*.o $(LIBDIR)/*.a ./*.log
+	rm -f $(BINDIR)/* $(OBJDIR)/*.o $(LIBDIR)/*.a ./*.log
 
 cleandata :
 	rm -f $(DATDIR)/*.dat
