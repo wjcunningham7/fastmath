@@ -40,7 +40,7 @@ double xi(double r)
 	return _xi;
 }
 
-double rescaledDegreeUniverse(int dim, double x[])
+double rescaledDegreeUniverse(int dim, double x[], double *params)
 {
 	//Identify x[0] with x coordinate
 	//Identify x[1] with r coordinate
@@ -92,7 +92,7 @@ int main(int argc, char **argv)
 	printf("tau0: %f\n", tau0);
 	printf("r0:   %f\n", r0);
 
-	double k = integrate2D(&rescaledDegreeUniverse, 0.0, 0.0, r0, r0, seed, 0);
+	double k = integrate2D(&rescaledDegreeUniverse, 0.0, 0.0, r0, r0, NULL, seed, 0);
 	k *= 8 * M_PI / (SINH(3.0f * tau0, STL) - 3.0f * tau0);
 	printf("k: %f\n", k);
 	printf("\n");
