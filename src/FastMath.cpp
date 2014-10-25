@@ -16,25 +16,25 @@
 ////////////////////////////////////////////////////////////////////
 
 //Approximation of x^2
-float POW2(const float x, const enum FastMethod fm)
+double POW2(const double x, const enum FastMethod fm)
 {
-	if (x == 0.0f)
+	if (x == 0.0)
 		return x;
 
 	if (FM_DEBUG)
 		assert (fm == STL || fm == FAST || fm == FASTER || fm == EXACT);
 
-	float y = 0.0f;
+	double y = 0.0;
 
 	if (fm == STL)
 		//Defined in <math.h>
-		y = powf(x, 2.0f);
+		y = pow(x, 2.0);
 	else if (fm == FAST)
 		//Defined in "fastapprox.h"
-		y = fastpow(x, 2.0f);
+		y = static_cast<double>(fastpow(static_cast<float>(x), 2.0f));
 	else if (fm == FASTER)
 		//Defined in "fastapprox.h"
-		y = fasterpow(x, 2.0f);
+		y = static_cast<double>(fasterpow(static_cast<float>(x), 2.0f));
 	else if (fm == EXACT)
 		y = x * x;
 
@@ -42,25 +42,25 @@ float POW2(const float x, const enum FastMethod fm)
 }
 
 //Approximation of x^3
-float POW3(const float x, const enum FastMethod fm)
+double POW3(const double x, const enum FastMethod fm)
 {
-	if (x == 0.0f)
+	if (x == 0.0)
 		return x;
 
 	if (FM_DEBUG)
 		assert (fm == STL || fm == FAST || fm == FASTER || fm == EXACT);
 
-	float y = 0.0f;
+	double y = 0.0;
 
 	if (fm == STL)
 		//Defined in <math.h>
-		y = powf(x, 3.0f);
+		y = pow(x, 3.0);
 	else if (fm == FAST)
 		//Defined in "fastapprox.h"
-		y = fastpow(x, 3.0f);
+		y = static_cast<double>(fastpow(static_cast<float>(x), 3.0f));
 	else if (fm == FASTER)
 		//Defined in "fastapprox.h"
-		y = fasterpow(x, 3.0f);
+		y = static_cast<double>(fasterpow(static_cast<float>(x), 3.0f));
 	else if (fm == EXACT)
 		y = x * x * x;
 
@@ -68,226 +68,231 @@ float POW3(const float x, const enum FastMethod fm)
 }
 
 //Approximation of x^p
-float POW(const float x, const float p, const enum FastMethod fm)
+double POW(const double x, const double p, const enum FastMethod fm)
 {
 	if (FM_DEBUG)
 		assert (fm == STL || fm == FAST || fm == FASTER);
 
-	float y = 0.0f;
+	double y = 0.0;
 
 	if (fm == STL)
 		//Defined in <math.h>
-		y = powf(x, p);
+		y = pow(x, p);
 	else if (fm == FAST)
 		//Defined in "fastapprox.h"
-		y = fastpow(x, p);
+		y = static_cast<double>(fastpow(static_cast<float>(x), static_cast<float>(p)));
 	else if (fm == FASTER)
 		//Defined in "fastapprox.h"
-		y = fasterpow(x, p);
+		y = static_cast<double>(fasterpow(static_cast<float>(x), static_cast<float>(p)));
 
 	return y;
 }
 
 //Approximation of x^(1/2)
-float SQRT(const float x, const enum FastMethod fm)
+double SQRT(const double x, const enum FastMethod fm)
 {
-	if (x == 0.0f)
+	if (x == 0.0)
 		return x;
 
 	if (FM_DEBUG) {
 		assert (fm == STL || fm == BITWISE);
-		assert (x > 0.0f);
+		assert (x > 0.0);
 	}
 
-	float y = 0.0f;
+	double y = 0.0;
 
 	if (fm == STL)
 		//Defined in <math.h>
-		y = sqrtf(x);
+		y = sqrt(x);
 	else if (fm == BITWISE) {
 		//Bit shift approximation
-		unsigned int i = *(unsigned int*) &x;
+		float z = static_cast<float>(x);
+		unsigned int i = *(unsigned int*) &z;
 		i += 127 << 23;
 		i >>= 1;
-		y = *(float*) &i;
+		y = static_cast<double>(*(float*) &i);
 	}
 
 	return y;
 }
 
 //Approximation of |x|
-float ABS(const float x, const enum FastMethod fm)
+double ABS(const double x, const enum FastMethod fm)
 {
-	if (x == 0.0f)
+	if (x == 0.0)
 		return x;
 
 	if (FM_DEBUG)
 		assert (fm == STL || fm == BITWISE);
 	
-	float y = 0.0f;
+	double y = 0.0;
 
 	if (fm == STL)
 		//Defined in <math.h>
 		y = fabs(x);
 	else if (fm == BITWISE) {
 		//Bitwise operation
-		int i = *(int*) &x;
+		float z = static_cast<float>(x);
+		int i = *(int*) &z;
 		i &= 0x7FFFFFFF;
-		y = *(float*) &i;
+		y = static_cast<double>(*(float*) &i);
 	}
 
 	return y;
 }
 
 //Approximation of ln(x)
-float LOG(const float x, const enum FastMethod fm)
+double LOG(const double x, const enum FastMethod fm)
 {
 	if (FM_DEBUG) {
 		assert (fm == STL || fm == FAST || fm == FASTER);
-		assert (x > 0.0f);
+		assert (x > 0.0);
 	}
 
-	float y = 0.0f;
+	double y = 0.0;
 
 	if (fm == STL)
 		//Defined int <math.h>
-		y = logf(x);
+		y = log(x);
 	else if (fm == FAST)
 		//Defined in "fastapprox.h"
-		y = fastlog(x);
+		y = static_cast<double>(fastlog(static_cast<float>(x)));
 	else if (fm == FASTER)
 		//Defined in "fastapprox.h"
-		y = fasterlog(x);
+		y = static_cast<double>(fasterlog(static_cast<float>(x)));
 
 	return y;
 }
 
 //Returns sign(x)
-float SGN(const float x, const enum FastMethod fm)
+double SGN(const double x, const enum FastMethod fm)
 {	
 	if (FM_DEBUG)
 		assert (fm == DEF || fm == BITWISE);
 
 	if (ABS(round(x) - x, STL) < FM_TOL)
-		return 0.0f;
+		return 0.0;
 
-	float y = 1.0f;
+	double y = 1.0;
 
 	if (fm == DEF);
-		if (y < 0.0f)
-			y = -1.0f;
-	else if (fm == BITWISE)
-		(int&)y |= ((int&)y & 0x80000000);
+		if (y < 0.0)
+			y = -1.0;
+	else if (fm == BITWISE) {
+		float z = static_cast<float>(y);
+		(int&)z |= ((int&)z & 0x80000000);
+		y = static_cast<double>(z);
+	}
 
 	return y;
 }
 
 //Approximation of sine(x)
-float SIN(const float x, const enum FastMethod fm)
+double SIN(const double x, const enum FastMethod fm)
 {
-	if (x == 0.0f)
+	if (x == 0.0)
 		return x;
 
 	if (FM_DEBUG)
 		assert (fm == STL || fm == FAST || fm == FASTER);
 
-	float y = 0.0f;
+	double y = 0.0;
 
 	if (fm == STL)
 		//Defined in <math.h>
-		y = sinf(x);
+		y = sin(x);
 	else if (fm == FAST) {
 		//Defined in "fastapprox.h"
 		if (FM_DEBUG)
 			assert (ABS(x, STL) < M_PI);
-		y = fastsin(x);
+		y = static_cast<double>(fastsin(static_cast<float>(x)));
 	} else if (fm == FASTER) {
 		//Defined in "fastapprox.h"
 		if (FM_DEBUG)
 			assert (ABS(x, STL) < M_PI);
-		y = fastersin(x);
+		y = static_cast<double>(fastersin(static_cast<float>(x)));
 	}
 
 	return y;
 }
 
 //Approximation of cosine(x)
-float COS(const float x, const enum FastMethod fm)
+double COS(const double x, const enum FastMethod fm)
 {
-	if (x == 0.0f)
-		return 1.0f;
+	if (x == 0.0)
+		return 1.0;
 
 	if (FM_DEBUG)
 		assert (fm == STL || fm == FAST || fm == FASTER);
 
-	float y = 0.0f;
+	double y = 0.0;
 
 	if (fm == STL)
 		//Defined in <math.h>
-		y = cosf(x);
+		y = cos(x);
 	else if (fm == FAST) {
 		//Defined in "fastapprox.h"
 		if (FM_DEBUG)
 			assert (ABS(x, STL) < M_PI);
-		y = fastcos(x);
+		y = static_cast<double>(fastcos(static_cast<float>(x)));
 	} else if (fm == FASTER) {
 		//Defined in "fastapprox.h"
 		if (FM_DEBUG)
 			assert (ABS(x, STL) < M_PI);
-		y = fastercos(x);
+		y = static_cast<double>(fastercos(static_cast<float>(x)));
 	}
 
 	return y;
 }
 
 //Approximation of tangent(x)
-float TAN(const float x, const enum FastMethod fm)
+double TAN(const double x, const enum FastMethod fm)
 {
-	if (x == 0.0f)
+	if (x == 0.0)
 		return x;
 
 	if (FM_DEBUG)
 		assert (fm == STL || fm == FAST || fm == FASTER);
 
-	float y = 0.0f;
+	double y = 0.0;
 
 	if (fm == STL)
 		//Defined in <math.h>
-		y = tanf(x);
+		y = tan(x);
 	else if (fm == FAST) {
 		//Defined in "fastapprox.h"
 		if (FM_DEBUG)
 			assert (ABS(x, STL) < HALF_PI);
-		y = fasttan(x);
+		y = static_cast<double>(fasttan(static_cast<float>(x)));
 	} else if (fm == FASTER) {
 		//Defined in "fastapprox.h"
 		if (FM_DEBUG)
 			assert (ABS(x, STL) < HALF_PI);
-		y = fastertan(x);
+		y = static_cast<double>(fastertan(static_cast<float>(x)));
 	}
 
 	return y;
 }
 
 //Approximation of arccosine(x)
-float ACOS(const float x, const enum FastMethod fm, const enum Precision p)
+double ACOS(const double x, const enum FastMethod fm, const enum Precision p)
 {
-	if (x == 0.0f)
+	if (x == 0.0)
 		return HALF_PI;
 
 	if (FM_DEBUG) {
 		assert (fm == STL || fm == CHEBYSHEV || fm == INTEGRATION);
-		assert (ABS(x, STL) < 1.0f);
+		assert (ABS(x, STL) < 1.0);
 	}
 
-	float y = 0.0f;
+	double y = 0.0;
 
 	if (fm == STL)
 		//Defined in <math.h>
-		y = acosf(x);
+		y = acos(x);
 	else if (fm == CHEBYSHEV) {
 		//Chebyshev Approximation
-		float _x2 = POW2(x, EXACT);
+		double _x2 = POW2(x, EXACT);
 		if (p == LOW_PRECISION)
 			y = ACOS_C0 + x * (ACOS_C3 * _x2 + ACOS_C1);
 		else if (p == HIGH_PRECISION)
@@ -296,7 +301,7 @@ float ACOS(const float x, const enum FastMethod fm, const enum Precision p)
 			y = ACOS_C0 + x * (_x2 * (_x2 * (_x2 * (ACOS_C9 * _x2 + ACOS_C7) + ACOS_C5) + ACOS_C3) + ACOS_C1);
 	} else if (fm == INTEGRATION) {
 		//Series from Integration (for |x| < 1)
-		float _x2 = POW2(x, EXACT);
+		double _x2 = POW2(x, EXACT);
 		if (p == LOW_PRECISION)
 			y = ACOS_I0 + x * (_x2 * (ACOS_I5 * _x2 + ACOS_I3) + ACOS_I1);
 		else if (p == HIGH_PRECISION)
@@ -309,25 +314,25 @@ float ACOS(const float x, const enum FastMethod fm, const enum Precision p)
 }
 
 //Approximation of arctangent(x)
-float ATAN(const float x, const enum FastMethod fm, const enum Precision p)
+double ATAN(const double x, const enum FastMethod fm, const enum Precision p)
 {
-	if (x == 0.0f)
+	if (x == 0.0)
 		return x;
-	else if (ABS(x, STL) == 1.0f)
+	else if (ABS(x, STL) == 1.0)
 		//Integration series not valid for |x| = 1.0
-		return HALF_PI / 2.0f;
+		return HALF_PI / 2.0;
 
 	if (FM_DEBUG)
 		assert (fm == STL || fm == CHEBYSHEV || fm == INTEGRATION);
 	
-	float y = 0.0f;
+	double y = 0.0;
 
 	if (fm == STL)
 		//Defined in <math.h>
-		y = atanf(x);
+		y = atan(x);
 	else if (fm == CHEBYSHEV) {
 		//Chebyshev Approximation
-		float _x2 = POW2(x, EXACT);
+		double _x2 = POW2(x, EXACT);
 		if (p == LOW_PRECISION)
 			y = x * (ATAN_C3 * _x2 + ATAN_C1);
 		else if (p == HIGH_PRECISION)
@@ -336,8 +341,8 @@ float ATAN(const float x, const enum FastMethod fm, const enum Precision p)
 			y = x * (_x2 * (_x2 * (_x2 * (ATAN_C9 * _x2 + ATAN_C7) + ATAN_C5) + ATAN_C3) + ATAN_C1);
 	} else if (fm == INTEGRATION) {
 		//Series from Integration (for x != 1.0)
-		if (ABS(x, STL) < 1.0f) {
-			float _x2 = POW2(x, EXACT);
+		if (ABS(x, STL) < 1.0) {
+			double _x2 = POW2(x, EXACT);
 			if (p == LOW_PRECISION)
 				y = x * (_x2 * (ATAN_H5 * _x2 + ATAN_H3) + ATAN_H1);
 			else if (p == HIGH_PRECISION)
@@ -345,7 +350,7 @@ float ATAN(const float x, const enum FastMethod fm, const enum Precision p)
 			else if (p == VERY_HIGH_PRECISION)
 				y = x * (_x2 * (_x2 * (_x2 * (_x2 * (_x2 * (_x2 * (ATAN_H15 * _x2 + ATAN_H13) + ATAN_H11) + ATAN_H9) + ATAN_H7) + ATAN_H5) + ATAN_H3) + ATAN_H1);
 		} else {
-			float _x2minus = 1.0 / POW2(x, EXACT);
+			double _x2minus = 1.0 / POW2(x, EXACT);
 			if (p == LOW_PRECISION)
 				y = ATAN_I0 * SGN(x, DEF) + (_x2minus * (ATAN_I5 * _x2minus + ATAN_I3) + ATAN_I1) / x;
 			else if (p == HIGH_PRECISION)
@@ -359,72 +364,72 @@ float ATAN(const float x, const enum FastMethod fm, const enum Precision p)
 }
 
 //Approximation of sinh(x)
-float SINH(const float x, const enum FastMethod fm)
+double SINH(const double x, const enum FastMethod fm)
 {
-	if (x == 0.0f)
+	if (x == 0.0)
 		return x;
 
 	if (FM_DEBUG)
 		assert (fm == STL || fm == FAST || fm == FASTER);
 
-	float y = 0.0f;
+	double y = 0.0;
 
 	if (fm == STL)
 		//Defined in <math.h>
-		y = sinhf(x);
+		y = sinh(x);
 	else if (fm == FAST)
 		//Defined in "fastapprox.h"
-		y = fastsinh(x);
+		y = static_cast<double>(fastsinh(static_cast<float>(x)));
 	else if (fm == FASTER)
 		//Defined in "fastapprox.h"
-		y = fastersinh(x);
+		y = static_cast<double>(fastersinh(static_cast<float>(x)));
 
 	return y;
 }
 
 //Approximation of cosh(x)
-float COSH(const float x, const enum FastMethod fm)
+double COSH(const double x, const enum FastMethod fm)
 {
-	if (x == 0.0f)
-		return 1.0f;
+	if (x == 0.0)
+		return 1.0;
 
 	if (FM_DEBUG)
 		assert (fm == STL || fm == FAST || fm == FASTER);
 
-	float y = 0.0f;
+	double y = 0.0;
 
 	if (fm == STL)
 		//Defined in <math.h>
-		y = coshf(x);
+		y = cosh(x);
 	else if (fm == FAST)
 		//Defined in "fastapprox.h"
-		y = fastcosh(x);
+		y = static_cast<double>(fastcosh(static_cast<float>(x)));
 	else if (fm == FASTER)
 		//Defined in "fastapprox.h"
-		y = fastercosh(x);
+		y = static_cast<double>(fastercosh(static_cast<float>(x)));
 
 	return y;
 }
 
 //Approximation of arcsinh(x)
-float ASINH(const float x, const enum FastMethod fm, const enum Precision p)
+double ASINH(const double x, const enum FastMethod fm, const enum Precision p)
 {
-	if (x == 0.0f)
+	if (x == 0.0)
 		return x;
 
 	if (FM_DEBUG)
 		assert (fm == STL || fm == INTEGRATION);
 
-	float y = 0.0f;
+	double y = 0.0;
 
 	if (fm == STL)
 		//Defined in <math.h>
-		y = asinhf(x);
+		y = asinh(x);
 	else if (fm == INTEGRATION) {
 		//Series from Integration (for |x| < 1)
 		if (FM_DEBUG)
-			assert (ABS(x, STL) < 1.0f);
-		float _x2 = POW2(x, EXACT);
+			assert (ABS(x, STL) < 1.0);
+		double _x2 = POW2(x, EXACT);
 		if (p == LOW_PRECISION)
 			y = x * (_x2 * (ASINH_I5 * _x2 + ASINH_I3) + ASINH_I1);
 		else if (p == HIGH_PRECISION)
@@ -437,25 +442,25 @@ float ASINH(const float x, const enum FastMethod fm, const enum Precision p)
 }
 
 //Approximation of arccosh(x)
-float ACOSH(const float x, const enum FastMethod fm, const enum Precision p)
+double ACOSH(const double x, const enum FastMethod fm, const enum Precision p)
 {
-	if (x == 1.0f)
-		return 0.0f;
+	if (x == 1.0)
+		return 0.0;
 
 	if (FM_DEBUG)
 		assert (fm == STL || fm == INTEGRATION);
 
-	float y = 0.0f;
+	double y = 0.0;
 
 	if (fm == STL)
 		//Defined in <math.h>
-		y = acoshf(x);
+		y = acosh(x);
 	else if (fm == INTEGRATION) {
 		//Series from Integration (for x > 1)
 		if (FM_DEBUG)
-			assert (ABS(x, STL) > 1.0f);
-		float _x2minus = 1.0f / POW2(x, EXACT);
-		y += LOG(2.0f * x, STL);
+			assert (ABS(x, STL) > 1.0);
+		double _x2minus = 1.0 / POW2(x, EXACT);
+		y += LOG(2.0 * x, STL);
 		if (p == LOW_PRECISION)
 			y += _x2minus * (_x2minus * (ACOSH_I6 * _x2minus + ACOSH_I4) + ACOSH_I2);
 		else if (p == HIGH_PRECISION)
@@ -468,27 +473,27 @@ float ACOSH(const float x, const enum FastMethod fm, const enum Precision p)
 }
 
 //Approximation of the Gamma Function
-float GAMMA(const float x, const enum FastMethod fm)
+double GAMMA(const double x, const enum FastMethod fm)
 {
-	if (x == 1.0f || x == 2.0f)
-		return 1.0f;
+	if (x == 1.0 || x == 2.0)
+		return 1.0;
 
 	if (FM_DEBUG) {
 		assert (fm == STL || fm == BOOST);
 		//Gamma(0) is undefined
-		assert (x != 0.0f);
-		assert (!(x > 0.0f && ABS(floor(x) - x, STL) < FM_TOL));
-		assert (!(x < 0.0f && ABS(ceil(x) - x, STL) < FM_TOL));
+		assert (x != 0.0);
+		assert (!(x > 0.0 && ABS(floor(x) - x, STL) < FM_TOL));
+		assert (!(x < 0.0 && ABS(ceil(x) - x, STL) < FM_TOL));
 		//Gamma not defined for negative integers
-		assert (!(x < 0.0f && ABS(x - round(x), STL) < FM_TOL));
+		assert (!(x < 0.0 && ABS(x - round(x), STL) < FM_TOL));
 	}
 
-	float y = 0.0f;
+	double y = 0.0;
 
-	if (x > 10.0f) {
+	if (x > 10.0) {
 		//Use Stirling's Approximation
-		y = 1.0f + 1.0f / (12.0f * x) + 1.0f / (288.0f * POW2(x, EXACT));
-		y *= SQRT(2.0f * M_PI * x, STL) * POW(x / M_E, x, STL);
+		y = 1.0 + 1.0 / (12.0 * x) + 1.0 / (288.0 * POW2(x, EXACT));
+		y *= SQRT(2.0 * M_PI * x, STL) * POW(x / M_E, x, STL);
 	} else if (fm == STL)
 		//Defined in <math.h>
 		y = tgamma(x);
@@ -501,28 +506,28 @@ float GAMMA(const float x, const enum FastMethod fm)
 }
 
 //Approximation of ln(gamma(x))
-float LOGGAMMA(const float x, const enum FastMethod fm)
+double LOGGAMMA(const double x, const enum FastMethod fm)
 {
-	if (x == 1.0f || x == 2.0f)
-		return 0.0f;
+	if (x == 1.0 || x == 2.0)
+		return 0.0;
 
 	if (FM_DEBUG) {
 		assert (fm == STL || fm == BOOST);
 		//Gamma(0) is undefined
-		assert (x != 0.0f);
-		assert (!(x > 0.0f && ABS(floor(x) - x, STL) < FM_TOL));
-		assert (!(x < 0.0f && ABS(ceil(x) - x, STL) < FM_TOL));
+		assert (x != 0.0);
+		assert (!(x > 0.0 && ABS(floor(x) - x, STL) < FM_TOL));
+		assert (!(x < 0.0 && ABS(ceil(x) - x, STL) < FM_TOL));
 		//Gamma not defined for negative integers
-		assert (!(x < 0.0f && ABS(x - round(x), STL) < FM_TOL));
+		assert (!(x < 0.0 && ABS(x - round(x), STL) < FM_TOL));
 		//Log not defined for negative numbers
-		assert (!(x < 0.0f && static_cast<int>(-1 * floor(x)) % 2 == 1));
+		assert (!(x < 0.0 && static_cast<int>(-1 * floor(x)) % 2 == 1));
 	}
 
-	float y = 0.0f;
+	double y = 0.0;
 
-	if (x > 10.0f) {
+	if (x > 10.0) {
 		//Use Stirling's Approximation
-		y = x * LOG(x, STL) - x + 0.5f * LOG(2.0f * M_PI * x, STL);
+		y = x * LOG(x, STL) - x + 0.5 * LOG(2.0 * M_PI * x, STL);
 	} else if (fm == STL)
 		//Defined in <math.h>
 		y = LOG(tgamma(x), STL);
@@ -536,17 +541,17 @@ float LOGGAMMA(const float x, const enum FastMethod fm)
 
 //Approximation of the Pochhammer symbol (x)_j = gamma(x+j)/gamma(x)
 //The coefficient j must be a non-negative integer by definition
-float POCHHAMMER(const float x, const int j)
+double POCHHAMMER(const double x, const int j)
 {
 	if (j == 0)
-		return 1.0f;
+		return 1.0;
 
 	if (FM_DEBUG)
 		assert (j >= 0);
 
-	float y = 0.0f;
+	double y = 0.0;
 
-	if (x > 10.0f || j > 10)
+	if (x > 10.0 || j > 10)
 		y = exp(LOGGAMMA(x + j, STL) - LOGGAMMA(x, STL));
 	else
 		y = GAMMA(x + j, STL) / GAMMA(x, STL);
@@ -559,7 +564,7 @@ float POCHHAMMER(const float x, const int j)
 //The solution is stored in the memory location at 'sol'
 //The actual error is stored in the memory location at 'err'
 //The number of terms used in the power series is given by 'nterms'
-void _2F1(float (*z)(const float &x, void * const param), const float &x, void * const param, const float a, const float b, const float c, float * const sol, float * const err, int * const nterms)
+void _2F1(double (*z)(const double &x, void * const param), const double &x, void * const param, const double a, const double b, const double c, double * const sol, double * const err, int * const nterms)
 {
 	if (FM_DEBUG) {
 		//No null pointers
@@ -569,7 +574,7 @@ void _2F1(float (*z)(const float &x, void * const param), const float &x, void *
 	}
 	
 	//Series will not converge in this region
-	if (ABS((*z)(x, param), STL) >= 1.0f) {
+	if (ABS((*z)(x, param), STL) >= 1.0) {
 		*sol = NAN;
 		*err = NAN;
 	}
@@ -579,14 +584,14 @@ void _2F1(float (*z)(const float &x, void * const param), const float &x, void *
 	}
 
 	int i;
-	*sol = 0.0f;
+	*sol = 0.0;
 	for (i = 0; i < *nterms; i++) {
 		if (i < 15)
-			*sol += POCHHAMMER(a, i) * POCHHAMMER(b, i) * POW((*z)(x, param), static_cast<float>(i), STL) / (POCHHAMMER(c, i) * GAMMA(i + 1, STL));
+			*sol += POCHHAMMER(a, i) * POCHHAMMER(b, i) * POW((*z)(x, param), static_cast<double>(i), STL) / (POCHHAMMER(c, i) * GAMMA(static_cast<double>(i + 1), STL));
 		else
-			*sol += POW((*z)(x, param), static_cast<float>(i), STL) * exp(LOGGAMMA(a + i, STL) - LOGGAMMA(a, STL) + LOGGAMMA(b + i, STL) - LOGGAMMA(b, STL) - LOGGAMMA(c + i, STL) + LOGGAMMA(c, STL) - LOGGAMMA(i + 1, STL));
+			*sol += POW((*z)(x, param), static_cast<double>(i), STL) * exp(LOGGAMMA(a + i, STL) - LOGGAMMA(a, STL) + LOGGAMMA(b + i, STL) - LOGGAMMA(b, STL) - LOGGAMMA(c + i, STL) + LOGGAMMA(c, STL) - LOGGAMMA(i + 1, STL));
 	}
 
 	//Estimate the magnitude of the error
-	*err = ABS(POW((*z)(x, param), static_cast<float>(*nterms), FAST), STL);
+	*err = ABS(POW((*z)(x, param), static_cast<double>(*nterms), FAST), STL);
 }

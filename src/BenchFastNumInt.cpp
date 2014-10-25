@@ -6,7 +6,7 @@ int main(int argc, char **argv)
 	double *results;
 	double *error;
 
-	long seed = -18100;
+	long seed = -18100L;
 	double tmax = 0.8458;
 	int nnum = 10000;
 	int i;
@@ -86,7 +86,7 @@ int main(int argc, char **argv)
 
 double tToEtaUniverse(double t, void *params)
 {
-	return static_cast<double>(POW(SINH(1.5 * static_cast<float>(t), STL), (-2.0f / 3.0f), STL));
+	return POW(SINH(1.5 * t, STL), (-2.0 / 3.0), STL);
 }
 
 double measureFastInt(double * const data, double * const results, double * const error, const int &nnum, struct IntData &idata, const enum FastIntMethod fim, const int variation, const char *funcname, const char *filename)
