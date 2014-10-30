@@ -14,7 +14,7 @@ LOCAL_DIR := ~
 endif
 
 CXX	:= /usr/bin/g++
-INCD	:= -I $(INCDIR) -I $(LOCAL_DIR)/inc
+INCD	:= -I $(INCDIR) -I $(LOCAL_DIR)/include
 LIBS	:= -L $(LD_LIBRARY_PATH) -L $(LOCAL_DIR)/lib64 -lm -lnint -lgsl -lgslcblas
 
 FLAGS	:= -O3 -g
