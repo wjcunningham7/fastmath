@@ -5,9 +5,17 @@ OBJDIR	:= ./obj
 LIBDIR	:= ./lib
 DATDIR	:= ./dat
 
+ifneq (, $(findstring compute, $(HOSTNAME)))
+LOCAL_DIR := /home/cunningham.wi/local
+else ifneq (, $(findstring tiberius, $(HOSTNAME)))
+LOCAL_DIR := /usr/local
+else
+LOCAL_DIR := ~
+endif
+
 CXX	:= /usr/bin/g++
-INCD	:= -I $(INCDIR) -I /home/cunningham.wi/local/inc
-LIBS	:= -L $(LD_LIBRARY_PATH) -L /home/cunningham.wi/local/lib64 -lm -lnint -lgsl -lgslcblas
+INCD	:= -I $(INCDIR) -I $(LOCAL_DIR)/inc
+LIBS	:= -L $(LD_LIBRARY_PATH) -L $(LOCAL_DIR)/lib64 -lm -lnint -lgsl -lgslcblas
 
 FLAGS	:= -O3 -g
 
