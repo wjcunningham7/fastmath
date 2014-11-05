@@ -1,0 +1,23 @@
+#!/bin/bash
+
+host1=compute
+host2=tiberius
+
+LOCAL_DIR=""
+
+if [[ "$HOSTNAME" =~ "$host1" ]]; then
+	LOCAL_DIR="/home/$USER/local"
+else
+	if [[ "$HOSTNAME" =~ "$host2" ]]; then
+		LOCAL_DIR="/usr/local"
+	else
+		echo "Hostname not recognized!"
+		exit 1
+	fi
+fi
+
+FASTDIR=$LOCAL_DIR/include/fastmath
+
+mkdir -p $FASTDIR
+cp inc/ran2.h $FASTDIR/
+cp inc/stopwatch.h $FASTDIR/

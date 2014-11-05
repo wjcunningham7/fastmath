@@ -1,4 +1,4 @@
-#include "ran2.h"
+#include <fastmath/ran2.h>
 
 #define IM1 2147483563
 #define IM2 2147483399

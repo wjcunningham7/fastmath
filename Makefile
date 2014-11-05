@@ -5,12 +5,15 @@ OBJDIR	:= ./obj
 LIBDIR	:= ./lib
 DATDIR	:= ./dat
 
-ifneq (, $(findstring compute, $(HOSTNAME)))
-LOCAL_DIR := /home/cunningham.wi/local
-else ifneq (, $(findstring tiberius, $(HOSTNAME)))
+host1	:= compute
+host2	:= tiberius
+
+ifneq (, $(findstring $(host1), $(HOSTNAME)))
+LOCAL_DIR := /home/$(USER)/local
+else ifneq (, $(findstring $(host2), $(HOSTNAME)))
 LOCAL_DIR := /usr/local
 else
-LOCAL_DIR := ~
+$(error Hostname not recognized!)
 endif
 
 CXX	:= /usr/bin/g++
@@ -49,6 +52,17 @@ bin2 : $(OBJS2)
 
 bin3 : $(OBJS3)
 	$(CXX) -o $(BIN3) $(OBJS3) $(INCD) $(LIBS)
+
+install :
+	mkdir -p $(LOCAL_DIR)/lib64
+	mkdir -p $(LOCAL_DIR)/include/fastmath
+	mkdir -p $(LOCAL_DIR)/src/fastmath
+	cp $(LIB) $(LOCAL_DIR)/lib64/
+	cp $(INCDIR)/fastapprox.h $(LOCAL_DIR)/include/fastmath/
+	cp $(INCDIR)/FastMath.h $(LOCAL_DIR)/include/fastmath/
+	cp $(INCDIR)/FastNumInt.h $(LOCAL_DIR)/include/fastmath/
+	cp $(SRCDIR)/ran2.cpp $(LOCAL_DIR)/src/fastmath/
+	cp $(SRCDIR)/stopwatch.cpp $(LOCAL_DIR)/src/fastmath/
 
 clean:
 	rm -f $(BINDIR)/* $(OBJDIR)/*.o $(LIBDIR)/*.a ./*.log

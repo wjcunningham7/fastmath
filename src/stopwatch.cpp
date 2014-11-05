@@ -1,4 +1,4 @@
-#include "stopwatch.h"
+#include <fastmath/stopwatch.h>
 
 void stopwatchStart(struct Stopwatch *sw)
 {
