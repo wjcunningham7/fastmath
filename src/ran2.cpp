@@ -59,6 +59,14 @@ double ran2(long *idum)	//Initialize with negative number
 		return temp;
 }
 
+//Thread-safe ran2
+double ran2ts(long *idum, int tid)
+{
+	long seedts = static_cast<long>(tid * 10000 * ran2(idum));
+	*idum = seedts;
+	return ran2(&seedts);
+}
+
 #undef IM1
 #undef IM2
 #undef AM

@@ -13,7 +13,7 @@ void stopwatchStop(struct Stopwatch *sw)
 	gettimeofday(&sw->stopTime, NULL);
 	long ds = sw->stopTime.tv_sec - sw->startTime.tv_sec;
 	long dus = sw->stopTime.tv_usec - sw->startTime.tv_usec;
-	sw->elapsedTime = ds + 0.000001 * dus;
+	sw->elapsedTime += ds + 0.000001 * dus;
 }
 
 void stopwatchReset(struct Stopwatch *sw)

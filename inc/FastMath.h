@@ -20,6 +20,7 @@
 //Useful Constants
 #define HALF_PI  1.57079632679489661923
 #define TWO_PI   6.28318530717958647692
+#define SQRT_PI  1.77245385090551602729
 
 //ACOS Chebyshev Series Coefficients
 #define ACOS_C0  HALF_PI
@@ -140,6 +141,6 @@ double LOGGAMMA(const double x, const enum FastMethod fm);
 double POCHHAMMER(const double x, const int j);
 
 //Gauss Hypergeometric Function
-void _2F1(double (*z)(const double &x, void * const param), const double &x, void * const param, const double a, const double b, const double c, double * const sol, double * const err, int * const nterms);
+void _2F1(const double a, const double b, const double c, const double z, double * const sol, double * const err, int * const nterms, const bool check);
 
 #endif

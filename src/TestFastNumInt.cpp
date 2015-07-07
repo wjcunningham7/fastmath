@@ -26,10 +26,12 @@ double xi(double r)
 	if (r < 1.0) {
 		//Since 1/f(x) = f(1/x) we can use _r
 		double _r = 1.0 / r;
-		_2F1(&_2F1_r, _r, NULL, 1.0 / 6.0, 0.5, 7.0 / 6.0, &f, &err, &nterms);
+		double z = _2F1_r(_r, NULL);
+		_2F1(1.0 / 6.0, 0.5, 7.0 / 6.0, z, &f, &err, &nterms, false);
 		_xi = 2.0 * SQRT(r, STL) * f;
 	} else {
-		_2F1(&_2F1_r, r, NULL, 1.0 / 3.0, 0.5, 4.0 / 3.0, &f, &err, &nterms);
+		double z = _2F1_r(r, NULL);
+		_2F1(1.0 / 3.0, 0.5, 4.0 / 3.0, z, &f, &err, &nterms, false);
 		_xi = SQRT(4.0 / M_PI, STL) * GAMMA(7.0 / 6.0, STL) * GAMMA(1.0 / 3.0, STL) - f / r;
 	}
 
