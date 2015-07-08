@@ -635,7 +635,7 @@ double GAMMA(const double x, const enum FastMethod fm)
 			y = SQRT(TWO_PI, STL) * exp(-1.0 * x) * POW(x, x - 0.5, STL);
 		else
 			//Use Reflection Formula, then Stirling's Approximation in the Gergo Nemes form
-			y = SQRT(HALF_PI, STL) * exp(x) * POW(1.0 - x, 0.5 - x, STL) / SIN(M_PI * x, STL);
+			y = SQRT(HALF_PI, STL) * exp(1.0 - x) * POW(1.0 - x, x - 0.5, STL) / SIN(M_PI * x, STL);
 	}
 
 	return y;
@@ -844,8 +844,11 @@ void _2F1(const double a, const double b, const double c, const double z, double
 			*nterms = static_cast<int>(LOG(*err, FAST) / LOG(ABS(z, STL), FAST)) + 1;
 
 		*sol = 0.0;
-		for (int i = 0; i < *nterms; i++)
+		for (int i = 0; i < *nterms; i++) {
+			//double An = _2F1_An(a, b, c, i);
+			//printf("\nAn(a = %f, b = %f, c = %f, i = %d) =  %f\n", a, b, c, i, An);
 			*sol += _2F1_An(a, b, c, i) * POW(z, static_cast<double>(i), STL);
+		}
 		*err = ABS(POW(z, static_cast<double>(*nterms), STL), STL);
 	}
 

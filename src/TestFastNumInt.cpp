@@ -87,7 +87,7 @@ int main(int argc, char **argv)
 
 	//2D Numerical Integration Test
 	
-	double tau0 = 0.8458;
+	/*double tau0 = 0.8458;
 	double r0 = POW(SINH(1.5 * tau0, STL), 2.0 / 3.0, STL);
 	long seed = 18100L;
 
@@ -98,5 +98,21 @@ int main(int argc, char **argv)
 	k *= 8.0 * M_PI / (SINH(3.0 * tau0, STL) - 3.0 * tau0);
 	printf("k: %f\n", k);
 	printf("\n");
-	printf("COMPLETED\n\n");
+	printf("COMPLETED\n\n");*/
+
+	//Hypergeometric Test
+	printf("gamma(+10.5) = %f\n", GAMMA(10.5, STL));
+	printf("gamma(+11.5) = %f\n", GAMMA(11.5, STL));
+	printf("gamma(-10.5) = %f\n", GAMMA(-10.5, STL));
+	printf("gamma(-11.5) = %f\n", GAMMA(-11.5, STL));
+
+	double x1 = 1.105654;
+	double lambda = 0.05;
+	double z = -1.0 * lambda * POW2(POW2(x1, EXACT), EXACT);
+	double w = z / (z - 1.0);
+
+	double f;
+	double f_err = 0.0;
+	int f_nt = 5;
+	_2F1(0.5, 1.0, -11.5, w, &f, &f_err, &f_nt, false);
 }
