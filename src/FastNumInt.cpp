@@ -30,7 +30,7 @@ double integrate1D(double (*f)(double x, void *params), void *params, struct Int
 
 	if (code != 0) {
 		fprintf(stderr, "GSL Error: %s\n", gsl_strerror(code));
-		result = 0.0;
+		result = NAN;
 	}
 
 	return result;
@@ -38,7 +38,7 @@ double integrate1D(double (*f)(double x, void *params), void *params, struct Int
 
 //NINTLIB C++ Library
 //Multi-Dimensional Quadrature
-double integrate2D(double (*f)(int dim, double x[], double *params), double lx, double ly, double ux, double uy, double *params, long &seed, int m)
+double integrate2D(double (*f)(int dim, double x[], double *params), double lx, double ly, double ux, double uy, double *params, int &seed, int m)
 {
 	if (FNI_DEBUG) {
 		assert (f != NULL);
@@ -65,8 +65,7 @@ double integrate2D(double (*f)(int dim, double x[], double *params), double lx, 
 		upper[1] = uy;
 
 		neval = i4_power(8, test) * 20000;
-		int _seed = (int)seed;
-		result = monte_carlo_nd(*f, dim, lower, upper, params, neval, &_seed);
+		result = monte_carlo_nd(*f, dim, lower, upper, params, neval, &seed);
 
 		free(lower);
 		lower = NULL;
@@ -76,4 +75,9 @@ double integrate2D(double (*f)(int dim, double x[], double *params), double lx, 
 	}
 
 	return result;
+}
+
+void disableGSLErrHandler()
+{
+	gsl_set_error_handler_off();
 }

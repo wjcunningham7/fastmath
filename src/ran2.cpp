@@ -1,4 +1,4 @@
-#include <fastmath/ran2.h>
+#include "ran2.h"
 
 #define IM1 2147483563
 #define IM2 2147483399
@@ -62,8 +62,11 @@ double ran2(long *idum)	//Initialize with negative number
 //Thread-safe ran2
 double ran2ts(long *idum, int tid)
 {
-	long seedts = static_cast<long>(tid * 10000 * ran2(idum));
-	*idum = seedts;
+	//long seedts = static_cast<long>(tid * 10000 * ran2(idum));
+	//*idum = seedts;
+	//return ran2(&seedts);
+	
+	long seedts = abs(((*idum*181)*((tid-83)*359))%104729);
 	return ran2(&seedts);
 }
 

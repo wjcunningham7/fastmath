@@ -47,6 +47,8 @@ struct IntData {
 
 double integrate1D(double (*f)(double x, void *params), void *params, struct IntData *idata, enum FastIntMethod fim);
 
-double integrate2D(double (*f)(int dim, double x[], double *params), double lx, double ly, double ux, double uy, double *params, long &seed, int m);
+double integrate2D(double (*f)(int dim, double x[], double *params), double lx, double ly, double ux, double uy, double *params, int &seed, int m);
+
+void disableGSLErrHandler();
 
 #endif

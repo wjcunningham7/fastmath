@@ -107,6 +107,14 @@ enum Precision {
 	VERY_HIGH_PRECISION = 2
 };
 
+//Type of transformation used for 2F1
+struct HyperType {
+	HyperType() : w(0.0), type(0) {}
+
+	double w;
+	int type;
+};
+
 //Power Functions
 double POW2(const double x, const enum FastMethod fm);
 double POW3(const double x, const enum FastMethod fm);
@@ -138,9 +146,18 @@ double ACOSH(const double x, const enum FastMethod fm, const enum Precision p);
 //Statistical Functions
 double GAMMA(const double x, const enum FastMethod fm);
 double LOGGAMMA(const double x, const enum FastMethod fm);
+double GAMMA_RATIO(const double x, const double y);
 double POCHHAMMER(const double x, const int j);
+double POCHHAMMER_F(const double x, const int j);
 
 //Gauss Hypergeometric Function
+double _2F1_An(const double a, const double b, const double c, const int n);
+double _2F1_An_F(const double a, const double b, const double c, const int n);
 void _2F1(const double a, const double b, const double c, const double z, double * const sol, double * const err, int * const nterms, const bool check);
+void _2F1_F(const double a, const double b, const double c, const double z, double * const sol, double * const err, int * const nterms);
+int getNumTerms(const double &z, const double &err);
+
+//Hypergeometric Transformation Type
+HyperType getHyperType(const double &z);
 
 #endif

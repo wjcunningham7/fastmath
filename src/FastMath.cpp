@@ -113,7 +113,7 @@ double SQRT(const double x, const enum FastMethod fm)
 {
 	#if FM_DEBUG
 	assert (fm == STL || fm == BITWISE);
-	assert (x > 0.0);
+	assert (x >= 0.0);
 	#endif
 
 	double y;
@@ -612,7 +612,7 @@ double GAMMA(const double x, const enum FastMethod fm)
 	//Gamma(0) is undefined
 	assert (x != 0.0);
 	//Gamma not defined for negative integers
-	assert (!(x < 0.0 && ABS(x - round(x), STL) < FM_TOL));
+	assert (!(x < 0.0 && round(x) == x));
 	#endif
 
 	double y = 0.0;
@@ -623,7 +623,7 @@ double GAMMA(const double x, const enum FastMethod fm)
 			break;
 		case BOOST:
 			//Lanczos Approximation
-			y = boost::math::tgamma1pm1(x);
+			y = boost::math::tgamma(x);
 			break;
 		default:
 			y = NAN;
@@ -649,7 +649,7 @@ double LOGGAMMA(const double x, const enum FastMethod fm)
 	//Gamma(0) is undefined
 	assert (x != 0.0);
 	//Gamma not defined for negative integers
-	assert (!(x < 0.0 && ABS(x - round(x), STL) < FM_TOL));
+	assert (!(x < 0.0 && round(x) == x));
 	//Log not defined for negative numbers
 	assert (!(x < 0.0 && static_cast<int>(-1 * floor(x)) % 2 == 1));
 	#endif
@@ -659,11 +659,12 @@ double LOGGAMMA(const double x, const enum FastMethod fm)
 		if (x <= 10.0) {
 			switch (fm) {
 			case STL:
-				y = LOG(tgamma(x), STL);
+				//y = LOG(tgamma(x), STL);
+				y = lgamma(x);
 				break;
 			case BOOST:
 				//Lanczos Approximation
-				y = LOG(boost::math::tgamma1pm1(x), STL);
+				y = boost::math::lgamma(x);
 				break;
 			default:
 				y = NAN;
@@ -685,8 +686,8 @@ double GAMMA_RATIO(const double x, const double y)
 	#if FM_DEBUG
 	assert (x != 0.0);
 	assert (y != 0.0);
-	assert (!(x < 0.0 && ABS(x - round(x), STL) < FM_TOL));
-	assert (!(y < 0.0 && ABS(y - round(y), STL) < FM_TOL));
+	assert (!(x < 0.0 && round(x) == x));
+	assert (!(y < 0.0 && round(y) == y));
 	#endif
 
 	double z;
@@ -719,6 +720,24 @@ double GAMMA_RATIO(const double x, const double y)
 
 //Approximation of the Pochhammer symbol (x)_j = gamma(x+j)/gamma(x)
 //The coefficient j must be a non-negative integer by definition
+
+//This is the fast version, assumes both arguments are non-negative
+double POCHHAMMER_F(const double x, const int j)
+{
+	#if FM_DEBUG
+	assert (x > 0.0);
+	assert (j >= 0);
+	#endif
+
+	double y;
+	if (x + j <= 10)
+		y = tgamma(x + j) / tgamma(x);
+	else
+		y = exp(lgamma(x + j) - lgamma(x));
+
+	return y;
+}
+
 double POCHHAMMER(const double x, const int j)
 {
 	#if FM_DEBUG
@@ -728,15 +747,45 @@ double POCHHAMMER(const double x, const int j)
 	double y;
 	if (__builtin_expect(!j, 0L))
 		y = 1.0;
-	else
-		y = GAMMA_RATIO(x + j, x);
+	else {
+		if (!(x <= 0.0 && round(x) == x))
+			y = GAMMA_RATIO(x + j, x);
+		else {
+			if (1.0 - x - j > 0.0)
+				y = POW(-1.0, static_cast<double>(j),STL) * GAMMA_RATIO(1.0 - x, 1.0 - x - j);
+			else
+				y = 0.0;
+		}
+	}
 
 	return y;
 }
 
 //Coefficient for the 2F1 function:
 //	A_n = (a)_n * (b)_n / ((c)_n * n!)
-//This uses logarithms when necessary
+
+//This version is the 'fast' version
+//It assumes a, b, c, and n are positive
+double _2F1_An_F(const double a, const double b, const double c, const int n)
+{
+	#if FM_DEBUG
+	assert (a > 0.0);
+	assert (b > 0.0);
+	assert (c > 0.0);
+	assert (n >= 0);
+	#endif
+
+	double A_n;
+
+	if (a + n <= 10.0 && b + n <= 10.0 && c + n <= 10.0 && n <= 9.0)
+		A_n = POCHHAMMER_F(a, n) * POCHHAMMER_F(b, n) / (POCHHAMMER_F(c, n) * tgamma(n + 1));
+	else
+		A_n = exp(lgamma(a + n) + lgamma(b + n) + lgamma(c) - lgamma(a) - lgamma(b) - lgamma(c + n) - lgamma(n + 1.0));
+
+	return A_n;
+}
+
+//This version permits negative values but takes longer to evaluate
 double _2F1_An(const double a, const double b, const double c, const int n)
 {
 	#if FM_DEBUG
@@ -751,53 +800,71 @@ double _2F1_An(const double a, const double b, const double c, const int n)
 	if (ABS(a + n, STL) <= 10.0 && ABS(b + n, STL) <= 10.0 && ABS(c + n, STL) <= 10.0 && ABS(a, STL) <= 10.0 && ABS(b, STL) <= 10.0 && ABS(c, STL) <= 10.0 && n <= 9)
 		A_n = POCHHAMMER(a, n) * POCHHAMMER(b, n) / (POCHHAMMER(c, n) * GAMMA(n + 1, STL));
 	else {
-		if (a + n > 0.0)
+		if (a + n > 0.0) {
+			if (a <= 0.0)
+				return 0.0;
 			t_an = LOGGAMMA(a + n, STL);
-		else {
+		} else if (a + n != round(a + n)) {
 			s_an = SIN(M_PI * (a + n), STL);
 			t_an = LOG(GAMMA(a + n, STL) * s_an, STL);
 			m /= s_an;
+		} else {
+			t_an = LOGGAMMA(1.0 - a, STL);
+			m *= POW(-1.0, static_cast<double>(n), STL);
 		}
 
-		if (b + n > 0.0)
+		if (b + n > 0.0) {
+			if (b <= 0.0)
+				return 0.0;
 			t_bn = LOGGAMMA(b + n, STL);
-		else {
+		} else if (b + n != round(b + n)) {
 			s_bn = SIN(M_PI * (b + n), STL);
 			t_bn = LOG(GAMMA(b + n, STL) * s_bn, STL);
 			m /= s_bn;
+		} else {
+			t_bn = LOGGAMMA(1.0 - b, STL);
+			m *= POW(-1.0, static_cast<double>(n), STL);
 		}
 
-		if (c + n > 0.0)
+		if (c + n > 0.0) {
+			if (c <= 0.0)
+				return 0.0;
 			t_cn = LOGGAMMA(c + n, STL);
-		else {
+		} else if (c + n != round(c + n)) {
 			s_cn = SIN(M_PI * (c + n), STL);
 			t_cn = LOG(GAMMA(c + n, STL) * s_cn, STL);
 			m *= s_cn;
+		} else {
+			t_cn = LOGGAMMA(1.0 - c, STL);
+			m *= POW(-1.0, static_cast<double>(n), STL);
 		}
 
 		if (a > 0.0)
 			ta = LOGGAMMA(a, STL);
-		else {
+		else if (a != round(a)) {
 			sa = SIN(M_PI * a, STL);
 			ta = LOG(GAMMA(a, STL) * sa, STL);
 			m *= sa;
-		}
+		} else
+			ta = LOGGAMMA(1.0 - a - n, STL);
 
 		if (b > 0.0)
 			tb = LOGGAMMA(b, STL);
-		else {
+		else if (b != round(b)) {
 			sb = SIN(M_PI * b, STL);
 			tb = LOG(GAMMA(b, STL) * sb, STL);
 			m *= sb;
-		}
+		} else
+			tb = LOGGAMMA(1.0 - b - n, STL);
 
 		if (c > 0.0)
 			tc = LOGGAMMA(c, STL);
-		else {
+		else if (c != round(c)) {
 			sc = SIN(M_PI * c, STL);
 			tc = LOG(GAMMA(c, STL) * sc, STL);
 			m /= sc;
-		}
+		} else
+			tc = LOGGAMMA(1.0 - c - n, STL);
 
 		tn = LOGGAMMA(n + 1.0, STL);
 		A_n = exp(t_an + t_bn + tc - ta - tb - t_cn - tn) * m;
@@ -826,7 +893,7 @@ void _2F1(const double a, const double b, const double c, const double z, double
 			*sol = 1.0;
 			*err = 0.0;
 			*nterms = 0;
-		} else if (ABS(c - static_cast<int>(c), STL) == 0.0 && c <= 0.0) {
+		} else if (c <= 0.0 && round(c) == c) {
 			//Solution will be complex infinity
 			*sol = NAN;
 		} else if (ABS(z, STL) >= 1.0) {
@@ -845,11 +912,86 @@ void _2F1(const double a, const double b, const double c, const double z, double
 
 		*sol = 0.0;
 		for (int i = 0; i < *nterms; i++) {
-			//double An = _2F1_An(a, b, c, i);
+			double An = _2F1_An(a, b, c, i);
 			//printf("\nAn(a = %f, b = %f, c = %f, i = %d) =  %f\n", a, b, c, i, An);
-			*sol += _2F1_An(a, b, c, i) * POW(z, static_cast<double>(i), STL);
+			if (!!An)
+				*sol += An * POW(z, static_cast<double>(i), STL);
+			else {
+				*nterms = i;
+				break;
+			}
 		}
 		*err = ABS(POW(z, static_cast<double>(*nterms), STL), STL);
 	}
 
+}
+
+//Faster algorithm
+//Uses a recursion relation for Hypergeometric coefficients
+void _2F1_F(const double a, const double b, const double c, const double z, double * const sol, double * const err, int * const nterms)
+{
+	#if FM_DEBUG
+	assert (sol != NULL);
+	assert (err != NULL);
+	assert (nterms != NULL);
+	//assert (a > 0.0);
+	//assert (b > 0.0);
+	//assert (c > 0.0);
+	assert (*nterms >= 0);
+	#endif
+
+	if (a == 0.0 || b == 0.0 || c == 0.0) {
+		*sol = 1.0;
+		*err = 0.0;
+		*nterms = 0;
+		return;
+	}
+
+	double Ai = 1.0;
+	double zi = 1.0;
+	for (int i = 0; i < *nterms; i++) {
+		*sol += Ai * zi;
+
+		//Update variables
+		//printf("Ai: %.8e\tzi: %.8e\n", Ai, zi);
+		Ai *= (a + i) * (b + i) / ((c + i) * (i + 1.0));
+		zi *= z;
+	}
+	*err = fabs(pow(z, *nterms));
+}
+
+int getNumTerms(const double &z, const double &err)
+{
+	#if FM_DEBUG
+	assert (err > 0.0);
+	#endif
+
+	return static_cast<int>(log(err) / log(fabs(z))) + 1;
+}
+
+HyperType getHyperType(const double &z)
+{
+	HyperType ht = HyperType();
+
+	if (z >= 0.0 && z <= 0.5) {
+		ht.w = z;
+		ht.type = 0;
+	} else if (z > 0.5 && z <= 1.00000000000001) {
+		if (z >= 1.0 || 1.0 - z < 1.0E-14)
+			ht.w = 0.0;
+		else
+			ht.w = 1.0 - z;
+		ht.type = 1;
+	} else if (z >= -1.0 && z < 0.0) {
+		ht.w = z / (z - 1.0);
+		ht.type = 2;
+	} else if (z < -1.0) {
+		ht.w = 1.0 / (1.0 - z);
+		ht.type = 3;
+	} else {
+		ht.w = NAN;
+		ht.type = -1;
+	}
+
+	return ht;
 }

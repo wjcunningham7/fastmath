@@ -20,7 +20,7 @@ ASMS	:= $(patsubst $(SRCDIR)/%.cpp, $(ASMDIR)/%.s, $(SOURCES))
 OBJS	:= $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SOURCES))
 OBJS2	:= $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SOURCES2))
 OBJS3	:= $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SOURCES3))
-EXCL	:= $(OBJDIR)/TestFastNumInt.o $(OBJDIR)/BenchFastMath.o $(OBJDIR)/BenchFastNumInt.o $(OBJDIR)/stopwatch.o $(OBJDIR)/ran2.o
+EXCL	:= $(OBJDIR)/TestFastNumInt.o $(OBJDIR)/BenchFastMath.o $(OBJDIR)/BenchFastNumInt.o
 LIBOBJS	:= $(filter-out $(EXCL), $(wildcard $(OBJDIR)/*.o))
 
 LIB	:= $(LIBDIR)/libfastmath.a

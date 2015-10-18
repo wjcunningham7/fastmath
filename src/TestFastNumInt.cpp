@@ -101,12 +101,7 @@ int main(int argc, char **argv)
 	printf("COMPLETED\n\n");*/
 
 	//Hypergeometric Test
-	printf("gamma(+10.5) = %f\n", GAMMA(10.5, STL));
-	printf("gamma(+11.5) = %f\n", GAMMA(11.5, STL));
-	printf("gamma(-10.5) = %f\n", GAMMA(-10.5, STL));
-	printf("gamma(-11.5) = %f\n", GAMMA(-11.5, STL));
-
-	double x1 = 1.105654;
+	/*double x1 = 1.105654;
 	double lambda = 0.05;
 	double z = -1.0 * lambda * POW2(POW2(x1, EXACT), EXACT);
 	double w = z / (z - 1.0);
@@ -114,5 +109,5 @@ int main(int argc, char **argv)
 	double f;
 	double f_err = 0.0;
 	int f_nt = 5;
-	_2F1(0.5, 1.0, -11.5, w, &f, &f_err, &f_nt, false);
+	_2F1(0.5, 1.0, -11.5, w, &f, &f_err, &f_nt, false);*/
 }
