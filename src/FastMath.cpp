@@ -221,7 +221,7 @@ double SGN(const double x, const enum FastMethod fm)
 	else {
 		switch (fm) {
 		case DEF:
-			y = table[x < 0.0];
+			y = table[x > 0.0];
 			break;
 		case BITWISE:
 			//NOTE: I'm not entirely sure where I found this - double check results
