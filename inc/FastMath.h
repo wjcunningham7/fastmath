@@ -7,8 +7,8 @@
 
 /////////////////////////////
 //(C) Will Cunningham 2014 //
+//         DK Lab          //
 // Northeastern University //
-// Krioukov Research Group //
 /////////////////////////////
 
 //Used for Unit Testing
