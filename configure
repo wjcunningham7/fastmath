@@ -1,0 +1,7 @@
+#!/bin/bash
+
+FASTDIR=$LOCAL_DIR/include/fastmath
+
+mkdir -p $FASTDIR
+cp inc/ran2.h $FASTDIR/
+cp inc/stopwatch.h $FASTDIR/

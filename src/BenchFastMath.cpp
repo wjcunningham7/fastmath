@@ -2,26 +2,26 @@
 
 int main(int argc, char **argv)
 {
-	float *data;
-	float *results;
-	float *error;
+	double *data;
+	double *results;
+	double *error;
 
 	long seed = -18100L;
 	int nnum = 100000;
 	int i;
 
 	//Allocate memory for test data
-	data = (float*)malloc(sizeof(float) * nnum);
+	data = (double*)malloc(sizeof(double) * nnum);
 
 	//Allocate memory for test results
-	results = (float*)malloc(sizeof(float) * nnum);	
+	results = (double*)malloc(sizeof(double) * nnum);	
 
 	//Allocate memory for errors
-	error = (float*)malloc(sizeof(float) * nnum);
+	error = (double*)malloc(sizeof(double) * nnum);
 
 	//Generate values
 	for (i = 0; i < nnum; i++)
-		data[i] = static_cast<float>(ran2(&seed));
+		data[i] = ran2(&seed);
 
 	//Method times
 	double pow2_t0, pow2_t1, pow2_t2, pow2_t3;
@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 	pow3_t3 = measure(&POW3, NULL, NULL, data, results, error, nnum, 0, FASTER, "POW3", "dat/fasterpow_3_error.dat", 0, DEFAULT, true);
 
 	//POW
-	float p = 2.0 * ran2(&seed);
+	double p = 2.0 * ran2(&seed);
 	pow_t0 = measure(NULL, &POW, NULL, data, results, NULL, nnum, 1, STL, "POW", NULL, p, DEFAULT, false);
 	pow_t1 = measure(NULL, &POW, NULL, data, results, error, nnum, 1, FAST, "POW", "dat/fastpow_error.dat", p, DEFAULT, true);
 	pow_t2 = measure(NULL, &POW, NULL, data, results, error, nnum, 1, FASTER, "POW", "dat/fasterpow_error.dat", p, DEFAULT, true);
@@ -141,46 +141,46 @@ int main(int argc, char **argv)
 	//Print Method Times
 	std::ofstream os("dat/method_times.dat");
 
-	os << "POW2\tpowf\t" << (pow2_t0 / nnum) << std::endl;
+	os << "POW2\tpow\t" << (pow2_t0 / nnum) << std::endl;
 	os << "POW2\tx*x\t" << (pow2_t1 / nnum) << std::endl;
 	os << "POW2\tfastpow\t" << (pow2_t2 / nnum) << std::endl;
 	os << "POW2\tfasterpow\t" << (pow2_t3 / nnum) << std::endl;
 	
-	os << "POW3\tpowf\t" << (pow3_t0 / nnum) << std::endl;
+	os << "POW3\tpow\t" << (pow3_t0 / nnum) << std::endl;
 	os << "POW3\tx*x*x\t" << (pow3_t1 / nnum) << std::endl;
 	os << "POW3\tfastpow\t" << (pow3_t2 / nnum) << std::endl;
 	os << "POW3\tfasterpow\t" << (pow3_t3 / nnum) << std::endl;
 
-	os << "POW\tpowf\t" << (pow_t0 / nnum) << std::endl;
+	os << "POW\tpow\t" << (pow_t0 / nnum) << std::endl;
 	os << "POW\tfastpow\t" << (pow_t1 / nnum) << std::endl;
 	os << "POW\tfasterpow\t" << (pow_t2 / nnum) << std::endl;
 
-	os << "SQRT\tsqrtf\t" << (sqrt_t0 / nnum) << std::endl;
+	os << "SQRT\tsqrt\t" << (sqrt_t0 / nnum) << std::endl;
 	os << "SQRT\tbit\t" << (sqrt_t1 / nnum) << std::endl;
 	
 	os << "ABS\tfabs\t" << (abs_t0 / nnum) << std::endl;
 	os << "ABS\tbit\t" << (abs_t1 / nnum) << std::endl;
 
-	os << "LOG\tlogf\t" << (log_t0 / nnum) << std::endl;
+	os << "LOG\tlog\t" << (log_t0 / nnum) << std::endl;
 	os << "LOG\tfastlog\t" << (log_t1 / nnum) << std::endl;
 	os << "LOG\tfasterlog\t" << (log_t2 / nnum) << std::endl;
 
 	os << "SGN\tif\t" << (sgn_t0 / nnum) << std::endl;
 	os << "SGN\tbit\t" << (sgn_t1 / nnum) << std::endl;
 
-	os << "SIN\tsinf\t" << (sin_t0 / nnum) << std::endl;
+	os << "SIN\tsin\t" << (sin_t0 / nnum) << std::endl;
 	os << "SIN\tfastsin\t" << (sin_t1 / nnum) << std::endl;
 	os << "SIN\tfastersin\t" << (sin_t2 / nnum) << std::endl;
 
-	os << "COS\tcosf\t" << (cos_t0 / nnum) << std::endl;
+	os << "COS\tcos\t" << (cos_t0 / nnum) << std::endl;
 	os << "COS\tfastcos\t" << (cos_t1 / nnum) << std::endl;
 	os << "COS\tfastercos\t" << (cos_t2 / nnum) << std::endl;
 
-	os << "TAN\ttanf\t" << (tan_t0 / nnum) << std::endl;
+	os << "TAN\ttan\t" << (tan_t0 / nnum) << std::endl;
 	os << "TAN\tfasttan\t" << (tan_t1 / nnum) << std::endl;
 	os << "TAN\tfastertan\t" << (tan_t2 / nnum) << std::endl;
 
-	os << "ACOS\tacosf\t" << (acos_t0 / nnum) << std::endl;
+	os << "ACOS\tacos\t" << (acos_t0 / nnum) << std::endl;
 	os << "ACOS\tch_low\t" << (acos_t1a / nnum) << std::endl;
 	os << "ACOS\tch_high\t" << (acos_t1b / nnum) << std::endl;
 	os << "ACOS\tch_vhigh\t" << (acos_t1c / nnum) << std::endl;
@@ -188,7 +188,7 @@ int main(int argc, char **argv)
 	os << "ACOS\tw_high\t" << (acos_t2b / nnum) << std::endl;
 	os << "ACOS\tw_vhigh\t" << (acos_t2c / nnum) << std::endl;
 
-	os << "ATAN\tatanf\t" << (atan_t0 / nnum) << std::endl;
+	os << "ATAN\tatan\t" << (atan_t0 / nnum) << std::endl;
 	os << "ATAN\tch_low\t" << (atan_t1a / nnum) << std::endl;
 	os << "ATAN\tch_high\t" << (atan_t1b / nnum) << std::endl;
 	os << "ATAN\tch_vhigh\t" << (atan_t1c / nnum) << std::endl;
@@ -196,20 +196,20 @@ int main(int argc, char **argv)
 	os << "ATAN\tw_high\t" << (atan_t2b / nnum) << std::endl;
 	os << "ATAN\tw_vhigh\t" << (atan_t2c / nnum) << std::endl;
 
-	os << "SINH\tsinhf\t" << (sinh_t0 / nnum) << std::endl;
+	os << "SINH\tsinh\t" << (sinh_t0 / nnum) << std::endl;
 	os << "SINH\tfastsinh\t" << (sinh_t1 / nnum) << std::endl;
 	os << "SINH\tfastersinh\t" << (sinh_t2 / nnum) << std::endl;
 
-	os << "COSH\tcoshf\t" << (cosh_t0 / nnum) << std::endl;
+	os << "COSH\tcosh\t" << (cosh_t0 / nnum) << std::endl;
 	os << "COSH\tfastcosh\t" << (cosh_t1 / nnum) << std::endl;
 	os << "COSH\tfastercosh\t" << (cosh_t2 / nnum) << std::endl;
 
-	os << "ASINH\tasinhf\t" << (asinh_t0 / nnum) << std::endl;
+	os << "ASINH\tasinh\t" << (asinh_t0 / nnum) << std::endl;
 	os << "ASINH\tw_low\t" << (asinh_t2a / nnum) << std::endl;
 	os << "ASINH\tw_high\t" << (asinh_t2b / nnum) << std::endl;
 	os << "ASINH\tw_vhigh\t" << (asinh_t2c / nnum) << std::endl;
 
-	//os << "ACOSH\tacoshf\t" << (acosh_t0 / nnum) << std::endl;
+	//os << "ACOSH\tacosh\t" << (acosh_t0 / nnum) << std::endl;
 	//os << "ACOSH\tw_low\t" << (acosh_t2a / nnum) << std::endl;
 	//os << "ACOSH\tw_high\t" << (acosh_t2b / nnum) << std::endl;
 	//os << "ACOSH\tw_vhigh\t" << (acosh_t2c / nnum) << std::endl;
@@ -226,7 +226,7 @@ int main(int argc, char **argv)
 	free(error);
 }
 
-double measure(float (*solve0)(const float x, const enum FastMethod fm), float (*solve1)(const float x, const float p, const enum FastMethod fm), float (*solve2)(const float x, const enum FastMethod fm, const enum Precision p), float * const data, float * const results, float * const error, const int &nnum, const int func, const enum FastMethod fm, const char *funcname, const char *filename, const float exponent, const enum Precision p, const bool calc_error)
+double measure(double (*solve0)(const double x, const enum FastMethod fm), double (*solve1)(const double x, const double p, const enum FastMethod fm), double (*solve2)(const double x, const enum FastMethod fm, const enum Precision p), double * const data, double * const results, double * const error, const int &nnum, const int func, const enum FastMethod fm, const char *funcname, const char *filename, const double exponent, const enum Precision p, const bool calc_error)
 {
 	assert (data != NULL);
 	assert (results != NULL);
@@ -291,7 +291,7 @@ double measure(float (*solve0)(const float x, const enum FastMethod fm), float (
 	return time;
 }
 
-void printErrors(const float * const data, const float * const error, const int &nnum, const char *filename)
+void printErrors(const double * const data, const double * const error, const int &nnum, const char *filename)
 {
 	assert (data != NULL);
 	assert (error != NULL);

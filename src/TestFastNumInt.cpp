@@ -5,32 +5,34 @@
 
 double tauToEtaUniverse(double tau, void *params)
 {
-	return POW(SINH(1.5f * tau, STL), (-2.0f / 3.0f), STL);
+	return POW(SINH(1.5 * tau, STL), (-2.0 / 3.0), STL);
 }
 
-float _2F1_r(const float &r, void * const param)
+double _2F1_r(const double &r, void * const param)
 {
-	return -1.0f / POW3(r, EXACT);
+	return -1.0 / POW3(r, EXACT);
 }
 
 double xi(double r)
 {
 	double _xi = 0.0;
-	float err = 0.0f;
-	float f;
+	double err = 0.0f;
+	double f;
 	int nterms = 10;
 
-	if (ABS(r - 1.0f, STL) < 0.05)
+	if (ABS(r - 1.0, STL) < 0.05)
 		nterms = 20;
 
-	if (r < 1.0f) {
+	if (r < 1.0) {
 		//Since 1/f(x) = f(1/x) we can use _r
-		double _r = 1.0f / r;
-		_2F1(&_2F1_r, _r, NULL, 1.0f / 6.0f, 0.5f, 7.0f / 6.0f, &f, &err, &nterms);
+		double _r = 1.0 / r;
+		double z = _2F1_r(_r, NULL);
+		_2F1(1.0 / 6.0, 0.5, 7.0 / 6.0, z, &f, &err, &nterms, false);
 		_xi = 2.0 * SQRT(r, STL) * f;
 	} else {
-		_2F1(&_2F1_r, r, NULL, 1.0f / 3.0f, 0.5f, 4.0f / 3.0f, &f, &err, &nterms);
-		_xi = SQRT(4.0f / M_PI, STL) * GAMMA(7.0f / 6.0f, STL) * GAMMA(1.0f / 3.0f, STL) - f / r;
+		double z = _2F1_r(r, NULL);
+		_2F1(1.0 / 3.0, 0.5, 4.0 / 3.0, z, &f, &err, &nterms, false);
+		_xi = SQRT(4.0 / M_PI, STL) * GAMMA(7.0 / 6.0, STL) * GAMMA(1.0 / 3.0, STL) - f / r;
 	}
 
 	//assert (ABS(err, STL) < 1e-4);
@@ -85,16 +87,27 @@ int main(int argc, char **argv)
 
 	//2D Numerical Integration Test
 	
-	float tau0 = 0.8458;
-	double r0 = POW(SINH(1.5f * tau0, STL), 2.0f / 3.0f, STL);
-	long seed = 18100;
+	/*double tau0 = 0.8458;
+	double r0 = POW(SINH(1.5 * tau0, STL), 2.0 / 3.0, STL);
+	long seed = 18100L;
 
 	printf("tau0: %f\n", tau0);
 	printf("r0:   %f\n", r0);
 
 	double k = integrate2D(&rescaledDegreeUniverse, 0.0, 0.0, r0, r0, NULL, seed, 0);
-	k *= 8 * M_PI / (SINH(3.0f * tau0, STL) - 3.0f * tau0);
+	k *= 8.0 * M_PI / (SINH(3.0 * tau0, STL) - 3.0 * tau0);
 	printf("k: %f\n", k);
 	printf("\n");
-	printf("COMPLETED\n\n");
+	printf("COMPLETED\n\n");*/
+
+	//Hypergeometric Test
+	/*double x1 = 1.105654;
+	double lambda = 0.05;
+	double z = -1.0 * lambda * POW2(POW2(x1, EXACT), EXACT);
+	double w = z / (z - 1.0);
+
+	double f;
+	double f_err = 0.0;
+	int f_nt = 5;
+	_2F1(0.5, 1.0, -11.5, w, &f, &f_err, &f_nt, false);*/
 }
