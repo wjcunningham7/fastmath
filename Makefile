@@ -6,6 +6,8 @@ OBJDIR	:= ./obj
 LIBDIR	:= ./lib
 DATDIR	:= ./dat
 
+LOCAL_DIR ?= /usr/local
+
 CXX	:= g++
 INCD	:= -I $(INCDIR) -I $(LOCAL_DIR)/include
 LIBS	:= -L $(LD_LIBRARY_PATH) -L $(LOCAL_DIR)/lib64 -lm -lnint -lgsl -lgslcblas
