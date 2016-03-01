@@ -6,11 +6,9 @@ OBJDIR	:= ./obj
 LIBDIR	:= ./lib
 DATDIR	:= ./dat
 
-LOCAL_DIR ?= /usr/local
-
 CXX	:= g++
 INCD	:= -I $(INCDIR) -I $(LOCAL_DIR)/include
-LIBS	:= -L $(LD_LIBRARY_PATH) -L $(LOCAL_DIR)/lib64 -lm -lnint -lgsl -lgslcblas
+LIBS	:= -L $(LD_LIBRARY_PATH) -L $(LOCAL_DIR)/lib64 -lm -lnint -lgsl -lgslcblas -lstdc++
 
 FLAGS	:= -O3 -g
 ASMFLAGS:= 
@@ -18,19 +16,22 @@ ASMFLAGS:=
 SOURCES	:= $(SRCDIR)/stopwatch.cpp $(SRCDIR)/ran2.cpp $(SRCDIR)/FastMath.cpp $(SRCDIR)/FastNumInt.cpp $(SRCDIR)/BenchFastMath.cpp
 SOURCES2:= $(SRCDIR)/stopwatch.cpp $(SRCDIR)/ran2.cpp $(SRCDIR)/FastMath.cpp $(SRCDIR)/FastNumInt.cpp $(SRCDIR)/BenchFastNumInt.cpp
 SOURCES3:= $(SRCDIR)/FastMath.cpp $(SRCDIR)/FastNumInt.cpp $(SRCDIR)/TestFastNumInt.cpp
+SOURCES4:= $(SRCDIR)/TestFastBitset.cpp
 ASMS	:= $(patsubst $(SRCDIR)/%.cpp, $(ASMDIR)/%.s, $(SOURCES))
 OBJS	:= $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SOURCES))
 OBJS2	:= $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SOURCES2))
 OBJS3	:= $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SOURCES3))
-EXCL	:= $(OBJDIR)/TestFastNumInt.o $(OBJDIR)/BenchFastMath.o $(OBJDIR)/BenchFastNumInt.o
+OBJS4	:= $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SOURCES4))
+EXCL	:= $(OBJDIR)/TestFastNumInt.o $(OBJDIR)/BenchFastMath.o $(OBJDIR)/BenchFastNumInt.o $(OBJDIR)/TestFastBitset.cpp
 LIBOBJS	:= $(filter-out $(EXCL), $(wildcard $(OBJDIR)/*.o))
 
 LIB	:= $(LIBDIR)/libfastmath.a
 BIN	:= $(BINDIR)/BenchFastMath
 BIN2	:= $(BINDIR)/BenchFastNumInt
 BIN3	:= $(BINDIR)/TestFastNumInt
+BIN4	:= $(BINDIR)/TestFastBitset
 
-.PHONY : check-env dirs lib bin bin2 bin3 install clean cleandata
+.PHONY : check-env dirs lib bin bin2 bin3 bin4 install clean cleandata
 
 all : check-env dirs $(OBJS)
 
@@ -69,6 +70,9 @@ bin2 : $(OBJS2)
 
 bin3 : $(OBJS3)
 	$(CXX) -o $(BIN3) $(OBJS3) $(INCD) $(LIBS)
+
+bin4 : dirs $(OBJS4)
+	$(CXX) -o $(BIN4) $(OBJS4) $(FLAGS) -std=c++0x $(INCD) $(LIBS)
 
 install : check-env lib
 	mkdir -p $(LOCAL_DIR)/lib64

@@ -1,9 +1,18 @@
 #ifndef FAST_MATH_H_
 #define FAST_MATH_H_
 
+#include <algorithm>
 #include <assert.h>
+#include <cstring>
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
+#include <limits.h>
 #include <math.h>
+#include <new>
+#include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <sstream>
 
 /////////////////////////////
 //(C) Will Cunningham 2014 //
@@ -159,5 +168,148 @@ int getNumTerms(const double &z, const double &err);
 
 //Hypergeometric Transformation Type
 HyperType getHyperType(const double &z);
+
+class FastBitset
+{
+public:
+	FastBitset() { n = 0; nb = 0; }
+	FastBitset(uint64_t _n) { createBitset(_n); }
+	~FastBitset() { destroyBitset(); }
+
+	void createBitset(uint64_t _n)
+	{
+		try {
+			n = _n;
+			nb = get_num_blocks(n);
+			bits = (unsigned int*)malloc(sizeof(unsigned int) * nb);
+			if (bits == NULL)
+				throw std::bad_alloc();
+			memset(bits, 0, sizeof(unsigned int) * nb);
+		} catch (std::bad_alloc) {
+			fprintf(stderr, "Memory allocation failure in %s on line %d!\n", __FILE__, __LINE__);
+			fflush(stderr);
+			destroyBitset();
+		}
+	}
+
+	void destroyBitset()
+	{
+		n = 0;
+		nb = 0;
+		if (bits != NULL) {
+			free(bits);
+			bits = NULL;
+		}
+	}
+
+	//Returns the number of bits stored in 'bits'
+	uint64_t size() const
+	{
+		return n;
+	}
+
+	//Returns the number of blocks (i.e. unsigned integers)
+	//used to represent 'bits'
+	uint64_t getNumBlocks() const
+	{
+		return nb;
+	}
+
+	//Returns the number of bits per block
+	size_t getBlockSize() const
+	{
+		return block_size;
+	}
+
+	//Computes the Hamming weight
+	uint64_t count() const
+	{
+		uint64_t num_set = 0;
+		for (uint64_t i = nb; i-- > 0; )
+			num_set += __builtin_popcount(bits[i]);
+		return num_set;
+	}
+
+	//Set the bit at location 'idx' to 1
+	void set(uint64_t idx)
+	{
+		if (__builtin_expect(idx < n, 1L)) {
+			uint64_t block_idx = idx / block_size;
+			unsigned int bit_idx = idx - block_idx * block_size;
+			bits[block_idx] |= 1 << bit_idx; 
+		}
+	}
+
+	//Set the bit at location 'idx' to 0
+	void unset(uint64_t idx)
+	{
+		if (__builtin_expect(idx < n, 1L)) {
+			uint64_t block_idx = idx / block_size;
+			unsigned int bit_idx = idx - block_idx * block_size;
+			bits[block_idx] &= ~(1 << bit_idx);
+		}
+	}
+
+	//Read the bit at location 'idx'
+	unsigned int read(uint64_t idx) const
+	{
+		if (__builtin_expect(idx < n, 1L)) {
+			uint64_t block_idx = idx / block_size;
+			unsigned int bit_idx = idx - block_idx * block_size;
+			return (bits[block_idx] >> bit_idx) & 1;
+		} else
+			return 0;
+	}
+
+	//Read the block at location 'idx'
+	unsigned int readBlock(uint64_t idx) const
+	{
+		if (__builtin_expect(idx < nb, 1L)) {
+			return bits[idx];
+		} else
+			return 0;
+	}
+
+	//Effectively acts as an &= operator
+	void setIntersection(const FastBitset &fb)
+	{
+		uint64_t _nb = fb.getNumBlocks();
+		for (uint64_t i = std::min(nb, _nb); i-- > 0; )
+			bits[i] &= fb.readBlock(i);
+		if (nb > _nb) {
+			int64_t offset = _nb;
+			int64_t range = nb - offset;
+			memset(bits+offset, 0, sizeof(unsigned int) * range);
+		}
+	}
+
+	//Effectively acts as an |= operator
+	//void setUnion(const unsigned int *& other_bits, const uint64_t _n)
+	void setUnion(const FastBitset &fb)
+	{
+		for (uint64_t i = std::min(n, fb.getNumBlocks()); i-- > 0; )
+			bits[i] |= fb.readBlock(i);
+	}
+
+	std::string toString()
+	{
+		std::ostringstream s;
+		for (uint64_t i = 0; i < n; i++)
+			s << read(i);
+		return s.str();
+	}
+
+private:
+	static const size_t block_size = sizeof(unsigned int) * CHAR_BIT;
+	unsigned int *bits;	//The bitset array (bits in groups of 32)
+	uint64_t n;		//Number of bits (not including padding)
+	uint64_t nb;		//Number of blocks
+
+	//Return the number of unsigned integers necessary to store '_n' bits
+	uint64_t get_num_blocks(uint64_t _n)
+	{
+		return static_cast<uint64_t>(ceil(static_cast<long double>(_n) / getBlockSize()));
+	}
+};
 
 #endif
