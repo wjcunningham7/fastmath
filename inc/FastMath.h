@@ -172,33 +172,75 @@ HyperType getHyperType(const double &z);
 class FastBitset
 {
 public:
-	FastBitset() { n = 0; nb = 0; }
-	FastBitset(uint64_t _n) { createBitset(_n); }
-	~FastBitset() { destroyBitset(); }
+	//Default Constructor
+	FastBitset()
+	{
+		//printf("Calling the default constructor.\n");
+		n = 0;
+		nb = 0;
+	}
 
-	void createBitset(uint64_t _n)
+	//Creation Constructor
+	FastBitset(uint64_t _n)
+	{
+		//printf("Calling the creation constructor.\n");
+		createBitset(bits, _n);
+	}
+
+	//Copy Constructor
+	FastBitset(const FastBitset& other)
+	{
+		//printf("Calling the copy constructor.\n");
+		if (__builtin_expect(this != &other, 1L)) {
+			createBitset(bits, other.size());
+			std::copy(other.bits, other.bits + other.getNumBlocks(), bits);
+		}
+	}
+
+	//Destructor
+	~FastBitset()
+	{
+		//printf("Calling the destructor.\n");
+		destroyBitset(bits);
+	}
+
+	//Overload assignment operator
+	FastBitset& operator= (const FastBitset& other)
+	{
+		//printf("Calling the overloaded assignment operator.\n");
+		if (__builtin_expect(this != &other, 1L)) {
+			unsigned int *_bits = NULL;
+			createBitset(_bits, other.size());
+			std::copy(other.bits, other.bits + other.getNumBlocks(), _bits);
+			destroyBitset(bits);
+			bits = _bits;
+		}
+		return *this;
+	}
+
+	void createBitset(unsigned int *& _bits, uint64_t _n)
 	{
 		try {
 			n = _n;
 			nb = get_num_blocks(n);
-			bits = (unsigned int*)malloc(sizeof(unsigned int) * nb);
-			if (bits == NULL)
+			_bits = (unsigned int*)malloc(sizeof(unsigned int) * nb);
+			if (_bits == NULL)
 				throw std::bad_alloc();
-			memset(bits, 0, sizeof(unsigned int) * nb);
+			memset(_bits, 0, sizeof(unsigned int) * nb);
 		} catch (std::bad_alloc) {
 			fprintf(stderr, "Memory allocation failure in %s on line %d!\n", __FILE__, __LINE__);
 			fflush(stderr);
-			destroyBitset();
+			destroyBitset(_bits);
 		}
 	}
 
-	void destroyBitset()
+	void destroyBitset(unsigned int *& _bits)
 	{
 		n = 0;
 		nb = 0;
-		if (bits != NULL) {
-			free(bits);
-			bits = NULL;
+		if (_bits != NULL) {
+			free(_bits);
+			_bits = NULL;
 		}
 	}
 
@@ -297,6 +339,11 @@ public:
 		for (uint64_t i = 0; i < n; i++)
 			s << read(i);
 		return s.str();
+	}
+
+	void* getAddress() const
+	{
+		return (void*)bits;
 	}
 
 private:

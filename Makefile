@@ -82,8 +82,8 @@ install : check-env lib
 	cp $(INCDIR)/fastapprox.h $(LOCAL_DIR)/include/fastmath/
 	cp $(INCDIR)/FastMath.h $(LOCAL_DIR)/include/fastmath/
 	cp $(INCDIR)/FastNumInt.h $(LOCAL_DIR)/include/fastmath/
-	cp $(SRCDIR)/ran2.cpp $(LOCAL_DIR)/src/fastmath/
-	cp $(SRCDIR)/stopwatch.cpp $(LOCAL_DIR)/src/fastmath/
+	#cp $(SRCDIR)/ran2.cpp $(LOCAL_DIR)/src/fastmath/
+	#cp $(SRCDIR)/stopwatch.cpp $(LOCAL_DIR)/src/fastmath/
 
 clean:
 	@ rm -rf $(BINDIR) $(OBJDIR) $(LIBDIR) $(ASMDIR) ./*.log

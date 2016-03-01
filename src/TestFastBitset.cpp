@@ -1,4 +1,5 @@
 #include "FastMath.h"
+#include <vector>
 
 int main(int argc, char **argv)
 {
@@ -40,4 +41,22 @@ int main(int argc, char **argv)
 	printf("Intersection:\t\t%s\n", fb1.toString().c_str());
 	fb2.setUnion(fb1);
 	printf("Union:\t\t\t%s\n", fb2.toString().c_str());
+
+	/*printf("Testing Vector Capabilities:\n");	//Enable print statements in constructors
+	printf("----------------------------\n");
+	std::vector<FastBitset> vec;
+	uint64_t size = 1;
+	vec.reserve(size);
+
+	//FastBitset f(1);
+	uint64_t i;
+	for (i = 0; i < size; i++) {
+		FastBitset f(i+1);
+		vec.push_back(f);
+		
+		//FastBitset g = f;
+	}
+
+	printf("Now I'm here.\n");
+	vec[0].set(0);*/
 }
