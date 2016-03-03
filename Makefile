@@ -10,14 +10,14 @@ CXX	:= g++
 INCD	:= -I $(INCDIR) -I $(LOCAL_DIR)/include
 LIBS	:= -L $(LD_LIBRARY_PATH) -L $(LOCAL_DIR)/lib64 -lm -lnint -lgsl -lgslcblas -lstdc++
 
-FLAGS	:= -O3 -g
-ASMFLAGS:= 
+FLAGS	:= -O3 -g -mavx2 -march=core-avx2 -mtune=core-avx2 -mf16c -mrdrnd #-pg
+ASMFLAGS:= -mpopcnt -mavx2
 
 SOURCES	:= $(SRCDIR)/stopwatch.cpp $(SRCDIR)/ran2.cpp $(SRCDIR)/FastMath.cpp $(SRCDIR)/FastNumInt.cpp $(SRCDIR)/BenchFastMath.cpp
 SOURCES2:= $(SRCDIR)/stopwatch.cpp $(SRCDIR)/ran2.cpp $(SRCDIR)/FastMath.cpp $(SRCDIR)/FastNumInt.cpp $(SRCDIR)/BenchFastNumInt.cpp
 SOURCES3:= $(SRCDIR)/FastMath.cpp $(SRCDIR)/FastNumInt.cpp $(SRCDIR)/TestFastNumInt.cpp
-SOURCES4:= $(SRCDIR)/TestFastBitset.cpp
-ASMS	:= $(patsubst $(SRCDIR)/%.cpp, $(ASMDIR)/%.s, $(SOURCES))
+SOURCES4:= $(SRCDIR)/stopwatch.cpp $(SRCDIR)/TestFastBitset.cpp
+ASMS	:= $(patsubst $(SRCDIR)/%.cpp, $(ASMDIR)/%.s, $(SOURCES4))
 OBJS	:= $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SOURCES))
 OBJS2	:= $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SOURCES2))
 OBJS3	:= $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SOURCES3))

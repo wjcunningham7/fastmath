@@ -1,9 +1,18 @@
 #include "FastMath.h"
+#include "stopwatch.h"
 #include <vector>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_real.hpp>
+#include <boost/random/variate_generator.hpp>
+#include <immintrin.h>
+
+typedef boost::mt19937 Engine;
+typedef boost::uniform_real<double> UDistribution;
+typedef boost::variate_generator< Engine &, UDistribution > UGenerator;
 
 int main(int argc, char **argv)
 {
-	uint64_t nbits = 34;
+	uint64_t nbits = 64*2;
 	FastBitset fb(nbits);
 
 	printf("Bitset Properties:\n");
@@ -22,12 +31,14 @@ int main(int argc, char **argv)
 	printf("Bit %" PRIu64 " now set:\t\t%s\n", s2, fb.toString().c_str());
 	fb.set(s3);
 	printf("Bit %" PRIu64 " now set:\t\t%s\n", s3, fb.toString().c_str());
-	uint64_t c = fb.count();
+	fb.set(nbits-1);
+	printf("Bit %" PRIu64 " now set:\t\t%s\n", nbits-1, fb.toString().c_str());
+	uint64_t c = fb.count_v3();
 	printf("Number of bits set:\t%" PRIu64 "\n", c);
 	fb.unset(s1);
 	printf("Bit %" PRIu64 " now unset:\t%s\n\n", s1, fb.toString().c_str());
 
-	FastBitset fb1(nbits);
+	/*FastBitset fb1(nbits);
 	for (uint64_t i = 0; i < nbits / 2; i++)
 		fb1.set(i);
 
@@ -37,10 +48,10 @@ int main(int argc, char **argv)
 
 	printf("Bitset 1:\t\t%s\n", fb1.toString().c_str());
 	printf("Bitset 2:\t\t%s\n", fb2.toString().c_str());
-	fb1.setIntersection(fb2);
+	fb1.setIntersectionS(fb2);
 	printf("Intersection:\t\t%s\n", fb1.toString().c_str());
 	fb2.setUnion(fb1);
-	printf("Union:\t\t\t%s\n", fb2.toString().c_str());
+	printf("Union:\t\t\t%s\n\n", fb2.toString().c_str());*/
 
 	/*printf("Testing Vector Capabilities:\n");	//Enable print statements in constructors
 	printf("----------------------------\n");
@@ -59,4 +70,104 @@ int main(int argc, char **argv)
 
 	printf("Now I'm here.\n");
 	vec[0].set(0);*/
+
+	//Benchmark assignment, intersection, and count operations
+	printf("Benchmarking Operations:\n");
+	printf("------------------------\n");
+	std::vector<FastBitset> adj;
+	uint64_t vec_size = 2000;
+	//uint64_t vec_size = 100;
+	uint64_t cnt, tot = 0L;
+	uint64_t i, j;
+
+	Stopwatch s = Stopwatch();
+	Stopwatch p1 = Stopwatch();
+	Stopwatch p2 = Stopwatch();
+	Stopwatch p3 = Stopwatch();
+
+	srand(time(NULL));
+	Engine eng((long)time(NULL));
+	UDistribution udist(0.0, 1.0);
+	UGenerator urng(eng, udist);
+	float set_prob = 0.4;
+
+	adj.reserve(vec_size);
+
+	for (i = 0; i < vec_size; i++) {
+		uint64_t length = i;
+		//uint64_t length = 64 * 4 * (i + 1) * 10;
+		FastBitset f(length);
+		//Randomly set bits
+		for (j = 0; j < length; j++)
+			if (urng() < set_prob)
+				f.set(j);
+		adj.push_back(f);
+	}
+
+	stopwatchStart(&s);
+	//Test the intersection of all pairs
+	for (i = 0; i < vec_size * vec_size; i++) {
+		int idx1 = static_cast<int>(i / vec_size);
+		int idx2 = static_cast<int>(i % vec_size);
+		stopwatchStart(&p1);
+		FastBitset g = adj[idx2];
+		stopwatchStop(&p1);
+		if (idx2 > idx1) {
+			stopwatchStart(&p2);
+			g.setIntersectionL(adj[idx1]);
+			stopwatchStop(&p2);
+		} else {
+			stopwatchStart(&p2);
+			g.setIntersectionS(adj[idx1]);
+			stopwatchStop(&p2);
+		}
+		stopwatchStart(&p3);
+		cnt = g.count_v3();
+		stopwatchStop(&p3);
+		if (cnt) tot++;
+	}
+	stopwatchStop(&s);
+	float tot_time = p1.elapsedTime + p2.elapsedTime + p3.elapsedTime;
+	printf("tot: %" PRIu64 "\n", tot);
+	printf("Execution Time: %5.6f sec\n", s.elapsedTime);
+	printf("Operation: [Assignment]\n");
+	printf("\tPartial Execution Time: %5.6f sec\n", p1.elapsedTime);
+	printf("\tPercent Used:           %5.6f%%\n", p1.elapsedTime / tot_time);
+	printf("Operation: [Intersection]\n");
+	printf("\tPartial Execution Time: %5.6f sec\n", p2.elapsedTime);
+	printf("\tPercent Used:           %5.6f%%\n", p2.elapsedTime / tot_time);
+	printf("Operation: [Count]\n");
+	printf("\tPartial Execution Time: %5.6f sec\n", p3.elapsedTime);
+	printf("\tPercent Used:           %5.6f%%\n", p3.elapsedTime / tot_time);
+	fflush(stdout);
+
+	//Test count speed
+	/*printf("\nBenchmarking count_v3():\n");
+	printf("------------------------\n");
+	Stopwatch s = Stopwatch();
+	stopwatchReset(&s);
+	uint64_t cnt_size = 8000000;
+	uint64_t samples = 10;
+	set_prob = 0.5;
+	uint64_t i, j;
+	for (i = 0; i < samples; i++) {
+		FastBitset fbb(cnt_size);
+		for (j = 0; j < cnt_size; j++)
+			if (urng() < set_prob)
+				fbb.set(i);
+		stopwatchStart(&s);
+		fbb.count_v3();
+		stopwatchStop(&s);
+	}
+	printf("Time for all operations: %5.6f sec\n", s.elapsedTime);*/
+
+	printf("\nTesting AVX Intrinsics:\n");
+	printf("-----------------------\n");
+	unsigned long data1[4] = { 1L, 2L, 1L, 1L };
+	//unsigned long data2[4] = { 2L, 2L, 1L, 1L };
+	__m256i v1 = _mm256_load_si256((__m256i*)data1);
+	//__m256i v2 = _mm256_load_si256((__m256i*)data2);
+	//unsigned long data3[4] = { 0 };
+	//__m256i v3 = (unsigned long*)_mm256_and_si256(v1, v2);
+	//_m256_store_si256((__m256i*)data3, v3);
 }
