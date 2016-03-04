@@ -8,9 +8,9 @@ DATDIR	:= ./dat
 
 CXX	:= g++
 INCD	:= -I $(INCDIR) -I $(LOCAL_DIR)/include
-LIBS	:= -L $(LD_LIBRARY_PATH) -L $(LOCAL_DIR)/lib64 -lm -lnint -lgsl -lgslcblas -lstdc++
-
-FLAGS	:= -O3 -g -mavx2 -march=core-avx2 -mtune=core-avx2 -mf16c -mrdrnd #-pg
+LIBS	:= -L $(LOCAL_DIR)/lib64 -lm -lnint -lgsl -lgslcblas -lstdc++
+#FLAGS	:= -O3 -g -mavx2 -march=core-avx2 #-mf16c -mrdrnd #-pg
+FLAGS	:= -g -mavx2 -mpopcnt #-pg
 ASMFLAGS:= -mpopcnt -mavx2
 
 SOURCES	:= $(SRCDIR)/stopwatch.cpp $(SRCDIR)/ran2.cpp $(SRCDIR)/FastMath.cpp $(SRCDIR)/FastNumInt.cpp $(SRCDIR)/BenchFastMath.cpp
@@ -72,7 +72,7 @@ bin3 : $(OBJS3)
 	$(CXX) -o $(BIN3) $(OBJS3) $(INCD) $(LIBS)
 
 bin4 : dirs $(OBJS4)
-	$(CXX) -o $(BIN4) $(OBJS4) $(FLAGS) -std=c++0x $(INCD) $(LIBS)
+	$(CXX) -o $(BIN4) $(OBJS4) $(FLAGS) $(INCD) $(LIBS)
 
 install : check-env lib
 	mkdir -p $(LOCAL_DIR)/lib64
@@ -82,8 +82,8 @@ install : check-env lib
 	cp $(INCDIR)/fastapprox.h $(LOCAL_DIR)/include/fastmath/
 	cp $(INCDIR)/FastMath.h $(LOCAL_DIR)/include/fastmath/
 	cp $(INCDIR)/FastNumInt.h $(LOCAL_DIR)/include/fastmath/
-	#cp $(SRCDIR)/ran2.cpp $(LOCAL_DIR)/src/fastmath/
-	#cp $(SRCDIR)/stopwatch.cpp $(LOCAL_DIR)/src/fastmath/
+	@ #cp $(SRCDIR)/ran2.cpp $(LOCAL_DIR)/src/fastmath/
+	@ #cp $(SRCDIR)/stopwatch.cpp $(LOCAL_DIR)/src/fastmath/
 
 clean:
 	@ rm -rf $(BINDIR) $(OBJDIR) $(LIBDIR) $(ASMDIR) ./*.log

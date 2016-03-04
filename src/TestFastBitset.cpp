@@ -4,7 +4,9 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
-#include <immintrin.h>
+//#include <immintrin.h>
+#include <x86intrin.h>
+#include <avx2intrin.h>
 
 typedef boost::mt19937 Engine;
 typedef boost::uniform_real<double> UDistribution;
@@ -72,7 +74,7 @@ int main(int argc, char **argv)
 	vec[0].set(0);*/
 
 	//Benchmark assignment, intersection, and count operations
-	printf("Benchmarking Operations:\n");
+	/*printf("Benchmarking Operations:\n");
 	printf("------------------------\n");
 	std::vector<FastBitset> adj;
 	uint64_t vec_size = 2000;
@@ -139,7 +141,7 @@ int main(int argc, char **argv)
 	printf("Operation: [Count]\n");
 	printf("\tPartial Execution Time: %5.6f sec\n", p3.elapsedTime);
 	printf("\tPercent Used:           %5.6f%%\n", p3.elapsedTime / tot_time);
-	fflush(stdout);
+	fflush(stdout);*/
 
 	//Test count speed
 	/*printf("\nBenchmarking count_v3():\n");
@@ -163,11 +165,24 @@ int main(int argc, char **argv)
 
 	printf("\nTesting AVX Intrinsics:\n");
 	printf("-----------------------\n");
-	unsigned long data1[4] = { 1L, 2L, 1L, 1L };
-	//unsigned long data2[4] = { 2L, 2L, 1L, 1L };
-	__m256i v1 = _mm256_load_si256((__m256i*)data1);
-	//__m256i v2 = _mm256_load_si256((__m256i*)data2);
-	//unsigned long data3[4] = { 0 };
-	//__m256i v3 = (unsigned long*)_mm256_and_si256(v1, v2);
-	//_m256_store_si256((__m256i*)data3, v3);
+	uint64_t data1[4] = { 1L, 2L, 1L, 1L };
+	uint64_t data2[4] = { 2L, 2L, 1L, 1L };
+	__m256i v1 = _mm256_load_si256((__m256i*)&data1[0]);
+	__m256i v2 = _mm256_load_si256((__m256i*)&data2[0]);
+	uint64_t data3[4];
+	__m256i v3 = _mm256_add_epi64(v1, v2);
+	//__m256i v3 = (__m256i)__builtin_ia32_andsi256((__v4di)v1, (__v4di)v2);
+	_mm256_store_si256((__m256i*)&data3[0], v3);	
+	for (int i = 0; i < 4; i++)
+		printf("%" PRIu64 "\n", data3[i]);
+	
+	/*uint64_t data1[2] = { 1L, 1L };
+	uint64_t data2[2] = { 2L, 1L };
+	__m128i v1 = _mm_load_si128((__m128i const*)&data1[0]);
+	__m128i v2 = _mm_load_si128((__m128i const*)&data2[0]);
+	//__m128i v3 = _mm_add_epi64(v1, v2);
+	__m128i v3 = _mm_and_si128(v1, v2);
+	uint64_t data3[2];
+	_mm_store_si128((__m128i*)&data3[0], v3);
+	printf("%" PRIu64 "\t%" PRIu64 "\n", data3[0], data3[1]);*/
 }
