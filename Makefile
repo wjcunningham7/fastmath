@@ -6,12 +6,12 @@ OBJDIR	:= ./obj
 LIBDIR	:= ./lib
 DATDIR	:= ./dat
 
+LOCAL_DIR	:= $(CAUSET_LOCAL_DIR)
 CXX	:= g++
 INCD	:= -I $(INCDIR) -I $(LOCAL_DIR)/include
 LIBS	:= -L $(LOCAL_DIR)/lib64 -lm -lnint -lgsl -lgslcblas -lstdc++
-#FLAGS	:= -O3 -g -mavx2 -march=core-avx2 #-mf16c -mrdrnd #-pg
-FLAGS	:= -g -mavx2 -mpopcnt #-pg
-ASMFLAGS:= -mpopcnt -mavx2
+FLAGS	:= -g -mpopcnt -O3 -mavx2 -march=core-avx2 -mtune=core-avx2 -DAVX2_ENABLED #-std=c++0x
+ASMFLAGS:= -mpopcnt -mavx2 -DAVX2_ENABLED -Ofast
 
 SOURCES	:= $(SRCDIR)/stopwatch.cpp $(SRCDIR)/ran2.cpp $(SRCDIR)/FastMath.cpp $(SRCDIR)/FastNumInt.cpp $(SRCDIR)/BenchFastMath.cpp
 SOURCES2:= $(SRCDIR)/stopwatch.cpp $(SRCDIR)/ran2.cpp $(SRCDIR)/FastMath.cpp $(SRCDIR)/FastNumInt.cpp $(SRCDIR)/BenchFastNumInt.cpp
