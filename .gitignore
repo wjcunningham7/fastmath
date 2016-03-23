@@ -21,7 +21,9 @@
 *.app
 
 # Specific
-./dat/*
+./dat/**
 ./lib/*
 ./bin/*
 ./obj/*
+Makefile
+./local/**

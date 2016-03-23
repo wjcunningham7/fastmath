@@ -207,13 +207,14 @@ public:
 	{
 		//printf("Calling the default constructor.\n");
 		n = 0; nb = 0; nr = 0;
+		bits = NULL;
 	}
 
 	//Creation Constructor
 	FastBitset(uint64_t _n)
 	{
 		//printf("Calling the creation constructor.\n");
-		createBitset(bits, _n);
+		createBitset(_n);
 	}
 
 	//Copy Constructor
@@ -247,39 +248,9 @@ public:
 		return *this;
 	}
 
-	inline void createBitset(BlockType *& _bits, uint64_t _n, uint64_t _nb)
+	inline void createBitset(uint64_t _n)
 	{
-		try {
-			n = _n;
-			nb = _nb;
-			//#ifdef AVX2_ENABLED
-			//posix_memalign((void**)&_bits, 32, sizeof(BlockType) * nb);
-			//#else
-			nr = nb & 3;	//Equivalent to nb % 4
-			_bits = (BlockType*)malloc(sizeof(BlockType) * nb);
-			//#endif
-			if (_bits == NULL)
-				throw std::bad_alloc();
-			memset(_bits, 0, sizeof(BlockType) * nb);
-		} catch (std::bad_alloc) {
-			fprintf(stderr, "Memory allocation failure in %s on line %d!\n", __FILE__, __LINE__);
-			fflush(stderr);
-			destroyBitset(_bits);
-		}
-	}
-
-	inline void createBitset(BlockType *& _bits, uint64_t _n)
-	{
-		createBitset(_bits, _n, get_num_blocks(_n));
-	}
-
-	inline void destroyBitset(BlockType *& _bits)
-	{
-		n = 0; nb = 0; nr = 0;
-		if (_bits != NULL) {
-			free(_bits);
-			_bits = NULL;
-		}
+		createBitset(bits, _n);
 	}
 
 	//Use this with fb as your workspace
@@ -363,20 +334,20 @@ public:
 	//NOTE: This operation is not thread-safe
 	void set(uint64_t idx)
 	{
-		bits[idx >> 6] |= (BlockType)1 << (idx & block_size_m);
+		bits[idx >> 6] |= (BlockType)1ULL << (idx & block_size_m);
 	}
 
 	//Set the bit at location 'idx' to 0
 	//NOTE: This operation is not thread-safe
 	void unset(uint64_t idx)
 	{
-		bits[idx >> 6] &= ~((BlockType)1 << (idx & block_size_m));
+		bits[idx >> 6] &= ~((BlockType)1ULL << (idx & block_size_m));
 	}
 
 	//Read the bit at location 'idx'
 	inline BlockType read(uint64_t idx) const
 	{
-		return (bits[idx >> 6] >> (idx & block_size_m)) & 1;
+		return (bits[idx >> 6] >> (idx & block_size_m)) & 1ULL;
 	}
 
 	//Read the block at location 'idx'
@@ -698,6 +669,42 @@ public:
 	}
 
 private:
+	inline void createBitset(BlockType *& _bits, uint64_t _n, uint64_t _nb)
+	{
+		try {
+			n = _n;
+			nb = _nb;
+			//#ifdef AVX2_ENABLED
+			//posix_memalign((void**)&_bits, 32, sizeof(BlockType) * nb);
+			//#else
+			nr = nb & 3;	//Equivalent to nb % 4
+			_bits = (BlockType*)malloc(sizeof(BlockType) * nb);
+			//#endif
+			if (_bits == NULL)
+				throw std::bad_alloc();
+			memset(_bits, 0, sizeof(BlockType) * nb);
+		} catch (std::bad_alloc) {
+			fprintf(stderr, "Memory allocation failure in %s on line %d!\n", __FILE__, __LINE__);
+			fflush(stderr);
+			destroyBitset(_bits);
+		}
+	}
+
+	inline void createBitset(BlockType *& _bits, uint64_t _n)
+	{
+		createBitset(_bits, _n, get_num_blocks(_n));
+	}
+
+	inline void destroyBitset(BlockType *& _bits)
+	{
+		n = 0; nb = 0; nr = 0;
+		if (_bits != NULL) {
+			//printf("Freeing the bitset.\n");
+			free(_bits);
+			_bits = NULL;
+		}
+	}
+
 	#ifdef AVX2_ENABLED
 	static const size_t block_size = 256;	//Enforces 32-byte alignment
 	#else

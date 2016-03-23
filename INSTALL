@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [[ -z "$FAST_LOCAL_DIR" ]] ; then
+  echo "Using $PWD/local as your local directory."
+  echo "Adding this variable to your .bashrc file."
+  mkdir -p local
+  FAST_LOCAL_DIR=$PWD/local
+  echo "export FAST_LOCAL_DIR=$FAST_LOCAL_DIR" >> /home/$USER/.bashrc
+fi
+
+AVX=0
+if [[ $(cat /proc/cpuinfo | grep avx2 | wc -l) -ne 0 ]] ; then
+  AVX=1
+fi
+
+sed "s:%AVX%:$AVX:g" < Makefile.in > Makefile
