@@ -10,7 +10,12 @@ fi
 
 AVX=0
 if [[ $(cat /proc/cpuinfo | grep avx2 | wc -l) -ne 0 ]] ; then
+  echo "AVX2 support detected."
+  echo "Compiling FastMath with AVX2 features enabled."
   AVX=1
 fi
 
 sed "s:%AVX%:$AVX:g" < Makefile.in > Makefile
+
+make
+make install
