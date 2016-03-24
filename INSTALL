@@ -17,5 +17,5 @@ fi
 
 sed "s:%AVX%:$AVX:g" < Makefile.in > Makefile
 
-make
+make clean; make
 make install
