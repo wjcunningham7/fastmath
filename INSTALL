@@ -6,6 +6,7 @@ if [[ -z "$FAST_LOCAL_DIR" ]] ; then
   mkdir -p local
   FAST_LOCAL_DIR=$PWD/local
   echo "export FAST_LOCAL_DIR=$FAST_LOCAL_DIR" >> /home/$USER/.bashrc
+  source ~/.bashrc
 fi
 
 AVX=0

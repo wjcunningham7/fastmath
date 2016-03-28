@@ -1,4 +1,4 @@
-#include "FastMath.h"
+#include "FastBitset.h"
 #include "stopwatch.h"
 #include <vector>
 #include <boost/random/mersenne_twister.hpp>
@@ -49,10 +49,60 @@ int main(int argc, char **argv)
 
 	printf("Bitset 1:\t\t%s\n", fb1.toString().c_str());
 	printf("Bitset 2:\t\t%s\n", fb2.toString().c_str());
-	//fb1.setIntersectionS_v3(fb2);
-	//printf("Intersection:\t\t%s\n", fb1.toString().c_str());
-	fb2.setUnion_v1(fb1);
-	printf("Union:\t\t\t%s\n", fb2.toString().c_str());
+	fb1.setIntersectionS_v2(fb2);
+	printf("Intersection:\t\t%s\n", fb1.toString().c_str());
+	//fb2.setUnion_v1(fb1);
+	//printf("Union:\t\t\t%s\n", fb2.toString().c_str());
+
+	//===========================================================//
+
+	/*printf("\nTesting Partial Bitset Capabilities:\n");
+	printf("------------------------------------\n");
+	//FastBitset fb3(384);
+	FastBitset fb3(640);
+	for (uint64_t i = 0; i < 64; i += 2)
+		fb3.set(i);
+	for (uint64_t i = 64; i < 128; i += 4)
+		fb3.set(i);
+	for (uint64_t i = 128; i < 192; i += 8)
+		fb3.set(i);
+	for (uint64_t i = 192; i < 256; i += 16)
+		fb3.set(i);
+	for (uint64_t i = 256; i < 320; i += 2)
+		fb3.set(i);
+	for (uint64_t i = 320; i < 384; i += 4)
+		fb3.set(i);
+	printf("Bitset 3:\t\t%s\n", fb3.toString().c_str());
+	
+	FastBitset fb_clone(640);
+	fb3.clone(fb_clone, 1, 8);
+	for (uint64_t i = 256; i < 512; i += 8)
+		fb_clone.set(i);
+	printf("Clone of Bitset:\t%s\n", fb_clone.toString().c_str());
+
+	printf("Count of the Clone: %" PRIu64 "\n", fb_clone.count_v3());
+
+	unsigned int start = 0;
+	unsigned int finish = 32;
+	printf("Partial Count (%d to %d): %" PRIu64 "\n", start, finish-1, fb_clone.partial_count(start, finish - start));*/
+
+	//===========================================================//
+
+	/*printf("\nTesting Partial Intersection:\n");
+	printf("-----------------------------\n");
+	printf("Set 1:\n");
+	for (int i = 0; i < 8; i++)
+		printf("%s\n", fb_clone.toString(fb_clone.readBlock(i)).c_str());
+	printf("\nSet 2:\n");
+	for (int i = 0; i < 8; i++)
+		printf("%s\n", fb3.toString(fb3.readBlock(i)).c_str());
+	printf("\nIntersection:\n");
+	fb_clone.partial_intersection(fb3, 48, 256);
+	for (int i = 0; i < 8; i++)
+		printf("%s\n", fb_clone.toString(fb_clone.readBlock(i)).c_str());
+	//printf("Intersection:\t\t%s\n", fb_clone.toString().c_str());*/
+
+	//===========================================================//
 
 	/*printf("Testing Vector Capabilities:\n");	//Enable print statements in constructors
 	printf("----------------------------\n");
@@ -72,6 +122,8 @@ int main(int argc, char **argv)
 	printf("Now I'm here.\n");
 	vec[0].set(0);*/
 
+	//===========================================================//
+
 	//Benchmark assignment, intersection, and count operations
 	/*printf("\nBenchmarking Operations:\n");
 	printf("------------------------\n");
@@ -86,12 +138,12 @@ int main(int argc, char **argv)
 	Stopwatch p2 = Stopwatch();
 	Stopwatch p3 = Stopwatch();*/
 
-	/*srand(time(NULL));
+	srand(time(NULL));
 	long seed = 49375439;
 	Engine eng(seed);
 	UDistribution udist(0.0, 1.0);
 	UGenerator urng(eng, udist);
-	float set_prob = 0.4;*/
+	float set_prob = 0.4;
 
 	/*adj.reserve(vec_size);
 
@@ -143,6 +195,8 @@ int main(int argc, char **argv)
 	printf("\tPercent Used:           %5.6f%%\n", p3.elapsedTime / tot_time);
 	fflush(stdout);*/
 
+	//===========================================================//
+
 	//Test count speed
 	/*printf("\nBenchmarking count_v3():\n");
 	printf("------------------------\n");
@@ -162,6 +216,8 @@ int main(int argc, char **argv)
 		stopwatchStop(&s);
 	}
 	printf("Time for all operations: %5.6f sec\n", s.elapsedTime);*/
+
+	//===========================================================//
 
 	/*printf("\nTesting AVX2 Intrinsics:\n");
 	printf("-----------------------\n");
@@ -222,4 +278,40 @@ int main(int argc, char **argv)
 	printf("Time using version 3: %5.6f sec\n", sw2.elapsedTime / samples * 5);
 	printf("Time using version 4: %5.6f sec\n", sw3.elapsedTime / samples * 5);
 	printf("Time using version 5: %5.6f sec\n", sw4.elapsedTime / samples * 5);*/
+
+	//===========================================================//
+
+	printf("\nBenchmarking Partial Count:\n");
+	printf("---------------------------\n");
+
+	Stopwatch s = Stopwatch();
+	uint64_t size = 16384;
+	uint64_t samples = 1;
+	set_prob = 0.4;
+
+	FastBitset work(size);
+	for (uint64_t i = 0; i < samples; i++) {
+		FastBitset fbpc0(size);
+		FastBitset fbpc1(size);
+		for (uint64_t j = 0; j < size; j++) {
+			if (urng() < set_prob)
+				fbpc0.set(j);
+			if (urng() < set_prob)
+				fbpc1.set(j);
+		}
+
+		stopwatchStart(&s);
+		for (uint64_t j = 0; j < size; j++) {
+			//printf("j: %" PRIu64 "\n", j);
+			for (uint64_t k = 1; k <= size - j; k++) {
+				//printf("k: %" PRIu64 "\n", k);
+				fbpc0.clone(work);
+				work.partial_intersection(fbpc1, j, k);
+				work.partial_count(j, k);
+			}
+		}
+		stopwatchStop(&s);
+	}
+
+	printf("Time for all operations: %5.6f sec\n", s.elapsedTime);
 }
