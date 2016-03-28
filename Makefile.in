@@ -89,6 +89,7 @@ install : check-env lib
 	mkdir -p $(LOCAL_DIR)/src/fastmath
 	cp $(LIB) $(LOCAL_DIR)/lib64/
 	cp $(INCDIR)/fastapprox.h $(LOCAL_DIR)/include/fastmath/
+	cp $(INCDIR)/FastBitset.h $(LOCAL_DIR)/include/fastmath/
 	cp $(INCDIR)/FastMath.h $(LOCAL_DIR)/include/fastmath/
 	cp $(INCDIR)/FastNumInt.h $(LOCAL_DIR)/include/fastmath/
 	cp $(INCDIR)/stopwatch.h $(LOCAL_DIR)/include/fastmath/
