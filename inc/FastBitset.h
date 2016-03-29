@@ -355,7 +355,7 @@ public:
 		unsigned int idx1 = static_cast<unsigned int>((offset + length) & (bits_per_block - 1));
 		BlockType lower_mask = idx0 ? ~get_bitmask(idx0) : (BlockType)(-1);
 		BlockType upper_mask = idx1 ? get_bitmask(idx1) : (BlockType)(-1);
-		uint64_t nmid, rem, max, nused;
+		uint64_t nmid, nused;
 
 		/*printf("\noffset: %" PRIu64 "\n", offset);
 		printf("length: %" PRIu64 "\n", length);
@@ -375,8 +375,8 @@ public:
 			//printf("\nnmid: %" PRIu64 "\n", nmid);
 			
 			#ifdef AVX2_ENABLED
-			rem = nmid & 3;
-			max = nmid - rem;
+			uint64_t rem = nmid & 3;
+			uint64_t max = nmid - rem;
 
 			/*printf("rem: %" PRIu64 "\n", rem);
 			printf("max: %" PRIu64 "\n", max);*/
