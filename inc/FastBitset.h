@@ -2,6 +2,7 @@
 #define FAST_BITSET_H_
 
 #include "FastMath.h"
+#include <boost/functional/hash/hash.hpp>
 
 /////////////////////////////
 //(C) Will Cunningham 2016 //
@@ -85,6 +86,17 @@ public:
 			bits = _bits;
 		}
 		return *this;
+	}
+
+	//Equality operator
+	inline bool operator==(FastBitset const& other) const
+	{
+		if (nb != other.nb) return false;
+
+		uint64_t same = 0;
+		for (uint64_t i = 0; i < nb; i++)
+			same ^= bits[i] ^ other.bits[i];
+		return !(bool)same;
 	}
 
 	inline void createBitset(uint64_t _n)
@@ -599,6 +611,23 @@ private:
 	BlockType get_bitmask(unsigned int offset) {
 		return ((BlockType)1 << offset) - 1;
 	}
+};
+
+//Add hashing function
+namespace std
+{
+	template<>
+	class hash<FastBitset>
+	{
+	public:
+		size_t operator()(FastBitset const& fb) const
+		{
+			size_t seed = 0;
+			for (uint64_t i = 0; i < fb.getNumBlocks(); i++)
+				boost::hash_combine(seed, (size_t)fb.readBlock(i));
+			return seed;
+		}
+	};
 };
 
 #endif

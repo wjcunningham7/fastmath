@@ -1,5 +1,6 @@
 #include "FastBitset.h"
 #include "stopwatch.h"
+#include <unordered_set>
 #include <vector>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_real.hpp>
@@ -8,6 +9,21 @@
 typedef boost::mt19937 Engine;
 typedef boost::uniform_real<double> UDistribution;
 typedef boost::variate_generator< Engine &, UDistribution > UGenerator;
+
+/*namespace std {
+	template <>
+	class hash<FastBitset>
+	{
+	public:
+		size_t operator()(FastBitset const& fb) const
+		{
+			size_t seed = 0;
+			for (uint64_t i = 0; i < fb.nb; i++)
+				boost::hash_combine(seed, (size_t)fb.bits[i]);
+			return seed;
+		}
+	};
+};*/
 
 int main(int argc, char **argv)
 {
@@ -53,6 +69,13 @@ int main(int argc, char **argv)
 	printf("Intersection:\t\t%s\n", fb1.toString().c_str());
 	//fb2.setUnion_v1(fb1);
 	//printf("Union:\t\t\t%s\n", fb2.toString().c_str());
+
+	bool equal = fb1 == fb1;
+	printf("Equal: %d\n", (int)equal);
+
+	std::unordered_set<FastBitset> fbset;
+	//std::unordered_set<FastBitset,FastBitset::fb_hash> fbset;
+	fbset.insert(fb1);
 
 	//===========================================================//
 
@@ -138,12 +161,12 @@ int main(int argc, char **argv)
 	Stopwatch p2 = Stopwatch();
 	Stopwatch p3 = Stopwatch();*/
 
-	srand(time(NULL));
+	/*srand(time(NULL));
 	long seed = 49375439;
 	Engine eng(seed);
 	UDistribution udist(0.0, 1.0);
 	UGenerator urng(eng, udist);
-	float set_prob = 0.4;
+	float set_prob = 0.4;*/
 
 	/*adj.reserve(vec_size);
 
@@ -281,7 +304,7 @@ int main(int argc, char **argv)
 
 	//===========================================================//
 
-	printf("\nBenchmarking Partial Count:\n");
+	/*printf("\nBenchmarking Partial Count:\n");
 	printf("---------------------------\n");
 
 	Stopwatch s = Stopwatch();
@@ -313,5 +336,5 @@ int main(int argc, char **argv)
 		stopwatchStop(&s);
 	}
 
-	printf("Time for all operations: %5.6f sec\n", s.elapsedTime);
+	printf("Time for all operations: %5.6f sec\n", s.elapsedTime);*/
 }
