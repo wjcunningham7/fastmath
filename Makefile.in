@@ -10,7 +10,7 @@ LOCAL_DIR	:= $(FAST_LOCAL_DIR)
 CXX	:= g++
 INCD	:= -I $(INCDIR) -I $(LOCAL_DIR)/include
 LIBS	:= -L $(LOCAL_DIR)/lib64 -lm -lnint -lgsl -lgslcblas -lstdc++
-FLAGS	:= -g -mpopcnt -O3 -std=c++0x -DBOOST_NO_FENV -Wno-narrowing
+FLAGS	:= -g -mpopcnt -O3 -std=c++0x -DBOOST_NO_FENV_H -Wno-narrowing
 ASMFLAGS:= -mpopcnt -mavx2 -DAVX2_ENABLED -Ofast
 
 USE_AVX2 := %AVX%
