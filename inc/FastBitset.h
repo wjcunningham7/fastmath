@@ -145,6 +145,12 @@ public:
 		return block_size;
 	}
 
+	//Return address of bits (needed for MPI)
+	inline void* getAddress() const
+	{
+		return (void*)bits;
+	}
+
 	//Computes the Hamming weight
 	//Make sure to compile with the flag -mpopcnt to use this
 	inline uint64_t count_v1() const
@@ -509,7 +515,7 @@ public:
 			setUnionL_v2(fb);
 	}
 
-	std::string toString()
+	std::string toString() const
 	{
 		std::ostringstream s;
 		for (uint64_t i = 0; i < n; i++)
@@ -524,7 +530,7 @@ public:
 		return cpy.toString();
 	}
 
-	void printBitset()
+	void printBitset() const
 	{
 		printf("%s\n", toString().c_str());
 	}

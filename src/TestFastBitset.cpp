@@ -74,8 +74,9 @@ int main(int argc, char **argv)
 	printf("Equal: %d\n", (int)equal);
 
 	std::unordered_set<FastBitset> fbset;
-	//std::unordered_set<FastBitset,FastBitset::fb_hash> fbset;
 	fbset.insert(fb1);
+
+	void *address = fb1.getAddress();
 
 	//===========================================================//
 
