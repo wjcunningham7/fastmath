@@ -8,7 +8,7 @@
 #define HAVE_ASSERT_H 1
 
 /* Define if avx2 instructions are supported */
-/* #undef HAVE_AVX2_INSTRUCTIONS */
+#define HAVE_AVX2_INSTRUCTIONS 1
 
 /* Defined if the requested minimum BOOST version is satisfied */
 #define HAVE_BOOST 1

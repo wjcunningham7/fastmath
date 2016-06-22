@@ -2,12 +2,12 @@ stopwatch.o: stopwatch.cpp ../inc/stopwatch.h /usr/include/assert.h \
  /usr/include/features.h /usr/include/sys/cdefs.h \
  /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
  /usr/include/gnu/stubs-64.h \
- /shared/apps/gnu-compilers/gnu-4.8.1/gcc-4.8.1/INSTALL/include/c++/4.8.1/cstdlib \
- /shared/apps/gnu-compilers/gnu-4.8.1/gcc-4.8.1/INSTALL/include/c++/4.8.1/x86_64-unknown-linux-gnu/bits/c++config.h \
- /shared/apps/gnu-compilers/gnu-4.8.1/gcc-4.8.1/INSTALL/include/c++/4.8.1/x86_64-unknown-linux-gnu/bits/os_defines.h \
- /shared/apps/gnu-compilers/gnu-4.8.1/gcc-4.8.1/INSTALL/include/c++/4.8.1/x86_64-unknown-linux-gnu/bits/cpu_defines.h \
+ /opt/rh/devtoolset-2/root/usr/include/c++/4.8.2/cstdlib \
+ /opt/rh/devtoolset-2/root/usr/include/c++/4.8.2/x86_64-redhat-linux/bits/c++config.h \
+ /opt/rh/devtoolset-2/root/usr/include/c++/4.8.2/x86_64-redhat-linux/bits/os_defines.h \
+ /opt/rh/devtoolset-2/root/usr/include/c++/4.8.2/x86_64-redhat-linux/bits/cpu_defines.h \
  /usr/include/stdlib.h \
- /shared/apps/gnu-compilers/usr/lib/gcc/x86_64-redhat-linux/4.4.7/include/stddef.h \
+ /opt/rh/devtoolset-2/root/usr/lib/gcc/x86_64-redhat-linux/4.8.2/include/stddef.h \
  /usr/include/bits/waitflags.h /usr/include/bits/waitstatus.h \
  /usr/include/endian.h /usr/include/bits/endian.h \
  /usr/include/bits/byteswap.h /usr/include/xlocale.h \
@@ -32,17 +32,17 @@ stopwatch.o: stopwatch.cpp ../inc/stopwatch.h /usr/include/assert.h \
 
 /usr/include/gnu/stubs-64.h:
 
-/shared/apps/gnu-compilers/gnu-4.8.1/gcc-4.8.1/INSTALL/include/c++/4.8.1/cstdlib:
+/opt/rh/devtoolset-2/root/usr/include/c++/4.8.2/cstdlib:
 
-/shared/apps/gnu-compilers/gnu-4.8.1/gcc-4.8.1/INSTALL/include/c++/4.8.1/x86_64-unknown-linux-gnu/bits/c++config.h:
+/opt/rh/devtoolset-2/root/usr/include/c++/4.8.2/x86_64-redhat-linux/bits/c++config.h:
 
-/shared/apps/gnu-compilers/gnu-4.8.1/gcc-4.8.1/INSTALL/include/c++/4.8.1/x86_64-unknown-linux-gnu/bits/os_defines.h:
+/opt/rh/devtoolset-2/root/usr/include/c++/4.8.2/x86_64-redhat-linux/bits/os_defines.h:
 
-/shared/apps/gnu-compilers/gnu-4.8.1/gcc-4.8.1/INSTALL/include/c++/4.8.1/x86_64-unknown-linux-gnu/bits/cpu_defines.h:
+/opt/rh/devtoolset-2/root/usr/include/c++/4.8.2/x86_64-redhat-linux/bits/cpu_defines.h:
 
 /usr/include/stdlib.h:
 
-/shared/apps/gnu-compilers/usr/lib/gcc/x86_64-redhat-linux/4.4.7/include/stddef.h:
+/opt/rh/devtoolset-2/root/usr/lib/gcc/x86_64-redhat-linux/4.8.2/include/stddef.h:
 
 /usr/include/bits/waitflags.h:
 

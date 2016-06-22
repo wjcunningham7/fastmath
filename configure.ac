@@ -52,8 +52,9 @@ AX_GCC_X86_CPU_SUPPORTS([popcnt],, AC_MSG_ERROR([CPU does not support popcnt ins
 AX_GCC_ARCHFLAG([no],, AC_MSG_ERROR([CPU architecture could not be identified.]))
 CXXFLAGS+=" $ax_cv_gcc_archflag"
 
-xtra=($(for file in $(find inc/intrinsics -type f) ; do echo $(basename $file) ; done))
+xtra=($(for file in $(find inc/intrinsics -type f) ; do echo intrinsics/$(basename $file) ; done))
+#xtra=($(for file in $(find inc/intrinsics -type f) ; do echo $file ; done))
 AC_SUBST([xtra], ["${xtra[[@]]}"])
 
-AC_CONFIG_FILES([Makefile nint/Makefile src/Makefile])
+AC_CONFIG_FILES([Makefile nint/Makefile src/Makefile inc/Makefile])
 AC_OUTPUT

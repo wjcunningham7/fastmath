@@ -27,3 +27,22 @@
 ./obj/*
 Makefile
 ./local/**
+
+# Autoconf files
+autom4te.cache/**
+aclocal.m4
+AUTHORS
+ChangeLog
+config.guess
+config.log
+config.status
+config.sub
+configure
+depcomp
+install-sh
+Makefile.in
+missing
+NEWS
+nint/.deps/**
+nint/Makefile
+nint/Makefile.in

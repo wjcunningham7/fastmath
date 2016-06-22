@@ -1,7 +1,3 @@
-# ifdef HAVE_CONFIG_H
-# include <config.hpp>
-# endif
-
 # include <cstdlib>
 # include <iostream>
 # include <iomanip>
