@@ -98,6 +98,9 @@
 #define ACOSH_I12 -0.03759765625000000000
 #define ACOSH_I14 -0.02992466517857142857
 
+//Used for SGN function
+static const double table[] = {-1.0, 1.0};
+
 //Method of Calculation
 enum FastMethod {
 	DEF = 0,
@@ -129,7 +132,9 @@ struct HyperType {
 };
 
 //Power Functions
+double POW2(const double x);
 double POW2(const double x, const enum FastMethod fm);
+double POW3(const double x);
 double POW3(const double x, const enum FastMethod fm);
 double POW(const double x, const double p, const enum FastMethod fm);
 double SQRT(const double x, const enum FastMethod fm);
@@ -137,6 +142,7 @@ double SQRT(const double x, const enum FastMethod fm);
 //Absolute Value, Natural Log, and Sign
 double ABS(const double x, const enum FastMethod fm);
 double LOG(const double x, const enum FastMethod fm);
+double SGN(const double x);
 double SGN(const double x, const enum FastMethod fm);
 
 //Trigonometric Functions
@@ -157,7 +163,9 @@ double ASINH(const double x, const enum FastMethod fm, const enum Precision p);
 double ACOSH(const double x, const enum FastMethod fm, const enum Precision p);
 
 //Statistical Functions
+double GAMMA(const double x);
 double GAMMA(const double x, const enum FastMethod fm);
+double LOGGAMMA(const double x);
 double LOGGAMMA(const double x, const enum FastMethod fm);
 double GAMMA_RATIO(const double x, const double y);
 double POCHHAMMER(const double x, const int j);

@@ -1,6 +1,10 @@
 #ifndef STOPWATCH_H_
 #define STOPWATCH_H_
 
+//#ifdef HAVE_CONFIG_H
+//#include "config.h"
+//#endif
+
 #include <assert.h>
 #include <cstdlib>
 #include <sys/time.h>

@@ -1,4 +1,4 @@
-src/stopwatch.o: src/stopwatch.cpp inc/stopwatch.h /usr/include/assert.h \
+stopwatch.o: stopwatch.cpp ../inc/stopwatch.h /usr/include/assert.h \
  /usr/include/features.h /usr/include/sys/cdefs.h \
  /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
  /usr/include/gnu/stubs-64.h \
@@ -18,7 +18,7 @@ src/stopwatch.o: src/stopwatch.cpp inc/stopwatch.h /usr/include/assert.h \
  /usr/include/sys/sysmacros.h /usr/include/bits/pthreadtypes.h \
  /usr/include/alloca.h /usr/include/sys/time.h
 
-inc/stopwatch.h:
+../inc/stopwatch.h:
 
 /usr/include/assert.h:
 

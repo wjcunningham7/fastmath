@@ -1,5 +1,5 @@
-src/FastNumInt.o: src/FastNumInt.cpp inc/FastNumInt.h \
- /usr/include/assert.h /usr/include/features.h /usr/include/sys/cdefs.h \
+FastNumInt.o: FastNumInt.cpp ../inc/FastNumInt.h /usr/include/assert.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h \
  /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
  /usr/include/gnu/stubs-64.h /usr/include/stdio.h \
  /shared/apps/gnu-compilers/usr/lib/gcc/x86_64-redhat-linux/4.4.7/include/stddef.h \
@@ -35,9 +35,9 @@ src/FastNumInt.o: src/FastNumInt.cpp inc/FastNumInt.h \
  /shared/apps/gnu-compilers/usr/lib/gcc/x86_64-redhat-linux/4.4.7/include/float.h \
  /usr/include/gsl/gsl_precision.h /usr/include/gsl/gsl_nan.h \
  /usr/include/gsl/gsl_pow_int.h /usr/include/gsl/gsl_minmax.h \
- opt/nintlib/nint.hpp
+ ../nint/nint.hpp
 
-inc/FastNumInt.h:
+../inc/FastNumInt.h:
 
 /usr/include/assert.h:
 
@@ -177,4 +177,4 @@ inc/FastNumInt.h:
 
 /usr/include/gsl/gsl_minmax.h:
 
-opt/nintlib/nint.hpp:
+../nint/nint.hpp:

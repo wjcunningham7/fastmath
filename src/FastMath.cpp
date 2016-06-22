@@ -16,6 +16,11 @@
 ////////////////////////////////////////////////////////////////////
 
 //Approximation of x^2
+double POW2(const double x)
+{
+	return x * x;
+}
+
 double POW2(const double x, const enum FastMethod fm)
 {
 	#if FM_DEBUG
@@ -49,6 +54,11 @@ double POW2(const double x, const enum FastMethod fm)
 }
 
 //Approximation of x^3
+double POW3(const double x)
+{
+	return x * x * x;
+}
+
 double POW3(const double x, const enum FastMethod fm)
 {
 	#if FM_DEBUG
@@ -206,13 +216,17 @@ double LOG(const double x, const enum FastMethod fm)
 }
 
 //Returns sign(x)
+double SGN(const double x)
+{
+	return table[x > 0.0];
+}
+
 double SGN(const double x, const enum FastMethod fm)
 {	
 	#if FM_DEBUG
 	assert (fm == DEF || fm == BITWISE);
 	#endif
 
-	static const double table[] = {-1.0, 1.0};
 	double y;
 	float z;
 
@@ -605,6 +619,11 @@ double ACOSH(const double x, const enum FastMethod fm, const enum Precision p)
 }
 
 //Approximation of the Gamma Function
+double GAMMA(const double x)
+{
+	return boost::math::tgamma(x);
+}
+
 double GAMMA(const double x, const enum FastMethod fm)
 {
 	#if FM_DEBUG
@@ -642,6 +661,11 @@ double GAMMA(const double x, const enum FastMethod fm)
 }
 
 //Approximation of ln(gamma(x))
+double LOGGAMMA(const double x)
+{
+	return boost::math::lgamma(x);
+}
+
 double LOGGAMMA(const double x, const enum FastMethod fm)
 {
 	#if FM_DEBUG

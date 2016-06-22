@@ -1,4 +1,4 @@
-src/FastMath.o: src/FastMath.cpp \
+FastMath.o: FastMath.cpp \
  /shared/apps/boost/boost_1_55_0/boost/math/special_functions/gamma.hpp \
  /shared/apps/boost/boost_1_55_0/boost/config.hpp \
  /shared/apps/boost/boost_1_55_0/boost/config/user.hpp \
@@ -141,8 +141,6 @@ src/FastMath.o: src/FastMath.cpp \
  /shared/apps/gnu-compilers/usr/lib/gcc/x86_64-redhat-linux/4.4.7/include/wmmintrin.h \
  /shared/apps/gnu-compilers/usr/lib/gcc/x86_64-redhat-linux/4.4.7/include/immintrin.h \
  /shared/apps/gnu-compilers/usr/lib/gcc/x86_64-redhat-linux/4.4.7/include/avxintrin.h \
- /shared/apps/gnu-compilers/usr/lib/gcc/x86_64-redhat-linux/4.4.7/include/f16cintrin.h \
- /shared/apps/gnu-compilers/usr/lib/gcc/x86_64-redhat-linux/4.4.7/include/bmiintrin.h \
  /shared/apps/gnu-compilers/gnu-4.8.1/gcc-4.8.1/INSTALL/include/c++/4.8.1/bits/random.tcc \
  /shared/apps/gnu-compilers/gnu-4.8.1/gcc-4.8.1/INSTALL/include/c++/4.8.1/numeric \
  /shared/apps/gnu-compilers/gnu-4.8.1/gcc-4.8.1/INSTALL/include/c++/4.8.1/bits/stl_numeric.h \
@@ -785,8 +783,7 @@ src/FastMath.o: src/FastMath.cpp \
  /shared/apps/boost/boost_1_55_0/boost/math/special_functions/detail/gamma_inva.hpp \
  /shared/apps/boost/boost_1_55_0/boost/math/special_functions/erf.hpp \
  /shared/apps/boost/boost_1_55_0/boost/math/special_functions/detail/erf_inv.hpp \
- inc/fastapprox.h inc/FastMath.h opt/intrinsics/x86intrin.h \
- /usr/include/inttypes.h
+ ../inc/fastapprox.h ../inc/FastMath.h /usr/include/inttypes.h
 
 /shared/apps/boost/boost_1_55_0/boost/math/special_functions/gamma.hpp:
 
@@ -1125,10 +1122,6 @@ src/FastMath.o: src/FastMath.cpp \
 /shared/apps/gnu-compilers/usr/lib/gcc/x86_64-redhat-linux/4.4.7/include/immintrin.h:
 
 /shared/apps/gnu-compilers/usr/lib/gcc/x86_64-redhat-linux/4.4.7/include/avxintrin.h:
-
-/shared/apps/gnu-compilers/usr/lib/gcc/x86_64-redhat-linux/4.4.7/include/f16cintrin.h:
-
-/shared/apps/gnu-compilers/usr/lib/gcc/x86_64-redhat-linux/4.4.7/include/bmiintrin.h:
 
 /shared/apps/gnu-compilers/gnu-4.8.1/gcc-4.8.1/INSTALL/include/c++/4.8.1/bits/random.tcc:
 
@@ -2422,10 +2415,8 @@ src/FastMath.o: src/FastMath.cpp \
 
 /shared/apps/boost/boost_1_55_0/boost/math/special_functions/detail/erf_inv.hpp:
 
-inc/fastapprox.h:
+../inc/fastapprox.h:
 
-inc/FastMath.h:
-
-opt/intrinsics/x86intrin.h:
+../inc/FastMath.h:
 
 /usr/include/inttypes.h:
