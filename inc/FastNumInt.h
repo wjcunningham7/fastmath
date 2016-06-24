@@ -6,7 +6,7 @@
 
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_integration.h>
-#include <nint/nint.hpp>
+#include <nint.h>
 
 #define FNI_DEBUG true
 

@@ -12,9 +12,6 @@ AC_PROG_RANLIB
 
 AC_LANG([C++])
 
-#var=($(for file in $(find inc/intrinsics -type f) ; do echo $(basename $file) ; done))
-#echo ${var[[@]]}
-
 AX_COMPILER_VERSION
 AX_COMPARE_VERSION([$ax_cv_cxx_compiler_version], [ge], [4.8.1],, AC_MSG_ERROR([GNU compiler must be at least version 4.8.1]))
 AX_CXX_COMPILE_STDCXX([11])
@@ -28,7 +25,7 @@ AC_CHECK_LIB([stdc++], [main],, AC_MSG_ERROR([Could not find the library "libstd
 
 AC_CHECK_FILES([src/stopwatch.cpp src/FastMath.cpp src/FastNumInt.cpp],, AC_MSG_ERROR([Could not find fastmath source files.]))
 AC_CHECK_FILES([inc/stopwatch.h inc/FastMath.h inc/FastNumInt.h inc/FastBitset.h inc/fastapprox.h],, AC_MSG_ERROR([Could not find fastmath header files.]))
-AC_CHECK_FILES([nint/nint.cpp nint/nint.hpp],, AC_MSG_ERROR([Could not find nint files.]))
+AC_CHECK_FILES([nint/nint.cpp nint/nint.h],, AC_MSG_ERROR([Could not find nint files.]))
 
 AC_CHECK_HEADERS([assert.h cstdlib algorithm cstring inttypes.h limits.h math.h new stddef.h stdio.h stdlib.h sstream stdint.h],, AC_MSG_ERROR([Could not find system header files.]))
 AC_CHECK_HEADER([emmintrin.h],, AC_MSG_ERROR([Could not find SSE header file.]))
@@ -46,14 +43,13 @@ AC_C_INLINE
 AC_C_CONST
 AC_C_VOLATILE
 
-CXXFLAGS="-g -O3 -DBOOST_NO_FENV_H -Wno-narrowing -mpopcnt"
-AX_GCC_X86_CPU_SUPPORTS([avx2], [CXXFLAGS+=" -mavx2 -DAVX2_ENABLED";], [CXXFLAGS+=""])
+CXXFLAGS="$CXXFLAGS -g -O3 -DBOOST_NO_FENV_H -Wno-narrowing -mpopcnt"
+AX_GCC_X86_CPU_SUPPORTS([avx2], [CXXFLAGS="$CXXFLAGS -mavx2 -DAVX2_ENABLED";], [CXXFLAGS+=""])
 AX_GCC_X86_CPU_SUPPORTS([popcnt],, AC_MSG_ERROR([CPU does not support popcnt instruction.]))
 AX_GCC_ARCHFLAG([no],, AC_MSG_ERROR([CPU architecture could not be identified.]))
-CXXFLAGS+=" $ax_cv_gcc_archflag"
+CXXFLAGS="$CXXFLAGS $ax_cv_gcc_archflag"
 
 xtra=($(for file in $(find inc/intrinsics -type f) ; do echo intrinsics/$(basename $file) ; done))
-#xtra=($(for file in $(find inc/intrinsics -type f) ; do echo $file ; done))
 AC_SUBST([xtra], ["${xtra[[@]]}"])
 
 AC_CONFIG_FILES([Makefile nint/Makefile src/Makefile inc/Makefile])

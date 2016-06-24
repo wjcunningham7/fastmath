@@ -86,7 +86,7 @@
 #undef HAVE_NINT_NINT_CPP
 
 /* Define to 1 if you have the file `AC_File'. */
-#undef HAVE_NINT_NINT_HPP
+#undef HAVE_NINT_NINT_H
 
 /* Define if popcnt instructions are supported */
 #undef HAVE_POPCNT_INSTRUCTIONS
