@@ -48,7 +48,11 @@ src/.dirstamp
 src/Makefile
 src/Makefile.in
 inc/stamp-h1
-inc/config.h*
+inc/config.h
+inc/config.h.in
+inc/config.h.in~
+inc/Makefile
+inc/Makefile.in
 nint/.deps/**
 nint/Makefile
 nint/Makefile.in
