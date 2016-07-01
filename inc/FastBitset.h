@@ -16,6 +16,7 @@
 
 //DO NOT CHANGE THESE
 #define BlockType unsigned long
+#define BlockTypeMPI MPI_UINT64_T
 #define popcount(x) __builtin_popcountl(x)
 #define BLOCK_SHIFT 6
 
