@@ -545,14 +545,14 @@ public:
 	}
 
 	//In this case, this is larger than fb
-	inline void setUnionL_v1(const FastBitset &fb)
+	inline void setDisjointUnionL_v1(const FastBitset &fb)
 	{
 		for (uint64_t i = fb.nb; i-- > 0; )
 			bits[i] ^= fb.bits[i];
 	}
 
 	//A more efficient version
-	inline void setUnionL_v2(const FastBitset &fb)
+	inline void setDisjointUnionL_v2(const FastBitset &fb)
 	{
 		#ifdef AVX2_ENABLED
 		asm volatile(
