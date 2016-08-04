@@ -495,12 +495,12 @@ public:
 		: "r" (fb.bits), "r" (fb.nb)
 		: "%rcx", "memory");
 		#else
-		setUnionS_v1(fb);
+		setUnionL_v1(fb);
 		#endif
 	}
 
 	//The general function
-	inline void setUnion_v1(FastBitset &fb)
+	inline void setUnion_v1(const FastBitset &fb)
 	{
 		if (nb <= fb.nb)
 			setUnionS_v1(fb);
@@ -514,6 +514,80 @@ public:
 			setUnionS_v2(fb);
 		else
 			setUnionL_v2(fb);
+	}
+
+	inline void setDisjointUnionS_v1(const FastBitset &fb)
+	{
+		for (uint64_t i = nb; i-- > 0; )
+			bits[i] ^= fb.bits[i];
+	}
+
+	//A more efficient version
+	inline void setDisjointUnionS_v2(const FastBitset &fb)
+	{
+		#ifdef AVX2_ENABLED
+		asm volatile(
+		"movq %2, %%rcx			\n"
+		"forloop%=:			\n\t"
+		"subq $4, %%rcx			\n\t"
+		"vmovdqu (%0,%%rcx,8), %%ymm0	\n\t"
+		"vmovdqu (%1,%%rcx,8), %%ymm1	\n\t"
+		"vpxor %%ymm0, %%ymm1, %%ymm0	\n\t"
+		"vmovdqu %%ymm0, (%0,%%rcx,8)	\n\t"
+		"cmpq $0, %%rcx			\n\t"
+		"jne forloop%=			\n\t"
+		: "+r" (bits)
+		: "r" (fb.bits), "r" (nb)
+		: "%rcx", "memory");
+		#else
+		setDisjointUnionS_v1(fb);
+		#endif
+	}
+
+	//In this case, this is larger than fb
+	inline void setUnionL_v1(const FastBitset &fb)
+	{
+		for (uint64_t i = fb.nb; i-- > 0; )
+			bits[i] ^= fb.bits[i];
+	}
+
+	//A more efficient version
+	inline void setUnionL_v2(const FastBitset &fb)
+	{
+		#ifdef AVX2_ENABLED
+		asm volatile(
+		"movq %2, %%rcx			\n"
+		"forloop%=:			\n\t"
+		"subq $4, %%rcx			\n\t"
+		"vmovdqu (%0,%%rcx,8), %%ymm0	\n\t"
+		"vmovdqu (%1,%%rcx,8), %%ymm1	\n\t"
+		"vpxor %%ymm0, %%ymm1, %%ymm0	\n\t"
+		"vmovdqu %%ymm0, (%0,%%rcx,8)	\n\t"
+		"cmpq $0, %%rcx			\n\t"
+		"jne forloop%=			\n\t"
+		: "+r" (bits)
+		: "r" (fb.bits), "r" (fb.nb)
+		: "%rcx", "memory");
+		#else
+		setDisjointUnionL_v1(fb);
+		#endif
+	}
+
+	//The general function
+	inline void setDisjointUnion_v1(const FastBitset &fb)
+	{
+		if (nb <= fb.nb)
+			setDisjointUnionS_v1(fb);
+		else
+			setDisjointUnionL_v1(fb);
+	}
+
+	inline void setDisjointUnion_v2(const FastBitset &fb)
+	{
+		if (nb <= fb.nb)
+			setDisjointUnionS_v2(fb);
+		else
+			setDisjointUnionL_v2(fb);
 	}
 
 	std::string toString() const
