@@ -152,6 +152,51 @@ public:
 		return (void*)bits;
 	}
 
+	//Return true if any bits are set
+	inline bool any() const
+	{
+		uint64_t any_set = 0;
+		for (uint64_t i = nb; i-- > 0; )
+			any_set |= bits[i];
+		return !!any_set;
+	}
+
+	//Return true if any bits are set within a particular range
+	inline bool any_in_range(uint64_t offset, uint64_t length)
+	{
+		uint64_t block_idx = offset >> BLOCK_SHIFT;
+		unsigned int idx0 = static_cast<unsigned int>(offset & (bits_per_block - 1));
+		unsigned int idx1 = static_cast<unsigned int>((offset + length) & (bits_per_block - 1));
+		BlockType lower_mask = idx0 ? ~get_bitmask(idx0) : (BlockType)(-1);
+		BlockType upper_mask = idx1 ? get_bitmask(idx1) : (BlockType)(-1);
+
+		uint64_t any_set[4] = { 0, 0, 0, 0 };
+		uint64_t nmid, rem, max;
+
+		if (length <= bits_per_block && (idx0 < idx1 || idx0 + idx1 == 0 || (idx0 > idx1 && idx1 == 0)))
+			any_set[0] |= bits[block_idx] & lower_mask & upper_mask;
+		else {
+			nmid = (length - 1) >> BLOCK_SHIFT;
+			if (idx0 < idx1 || idx0 == 0 || idx1 == 0) nmid--;
+			rem = nmid & 3;
+			max = nmid - rem;
+
+			for (uint64_t i = 1; i <= max; i += 4) {
+				any_set[0] |= bits[block_idx+i];
+				any_set[1] |= bits[block_idx+i+1];
+				any_set[2] |= bits[block_idx+i+2];
+				any_set[3] |= bits[block_idx+i+3];
+			}
+
+			for (uint64_t i = 0; i < rem; i++)
+				any_set[0] |= bits[block_idx + max + i + 1];
+
+			any_set[0] |= (bits[block_idx] & lower_mask) | (bits[block_idx + nmid + 1] & upper_mask);
+		}
+
+		return !!(any_set[0] | any_set[1] | any_set[2] | any_set[3]);
+	}
+
 	//Computes the Hamming weight
 	//Make sure to compile with the flag -mpopcnt to use this
 	inline uint64_t count_v1() const
