@@ -43,10 +43,14 @@ const unsigned char count_table<b>::table[] =
 class FastBitset
 {
 public:
+	//----------------------------//
+	// Constructors, Destructors, //
+	// and Other Class Utilities  //
+	//----------------------------//
+
 	//Default Constructor
 	FastBitset()
 	{
-		//printf("Calling the default constructor.\n");
 		n = 0; nb = 0; nr = 0;
 		bits = NULL;
 	}
@@ -54,14 +58,12 @@ public:
 	//Creation Constructor
 	FastBitset(uint64_t _n)
 	{
-		//printf("Calling the creation constructor.\n");
 		createBitset(_n);
 	}
 
 	//Copy Constructor
 	FastBitset(const FastBitset& other)
 	{
-		//printf("Calling the copy constructor.\n");
 		if (__builtin_expect(this != &other, 1L)) {
 			createBitset(bits, other.n, other.nb);
 			std::copy(other.bits, other.bits + other.nb, bits);
@@ -71,14 +73,12 @@ public:
 	//Destructor
 	~FastBitset()
 	{
-		//printf("Calling the destructor.\n");
 		destroyBitset(bits);
 	}
 
-	//Overload assignment operator
+	//Overloaded Assignment Operator
 	FastBitset& operator= (const FastBitset& other)
 	{
-		//printf("Calling the overloaded assignment operator.\n");
 		if (__builtin_expect(this != &other, 1L)) {
 			BlockType *_bits = NULL;
 			createBitset(_bits, other.n, other.nb);
@@ -89,7 +89,7 @@ public:
 		return *this;
 	}
 
-	//Equality operator
+	//Equality Operator
 	inline bool operator==(FastBitset const& other) const
 	{
 		if (nb != other.nb) return false;
@@ -100,32 +100,9 @@ public:
 		return !(bool)same;
 	}
 
-	inline void createBitset(uint64_t _n)
-	{
-		createBitset(bits, _n);
-	}
-
-	//Use this with fb as your workspace
-	//to avoid unnecessary malloc and free operations
-	//It is important fb be at least as large as this object
-	inline void clone(FastBitset &fb)
-	{
-		fb.n = n;
-		fb.nb = nb;
-		fb.nr = nr;
-		memcpy(fb.bits, bits, sizeof(BlockType) * nb);
-	}
-
-	//Clone only a subset of the bitset
-	//NOTE: The offset and the length are for blocks, not bits!
-	//It is important fb be at least as large as this object
-	inline void clone(FastBitset &fb, const uint64_t offset, const uint64_t length)
-	{
-		fb.n = length * bits_per_block;
-		fb.nb = length;
-		fb.nr = fb.nb & 3;
-		memcpy(fb.bits, bits + offset, sizeof(BlockType) * length);
-	}
+	//-------------------//
+	// Bitset Properties //
+	//-------------------//
 
 	//Returns the number of bits stored in 'bits'
 	inline uint64_t size() const
@@ -196,6 +173,106 @@ public:
 
 		return !!(any_set[0] | any_set[1] | any_set[2] | any_set[3]);
 	}
+
+	//---------------------//
+	// Reading and Writing //
+	//---------------------//
+
+	//Set the bit at location 'idx' to 1
+	//NOTE: This operation is not thread-safe
+	void set(uint64_t idx)
+	{
+		bits[idx >> BLOCK_SHIFT] |= (BlockType)1 << (idx & block_size_m);
+	}
+
+	//Set the bit at location 'idx' to 0
+	//NOTE: This operation is not thread-safe
+	void unset(uint64_t idx)
+	{
+		bits[idx >> BLOCK_SHIFT] &= ~((BlockType)1 << (idx & block_size_m));
+	}
+
+	//Read the bit at location 'idx'
+	inline BlockType read(uint64_t idx) const
+	{
+		return (bits[idx >> BLOCK_SHIFT] >> (idx & block_size_m)) & (BlockType)1;
+	}
+
+	//Read the block at location 'idx'
+	inline BlockType readBlock(uint64_t idx) const
+	{
+		return bits[idx];
+	}
+
+	//---------------//
+	// Create Bitset //
+	//---------------//
+
+	inline void createBitset(uint64_t _n)
+	{
+		createBitset(bits, _n);
+	}
+
+	//--------------------//
+	// Reset Bits to Zero //
+	//--------------------//
+
+	inline void reset()
+	{
+		memset(bits, 0, sizeof(BlockType) * nb);
+	}
+
+	//--------------------//
+	// Cloning Operations //
+	//--------------------//
+
+	//Use this with fb as your workspace
+	//to avoid unnecessary malloc and free operations
+	//It is important fb be at least as large as this object
+	inline void clone(FastBitset &fb)
+	{
+		fb.n = n;
+		fb.nb = nb;
+		fb.nr = nr;
+		memcpy(fb.bits, bits, sizeof(BlockType) * nb);
+	}
+
+	//Clone only a subset of the bitset
+	//NOTE: The offset and the length are for blocks, not bits!
+	//It is important fb be at least as large as this object
+	inline void clone(FastBitset &fb, const uint64_t offset, const uint64_t length)
+	{
+		fb.n = length * bits_per_block;
+		fb.nb = length;
+		fb.nr = fb.nb & 3;
+		memcpy(fb.bits, bits + offset, sizeof(BlockType) * length);
+	}
+
+	//This copies a subset of bits, but does not
+	//modify the parameters of 'fb' like the above method does
+	inline void partial_clone(FastBitset &fb, const uint64_t offset, const uint64_t length)
+	{
+		uint64_t block_idx = offset >> BLOCK_SHIFT;
+		unsigned int idx0 = static_cast<unsigned int>(offset & (bits_per_block - 1));
+		unsigned int idx1 = static_cast<unsigned int>((offset + length) & (bits_per_block - 1));
+		BlockType lower_mask = idx0 ? ~get_bitmask(idx0) : (BlockType)(-1);
+		BlockType upper_mask = idx1 ? get_bitmask(idx1) : (BlockType)(-1);
+		
+		if (length <= bits_per_block && (idx0 < idx1 || idx0 + idx1 == 0 || (idx0 > idx1 && idx1 == 0)))
+			fb.bits[block_idx] = (fb.bits[block_idx] & ~lower_mask) | (bits[block_idx] & lower_mask & upper_mask) | (fb.bits[block_idx] & ~upper_mask);
+		else {
+			uint64_t nmid = (length - 1) >> BLOCK_SHIFT;
+			if (idx0 < idx1 || idx0 == 0 || idx1 == 0) nmid--;
+
+			memcpy(fb.bits + block_idx + 1, bits + block_idx + 1, sizeof(BlockType) * nmid);
+			fb.bits[block_idx] = (fb.bits[block_idx] & ~lower_mask) | (bits[block_idx] & lower_mask);
+			fb.bits[block_idx+nmid+1] = (fb.bits[block_idx+nmid+1] & ~upper_mask) | (bits[block_idx+nmid+1] & upper_mask);
+		}
+	}
+
+	//---------------------//
+	// Counting Operations //
+	//---------------------//
 
 	//Computes the Hamming weight
 	//Make sure to compile with the flag -mpopcnt to use this
@@ -304,112 +381,59 @@ public:
 		return cnt[0] + cnt[1] + cnt[2] + cnt[3];
 	}
 
-	//Set the bit at location 'idx' to 1
-	//NOTE: This operation is not thread-safe
-	void set(uint64_t idx)
-	{
-		bits[idx >> BLOCK_SHIFT] |= (BlockType)1 << (idx & block_size_m);
-	}
+	//------------------//
+	// Set Intersection //
+	//------------------//
 
-	//Set the bit at location 'idx' to 0
-	//NOTE: This operation is not thread-safe
-	void unset(uint64_t idx)
-	{
-		bits[idx >> BLOCK_SHIFT] &= ~((BlockType)1 << (idx & block_size_m));
-	}
+	//Aliases to be used externally
+	#ifdef AVX2_ENABLED
+	#define setIntersection(fb) setIntersection_v2(fb)
+	#else
+	#define setIntersection(fb) setIntersection_v1(fb)
+	#endif
 
-	//Read the bit at location 'idx'
-	inline BlockType read(uint64_t idx) const
-	{
-		return (bits[idx >> BLOCK_SHIFT] >> (idx & block_size_m)) & (BlockType)1;
-	}
-
-	//Read the block at location 'idx'
-	inline BlockType readBlock(uint64_t idx) const
-	{
-		return bits[idx];
-	}
-
-	//Effectively acts as an &= operator
-	//In this case, this is smaller than fb (or the same size)
-	inline void setIntersectionS_v1(const FastBitset &fb)
-	{
-		for (uint64_t i = nb; i-- > 0; )
-			bits[i] &= fb.bits[i];
-	}
-
-	//The assembly implementation of version 1
-	//This version is the fastest
-	inline void setIntersectionS_v2(const FastBitset &fb)
-	{
-		#ifdef AVX2_ENABLED
-		asm volatile(
-		"movq %2, %%rcx			\n"
-		"forloop%=:			\n\t"
-		"subq $4, %%rcx			\n\t"
-		"vmovdqu (%0,%%rcx,8), %%ymm0	\n\t"
-		"vmovdqu (%1,%%rcx,8), %%ymm1	\n\t"
-		"vpand %%ymm0, %%ymm1, %%ymm0	\n\t"
-		"vmovdqu %%ymm0, (%0,%%rcx,8)	\n\t"
-		"cmpq $0, %%rcx			\n\t"
-		"jne forloop%=			\n\t"
-		: "+r" (bits)
-		: "r" (fb.bits), "r" (nb)
-		: "%rcx", "memory");
-		#else
-		setIntersectionS_v1(fb);
-		#endif
-	}
-
-	//In this case, this is larger than fb
-	inline void setIntersectionL_v1(const FastBitset fb)
-	{
-		for (uint64_t i = fb.nb; i-- > 0; )
-			bits[i] &= fb.bits[i];
-		memset(bits+fb.nb, 0, sizeof(BlockType) * (nb-fb.nb));
-	}
-
-	inline void setIntersectionL_v2(const FastBitset &fb)
-	{
-		#ifdef AVX2_ENABLED
-		asm volatile(
-		"movq %2, %%rcx			\n"
-		"forloop%=:			\n\t"
-		"subq $4, %%rcx			\n\t"
-		"vmovdqu (%0,%%rcx,8), %%ymm0	\n\t"
-		"vmovdqu (%1,%%rcx,8), %%ymm1	\n\t"
-		"vpand %%ymm0, %%ymm1, %%ymm0	\n\t"
-		"vmovdqu %%ymm0, (%0,%%rcx,8)	\n\t"
-		"cmpq $0, %%rcx			\n\t"
-		"jne forloop%=			\n\t"
-		: "+r" (bits)
-		: "r" (fb.bits), "r" (fb.nb)
-		: "%rcx", "memory");
-		memset(bits+fb.nb, 0, sizeof(BlockType) * (nb-fb.nb));
-		#else
-		setIntersectionL_v1(fb);
-		#endif
-	}
-
-	//The general function
 	inline void setIntersection_v1(const FastBitset &fb)
 	{
-		if (nb <= fb.nb)
-			setIntersectionS_v1(fb);
-		else
-			setIntersectionL_v1(fb);
+		for (uint64_t i = std::min(nb, fb.nb); i-- > 0; )
+			bits[i] &= fb.bits[i];
 	}
 
-	//Accelerated functions
+	//Use the general "G" function if you aren't sure
+	//which bitset is larger - otherwise avoid the branch
+	inline void setIntersectionG_v1(const FastBitset &fb)
+	{
+		setIntersection_v1(fb);
+		if (nb > fb.nb)
+			memset(bits+fb.nb, 0, sizeof(BlockType) * (nb-fb.nb));
+	}
+
+	#ifdef AVX2_ENABLED
 	inline void setIntersection_v2(const FastBitset &fb)
 	{
-		if (nb <= fb.nb)
-			setIntersectionS_v2(fb);
-		else
-			setIntersectionL_v2(fb);
+		asm volatile(
+		"movq %2, %%rcx			\n"
+		"forloop%=:			\n\t"
+		"subq $4, %%rcx			\n\t"
+		"vmovdqu (%0,%%rcx,8), %%ymm0	\n\t"
+		"vmovdqu (%1,%%rcx,8), %%ymm1	\n\t"
+		"vpand %%ymm0, %%ymm1, %%ymm0	\n\t"
+		"vmovdqu %%ymm0, (%0,%%rcx,8)	\n\t"
+		"cmpq $0, %%rcx			\n\t"
+		"jne forloop%=			\n\t"
+		: "+r" (bits)
+		: "r" (fb.bits), "r" (std::min(nb, fb.nb))
+		: "%rcx", "memory");
 	}
 
-	//Perform a set intersection using a subset
+	inline void setIntersectionG_v2(const FastBitset &fb)
+	{
+		setIntersection_v2(fb);
+		if (nb > fb.nb)
+			memset(bits+fb.nb, 0, sizeof(BlockType) * (nb-fb.nb));
+	}
+	#endif
+
+	//Perform a subset intersection
 	//This is equivalent to a full intersection with some bitmasks
 	//NOTE: The offset and length refer to bit indices, not blocks
 	inline void partial_intersection(const FastBitset &fb, uint64_t offset, uint64_t length)
@@ -421,14 +445,6 @@ public:
 		BlockType upper_mask = idx1 ? get_bitmask(idx1) : (BlockType)(-1);
 		uint64_t nmid, nused;
 
-		/*printf("\noffset: %" PRIu64 "\n", offset);
-		printf("length: %" PRIu64 "\n", length);
-		printf("block_idx: %" PRIu64 "\n", block_idx);
-		printf("idx0: %u\n", idx0);
-		printf("idx1: %u\n", idx1);
-		printf("lower_mask:\t\t%s\n", toString(lower_mask).c_str());
-		printf("upper_mask:\t\t%s\n", toString(upper_mask).c_str());*/
-
 		if (length <= bits_per_block && (idx0 < idx1 || idx0 + idx1 == 0 || (idx0 > idx1 && idx1 == 0))) {
 			bits[block_idx] &= fb.bits[block_idx] & lower_mask & upper_mask;
 			nused = 1;
@@ -436,14 +452,9 @@ public:
 			nmid = (length - 1) >> BLOCK_SHIFT;
 			if (idx0 < idx1 || idx0 == 0 || idx1 == 0) nmid--;
 
-			//printf("\nnmid: %" PRIu64 "\n", nmid);
-			
 			#ifdef AVX2_ENABLED
 			uint64_t rem = nmid & 3;
 			uint64_t max = nmid - rem;
-
-			/*printf("rem: %" PRIu64 "\n", rem);
-			printf("max: %" PRIu64 "\n", max);*/
 
 			if (max) {
 				asm volatile(
@@ -472,7 +483,6 @@ public:
 
 			bits[block_idx] &= fb.bits[block_idx] & lower_mask;
 			bits[block_idx+nmid+1] &= fb.bits[block_idx+nmid+1] & upper_mask;
-
 			nused = nmid + 2;
 		}
 
@@ -485,155 +495,118 @@ public:
 			memset(bits + low + nused, 0, sizeof(BlockType) * high);
 	}
 
-	//Effectively acts as an |= operator
-	//In this case, this is smaller than fb (or the same size)
-	inline void setUnionS_v1(const FastBitset &fb)
-	{
-		for (uint64_t i = nb; i-- > 0; )
-			bits[i] |= fb.bits[i];
-	}
+	//-----------//
+	// Set Union //
+	//-----------//
 
-	//A more efficient version
-	inline void setUnionS_v2(const FastBitset &fb)
-	{
-		#ifdef AVX2_ENABLED
-		asm volatile(
-		"movq %2, %%rcx			\n"
-		"forloop%=:			\n\t"
-		"subq $4, %%rcx			\n\t"
-		"vmovdqu (%0,%%rcx,8), %%ymm0	\n\t"
-		"vmovdqu (%1,%%rcx,8), %%ymm1	\n\t"
-		"vpor %%ymm0, %%ymm1, %%ymm0	\n\t"
-		"vmovdqu %%ymm0, (%0,%%rcx,8)	\n\t"
-		"cmpq $0, %%rcx			\n\t"
-		"jne forloop%=			\n\t"
-		: "+r" (bits)
-		: "r" (fb.bits), "r" (nb)
-		: "%rcx", "memory");
-		#else
-		setUnionS_v1(fb);
-		#endif
-	}
+	//Aliases to be used externally
+	#ifdef AVX2_ENABLED
+	#define setUnion(fb) setUnion_v2(fb)
+	#else
+	#define setUnion(fb) setUnion_v1(fb)
+	#endif
 
-	//In this case, this is larger than fb
-	inline void setUnionL_v1(const FastBitset &fb)
-	{
-		for (uint64_t i = fb.nb; i-- > 0; )
-			bits[i] |= fb.bits[i];
-	}
-
-	//A more efficient version
-	inline void setUnionL_v2(const FastBitset &fb)
-	{
-		#ifdef AVX2_ENABLED
-		asm volatile(
-		"movq %2, %%rcx			\n"
-		"forloop%=:			\n\t"
-		"subq $4, %%rcx			\n\t"
-		"vmovdqu (%0,%%rcx,8), %%ymm0	\n\t"
-		"vmovdqu (%1,%%rcx,8), %%ymm1	\n\t"
-		"vpor %%ymm0, %%ymm1, %%ymm0	\n\t"
-		"vmovdqu %%ymm0, (%0,%%rcx,8)	\n\t"
-		"cmpq $0, %%rcx			\n\t"
-		"jne forloop%=			\n\t"
-		: "+r" (bits)
-		: "r" (fb.bits), "r" (fb.nb)
-		: "%rcx", "memory");
-		#else
-		setUnionL_v1(fb);
-		#endif
-	}
-
-	//The general function
 	inline void setUnion_v1(const FastBitset &fb)
 	{
-		if (nb <= fb.nb)
-			setUnionS_v1(fb);
-		else
-			setUnionL_v1(fb);
+		for (uint64_t i = std::min(nb, fb.nb); i-- > 0; )
+			bits[i] |= fb.bits[i];
 	}
 
+	#ifdef AVX2_ENABLED
 	inline void setUnion_v2(const FastBitset &fb)
 	{
-		if (nb <= fb.nb)
-			setUnionS_v2(fb);
-		else
-			setUnionL_v2(fb);
-	}
-
-	inline void setDisjointUnionS_v1(const FastBitset &fb)
-	{
-		for (uint64_t i = nb; i-- > 0; )
-			bits[i] ^= fb.bits[i];
-	}
-
-	//A more efficient version
-	inline void setDisjointUnionS_v2(const FastBitset &fb)
-	{
-		#ifdef AVX2_ENABLED
 		asm volatile(
 		"movq %2, %%rcx			\n"
 		"forloop%=:			\n\t"
 		"subq $4, %%rcx			\n\t"
 		"vmovdqu (%0,%%rcx,8), %%ymm0	\n\t"
 		"vmovdqu (%1,%%rcx,8), %%ymm1	\n\t"
-		"vpxor %%ymm0, %%ymm1, %%ymm0	\n\t"
+		"vpor %%ymm0, %%ymm1, %%ymm0	\n\t"
 		"vmovdqu %%ymm0, (%0,%%rcx,8)	\n\t"
 		"cmpq $0, %%rcx			\n\t"
 		"jne forloop%=			\n\t"
 		: "+r" (bits)
-		: "r" (fb.bits), "r" (nb)
+		: "r" (fb.bits), "r" (std::min(nb, fb.nb))
 		: "%rcx", "memory");
-		#else
-		setDisjointUnionS_v1(fb);
-		#endif
 	}
+	#endif
 
-	//In this case, this is larger than fb
-	inline void setDisjointUnionL_v1(const FastBitset &fb)
-	{
-		for (uint64_t i = fb.nb; i-- > 0; )
-			bits[i] ^= fb.bits[i];
-	}
+	//--------------------//
+	// Set Disjoint Union //
+	//--------------------//
 
-	//A more efficient version
-	inline void setDisjointUnionL_v2(const FastBitset &fb)
-	{
-		#ifdef AVX2_ENABLED
-		asm volatile(
-		"movq %2, %%rcx			\n"
-		"forloop%=:			\n\t"
-		"subq $4, %%rcx			\n\t"
-		"vmovdqu (%0,%%rcx,8), %%ymm0	\n\t"
-		"vmovdqu (%1,%%rcx,8), %%ymm1	\n\t"
-		"vpxor %%ymm0, %%ymm1, %%ymm0	\n\t"
-		"vmovdqu %%ymm0, (%0,%%rcx,8)	\n\t"
-		"cmpq $0, %%rcx			\n\t"
-		"jne forloop%=			\n\t"
-		: "+r" (bits)
-		: "r" (fb.bits), "r" (fb.nb)
-		: "%rcx", "memory");
-		#else
-		setDisjointUnionL_v1(fb);
-		#endif
-	}
+	//Aliases to be used externally
+	#ifdef AVX2_ENABLED
+	#define setDisjointUnion(fb) setDisjointUnion_v2(fb)
+	#else
+	#define setDisjointUnion(fb) setDisjointUnion_v1(fb)
+	#endif
 
-	//The general function
 	inline void setDisjointUnion_v1(const FastBitset &fb)
 	{
-		if (nb <= fb.nb)
-			setDisjointUnionS_v1(fb);
-		else
-			setDisjointUnionL_v1(fb);
+		for (uint64_t i = std::min(nb, fb.nb); i-- > 0; )
+			bits[i] ^= fb.bits[i];
 	}
 
+	#ifdef AVX2_ENABLED
 	inline void setDisjointUnion_v2(const FastBitset &fb)
 	{
-		if (nb <= fb.nb)
-			setDisjointUnionS_v2(fb);
-		else
-			setDisjointUnionL_v2(fb);
+		asm volatile(
+		"movq %2, %%rcx			\n"
+		"forloop%=:			\n\t"
+		"subq $4, %%rcx			\n\t"
+		"vmovdqu (%0,%%rcx,8), %%ymm0	\n\t"
+		"vmovdqu (%1,%%rcx,8), %%ymm1	\n\t"
+		"vpxor %%ymm0, %%ymm1, %%ymm0	\n\t"
+		"vmovdqu %%ymm0, (%0,%%rcx,8)	\n\t"
+		"cmpq $0, %%rcx			\n\t"
+		"jne forloop%=			\n\t"
+		: "+r" (bits)
+		: "r" (fb.bits), "r" (std::min(nb, fb.nb))
+		: "%rcx", "memory");
 	}
+	#endif
+
+	//----------------//
+	// Set Difference //
+	//----------------//
+
+	//Aliases to be used externally
+	#ifdef AVX2_ENABLED
+	#define setDifference(fb) setDifference_v2(fb)
+	#else
+	#define setDifference(fb) setDifference_v1(fb)
+	#endif
+
+	inline void setDifference_v1(const FastBitset &fb)
+	{
+		for (uint64_t i = std::min(nb, fb.nb); i-- > 0; )
+			bits[i] &= (bits[i] ^ fb.bits[i]);
+	}
+
+	#ifdef AVX2_ENABLED
+	inline void setDifference_v2(const FastBitset &fb)
+	{
+		asm volatile(
+		"movq %2, %%rcx			\n"
+		"forloop%=:			\n\t"
+		"subq $4, %%rcx			\n\t"
+		"vmovdqu (%0,%%rcx,8), %%ymm0	\n\t"
+		"vmovdqu (%1,%%rcx,8), %%ymm1	\n\t"
+		"vpxor %%ymm0, %%ymm1, %%ymm1	\n\t"
+		"vpand %%ymm0, %%ymm1, %%ymm0	\n\t"		
+		"vmovdqu %%ymm0, (%0,%%rcx,8)	\n\t"
+		"cmpq $0, %%rcx			\n\t"
+		"jne forloop%=			\n\t"
+		: "+r" (bits)
+		: "r" (fb.bits), "r" (std::min(nb, fb.nb))
+		: "%rcx", "memory");
+	}
+	#endif
+
+	//----------//
+	// Printing //
+	//----------//
 
 	std::string toString() const
 	{
@@ -663,12 +636,8 @@ private:
 		try {
 			n = _n;
 			nb = _nb;
-			//#ifdef AVX2_ENABLED
-			//posix_memalign((void**)&_bits, 32, sizeof(BlockType) * nb);
-			//#else
 			nr = nb & 3;	//Equivalent to nb % 4
 			_bits = (BlockType*)malloc(sizeof(BlockType) * nb);
-			//#endif
 			if (_bits == NULL)
 				throw std::bad_alloc();
 			memset(_bits, 0, sizeof(BlockType) * nb);
@@ -688,7 +657,6 @@ private:
 	{
 		n = 0; nb = 0; nr = 0;
 		if (_bits != NULL) {
-			//printf("Freeing the bitset.\n");
 			free(_bits);
 			_bits = NULL;
 		}

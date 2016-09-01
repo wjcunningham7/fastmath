@@ -65,7 +65,7 @@ int main(int argc, char **argv)
 
 	printf("Bitset 1:\t\t%s\n", fb1.toString().c_str());
 	printf("Bitset 2:\t\t%s\n", fb2.toString().c_str());
-	fb1.setIntersectionS_v2(fb2);
+	fb1.setIntersection(fb2);
 	printf("Intersection:\t\t%s\n", fb1.toString().c_str());
 	//fb2.setUnion_v1(fb1);
 	//printf("Union:\t\t\t%s\n", fb2.toString().c_str());
