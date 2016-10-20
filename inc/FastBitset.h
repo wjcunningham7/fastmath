@@ -217,9 +217,29 @@ public:
 	// Reset Bits to Zero //
 	//--------------------//
 
+	//Reset all bits to zero
 	inline void reset()
 	{
 		memset(bits, 0, sizeof(BlockType) * nb);
+	}
+
+	//Reset all bits to one
+	inline void set()
+	{
+		BlockType s = n >> BLOCK_SHIFT;
+		memset(bits, ~0, sizeof(BlockType) * s);
+
+		unsigned int idx = static_cast<unsigned int>(n & (bits_per_block - 1));
+		BlockType mask = idx ? get_bitmask(idx) : (BlockType)(-1);
+		s -= !idx;
+		bits[s] |= mask;
+	}
+
+	//Reset bits in a range
+	//NOTE: the offset and length refer to blocks, not bits!
+	inline void reset(const uint64_t offset, const uint64_t length)
+	{
+		memset(bits+offset, 0, sizeof(BlockType) * length);
 	}
 
 	//--------------------//
@@ -257,7 +277,7 @@ public:
 		unsigned int idx1 = static_cast<unsigned int>((offset + length) & (bits_per_block - 1));
 		BlockType lower_mask = idx0 ? ~get_bitmask(idx0) : (BlockType)(-1);
 		BlockType upper_mask = idx1 ? get_bitmask(idx1) : (BlockType)(-1);
-		
+
 		if (length <= bits_per_block && (idx0 < idx1 || idx0 + idx1 == 0 || (idx0 > idx1 && idx1 == 0)))
 			fb.bits[block_idx] = (fb.bits[block_idx] & ~lower_mask) | (bits[block_idx] & lower_mask & upper_mask) | (fb.bits[block_idx] & ~upper_mask);
 		else {
@@ -273,6 +293,9 @@ public:
 	//---------------------//
 	// Counting Operations //
 	//---------------------//
+
+	//Alias to be used externally
+	#define count_bits() count_v3()
 
 	//Computes the Hamming weight
 	//Make sure to compile with the flag -mpopcnt to use this
@@ -327,19 +350,10 @@ public:
 	inline uint64_t partial_count(uint64_t offset, uint64_t length)
 	{
 		uint64_t block_idx = offset >> BLOCK_SHIFT;
-		//idx0 and idx1 lie between 0 and 63
 		unsigned int idx0 = static_cast<unsigned int>(offset & (bits_per_block - 1));
 		unsigned int idx1 = static_cast<unsigned int>((offset + length) & (bits_per_block - 1));
 		BlockType lower_mask = idx0 ? ~get_bitmask(idx0) : (BlockType)(-1);
 		BlockType upper_mask = idx1 ? get_bitmask(idx1) : (BlockType)(-1);
-
-		/*printf("\noffset: %" PRIu64 "\n", offset);
-		printf("length: %" PRIu64 "\n", length);
-		printf("block_idx: %" PRIu64 "\n", block_idx);
-		printf("idx0: %u\n", idx0);
-		printf("idx1: %u\n", idx1);
-		printf("lower_mask:\t\t%s\n", toString(lower_mask).c_str());
-		printf("upper_mask:\t\t%s\n", toString(upper_mask).c_str());*/
 
 		uint64_t cnt[4] = { 0, 0, 0, 0 };
 		uint64_t nmid, rem, max;
@@ -352,10 +366,6 @@ public:
 			rem = nmid & 3;
 			max = nmid - rem;
 
-			/*printf("\nnmid: %" PRIu64 "\n", nmid);
-			printf("rem: %" PRIu64 "\n", rem);
-			printf("max: %" PRIu64 "\n", max);*/
-			
 			for (uint64_t i = 1; i <= max; i += 4) {
 				asm volatile(
 				"popcntq %4, %4	\n\t"
@@ -372,8 +382,6 @@ public:
 
 			if (rem)
 				cnt[0] += do_count((bits + block_idx + max + 1), rem);
-
-			//printf("\nCount of interior: %" PRIu64 "\n", cnt[0] + cnt[1] + cnt[2] + cnt[3]);
 
 			cnt[0] += popcount(bits[block_idx] & lower_mask) + popcount(bits[block_idx + nmid + 1] & upper_mask);
 		}

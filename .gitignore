@@ -43,6 +43,7 @@ install-sh
 Makefile.in
 missing
 NEWS
+.deps/**
 src/.deps/**
 src/.dirstamp
 src/Makefile
@@ -56,3 +57,4 @@ inc/Makefile.in
 nint/.deps/**
 nint/Makefile
 nint/Makefile.in
+test/.deps/**

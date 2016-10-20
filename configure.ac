@@ -52,5 +52,5 @@ CXXFLAGS="$CXXFLAGS $ax_cv_gcc_archflag"
 xtra=($(for file in $(find inc/intrinsics -type f) ; do echo intrinsics/$(basename $file) ; done))
 AC_SUBST([xtra], ["${xtra[[@]]}"])
 
-AC_CONFIG_FILES([Makefile nint/Makefile src/Makefile inc/Makefile])
+AC_CONFIG_FILES([Makefile nint/Makefile src/Makefile inc/Makefile test/Makefile])
 AC_OUTPUT
