@@ -1,4 +1,5 @@
 #include "FastBitset.h"
+#include "stdlib.h"
 
 void initialize(FastBitset &f, FastBitset &g)
 {
@@ -54,4 +55,20 @@ int main(int argc, char **argv)
 	g.printBitset();
 	f.partial_intersection(g, 64, 64);
 	f.printBitset();
+
+	printf("\nVector product:\n");
+	unsigned int N = 5000;
+	FastBitset m(N);
+	FastBitset n(N);
+	srand(time(NULL));
+	for (unsigned int i = 0; i < N; i++) {
+		if ((float)rand() / RAND_MAX > 0.5) m.set(i);
+		if ((float)rand() / RAND_MAX > 0.5) n.set(i);
+	}
+
+	uint64_t c = m.partial_vecprod(m, n, 0, N);
+	printf("Count (VPD): %" PRIu64 "\n", c);
+	m.partial_intersection(n, 0, m.size());
+	c = m.count_bits();
+	printf("Count (COR): %" PRIu64 "\n", c);
 }

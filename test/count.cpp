@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 	printf("Middle half: %" PRIu64 "\n", f.partial_count(32, 64));
 	printf("Final half: %" PRIu64 "\n", f.partial_count(64, 64));
 
-	FastBitset g(300);
+	FastBitset g(550);
 	g.set();
 
 	printf("\nTesting set().\n");
