@@ -66,7 +66,7 @@ int main(int argc, char **argv)
 		if ((float)rand() / RAND_MAX > 0.5) n.set(i);
 	}
 
-	uint64_t c = m.partial_vecprod(m, n, 0, N);
+	uint64_t c = m.partial_vecprod(n, 0, N);
 	printf("Count (VPD): %" PRIu64 "\n", c);
 	m.partial_intersection(n, 0, m.size());
 	c = m.count_bits();

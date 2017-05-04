@@ -392,8 +392,6 @@ public:
 		uint64_t block_idx = offset >> BLOCK_SHIFT;
 		unsigned int idx0 = static_cast<unsigned int>(offset & block_size_m);
 		unsigned int idx1 = static_cast<unsigned int>((offset + length) & block_size_m);
-		//BlockType lower_mask = idx0 ? ~get_bitmask(idx0) : (BlockType)(-1);
-		//BlockType upper_mask = idx1 ? get_bitmask(idx1) : (BlockType)(-1);
 		BlockType lower_mask = masks2[idx0];
 		BlockType upper_mask = masks[idx1];
 
@@ -491,8 +489,6 @@ public:
 		uint64_t block_idx = offset >> BLOCK_SHIFT;
 		unsigned int idx0 = static_cast<unsigned int>(offset & block_size_m);
 		unsigned int idx1 = static_cast<unsigned int>((offset + length) & block_size_m);
-		//BlockType lower_mask = idx0 ? ~get_bitmask(idx0) : (BlockType)(-1);
-		//BlockType upper_mask = idx1 ? get_bitmask(idx1) : (BlockType)(-1);
 		BlockType lower_mask = masks2[idx0];
 		BlockType upper_mask = masks[idx1];
 		uint64_t nmid, nused;
@@ -656,7 +652,7 @@ public:
 	}
 	#endif
 
-	inline uint64_t partial_vecprod(const FastBitset &fb0, const FastBitset &fb1, uint64_t offset, uint64_t length)
+	inline uint64_t partial_vecprod(const FastBitset &fb, uint64_t offset, uint64_t length)
 	{
 		uint64_t block_idx = offset >> BLOCK_SHIFT;
 		unsigned int idx0 = static_cast<unsigned int>(offset & block_size_m);
@@ -667,7 +663,7 @@ public:
 		uint64_t nmid, rem, max;
 
 		if (length <= bits_per_block && (idx0 < idx1 || idx0 + idx1 == 0 || (idx0 > idx1 && idx1 == 0))) {
-			return popcount(fb0.bits[block_idx] & fb1.bits[block_idx] & lower_mask & upper_mask);
+			return popcount(bits[block_idx] & fb.bits[block_idx] & lower_mask & upper_mask);
 		} else {
 			nmid = (length - 1) >> BLOCK_SHIFT;
 			if (idx0 < idx1 || idx0 == 0 || idx1 == 0) nmid--;
@@ -675,29 +671,8 @@ public:
 			max = nmid - rem;
 
 			#ifdef AVX2_ENABLED
-			if (max && fb0.size() >= 4096) {
-				/*__m256i lookup = _mm256_setr_epi8(0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
-								  0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4);
-				__m256i low_mask = _mm256_set1_epi8(0xf);
-				__m256i tot = _mm256_setzero_si256();
-				__m256i zero = _mm256_setzero_si256();
-
-				for (uint64_t i = 1; i <= max; i += 4) {
-					__m256i a = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&fb0.bits[block_idx+i]));
-					__m256i b = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&fb1.bits[block_idx+i]));
-					__m256i ab = _mm256_and_si256(a, b);
-					__m256i lo = _mm256_and_si256(ab, low_mask);
-					__m256i hi = _mm256_srli_epi16(ab, 4);
-					hi = _mm256_and_si256(hi, low_mask);
-					__m256i p1 = _mm256_shuffle_epi8(lookup, lo);
-					__m256i p2 = _mm256_shuffle_epi8(lookup, hi);
-					__m256i sum = _mm256_add_epi8(p1, p2);
-					sum = _mm256_sad_epu8(sum, zero);
-					tot = _mm256_add_epi64(tot, sum);
-				}
-				_mm256_storeu_si256((__m256i*)cnt, tot);*/
-
-				uint64_t *cntp = &cnt[0];
+			if (max && n >= 4096) {
+				uint64_t __attribute__ ((unused)) *cntp = &cnt[0];
 				unsigned char mask = 0xf;
 				asm volatile(
 				"movq %4, %%rax			\n\t"
@@ -727,8 +702,8 @@ public:
 				"jl forloop%=			\n\t"
 
 				"vmovdqu %%ymm6, (%0)		\n\t"	//result in cnt
-				: "=r" (cntp)
-				: "r" (fb0.bits), "r" (fb1.bits), "r" (block_idx + 1), "r" (max + block_idx), "r" (avx_table), "r" (&mask)
+				: "+r" (cntp)
+				: "r" (bits), "r" (fb.bits), "r" (block_idx + 1), "r" (max + block_idx), "r" (avx_table), "r" (&mask)
 				: "%rax", "%rcx", "memory");
 			} else
 			#endif
@@ -744,16 +719,16 @@ public:
 					"popcntq %7, %7	\n\t"
 					"addq %7, %3	\n\t"
 					: "+r" (cnt[0]), "+r" (cnt[1]), "+r" (cnt[2]), "+r" (cnt[3])
-					: "r" (fb0.bits[block_idx+i] & fb1.bits[block_idx+i]), "r" (fb0.bits[block_idx+i+1] & fb1.bits[block_idx+i+1]),
-				  "r" (fb0.bits[block_idx+i+2] & fb1.bits[block_idx+i+2]), "r" (fb0.bits[block_idx+i+3] & fb1.bits[block_idx+i+3]));
+					: "r" (bits[block_idx+i] & fb.bits[block_idx+i]), "r" (bits[block_idx+i+1] & fb.bits[block_idx+i+1]),
+				  "r" (bits[block_idx+i+2] & fb.bits[block_idx+i+2]), "r" (bits[block_idx+i+3] & fb.bits[block_idx+i+3]));
 				}
 			}
 
 			if (rem)
 				for (uint64_t i = max + 1; i <= nmid; i++)
-					cnt[0] += popcount(fb0.bits[block_idx+i] & fb1.bits[block_idx+i]);
+					cnt[0] += popcount(bits[block_idx+i] & fb.bits[block_idx+i]);
 
-			cnt[1] += popcount(fb0.bits[block_idx] & fb1.bits[block_idx] & lower_mask) + popcount(fb0.bits[block_idx + nmid + 1] & fb1.bits[block_idx + nmid + 1] & upper_mask);
+			cnt[1] += popcount(bits[block_idx] & fb.bits[block_idx] & lower_mask) + popcount(bits[block_idx + nmid + 1] & fb.bits[block_idx + nmid + 1] & upper_mask);
 		}
 
 		return cnt[0] + cnt[1] + cnt[2] + cnt[3];
@@ -805,19 +780,6 @@ private:
 			}
 			masks[0] = (BlockType)(-1);
 			masks2[0] = masks[0];
-
-			/*#ifdef AVX2_ENABLED
-			printf("Before.\n");
-			uint64_t x[4] = { 0xf, 0, 0, 0 };
-			asm volatile(
-			"vmovdqu (%0), %%ymm2		\n\t"
-			"vmovq (%1), %%xmm3		\n\t"
-			"vpbroadcastb %%xmm3, %%ymm3	\n\t"
-			:
-			: "r" (avx_table), "r" (x)
-			: "memory");
-			printf("After.\n");
-			#endif*/
 		} catch (std::bad_alloc) {
 			fprintf(stderr, "Memory allocation failure in %s on line %d!\n", __FILE__, __LINE__);
 			fflush(stderr);

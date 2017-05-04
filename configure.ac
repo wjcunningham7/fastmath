@@ -2,6 +2,10 @@ AC_PREREQ([2.63])
 AC_INIT([FastMath], [1.1], [w.cunningham@northeastern.edu])
 AM_INIT_AUTOMAKE
 
+if [[ -e /home/$USER/.fastmath ]] ; then
+  source /home/$USER/.fastmath
+fi
+
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/FastMath.cpp])
 AC_CONFIG_HEADERS([inc/config.h])

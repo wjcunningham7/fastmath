@@ -98,6 +98,9 @@
 #define ACOSH_I12 -0.03759765625000000000
 #define ACOSH_I14 -0.02992466517857142857
 
+#define sec(x) (1.0/cos(x))
+#define asec(x) acos(1.0/x)
+
 //Used for SGN function
 static const double table[] = {-1.0, 1.0};
 
