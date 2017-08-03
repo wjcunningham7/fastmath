@@ -1,5 +1,11 @@
 #include "FastBitset.h"
 
+/////////////////////////////
+//(C) Will Cunningham 2017 //
+//         DK Lab          //
+// Northeastern University //
+/////////////////////////////
+
 int main(int argc, char **argv)
 {
 	FastBitset f(128);

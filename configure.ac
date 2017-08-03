@@ -1,5 +1,11 @@
+###########################
+#(C) Will Cunningham 2017 #
+#         DK Lab          #
+# Northeastern University #
+###########################
+
 AC_PREREQ([2.63])
-AC_INIT([FastMath], [1.1], [w.cunningham@northeastern.edu])
+AC_INIT([FastMath], [1.2], [w.cunningham@northeastern.edu])
 AM_INIT_AUTOMAKE
 
 if [[ -e /home/$USER/.fastmath ]] ; then

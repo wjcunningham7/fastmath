@@ -304,6 +304,7 @@ double monte_carlo_nd ( double func ( int dim_num, double x[], double *params ),
     int j;
     for (j = 0; j < dim_num; j++)
       x[j] = (b[j] - a[j]) * x[j] + a[j];
+    //END
 
     result = result + func ( dim_num, x, params );
 

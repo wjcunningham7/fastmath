@@ -1,5 +1,19 @@
 #include "FastNumInt.h"
 
+/////////////////////////////
+//(C) Will Cunningham 2017 //
+//         DK Lab          //
+// Northeastern University //
+/////////////////////////////
+
+//---SUMMARY---//
+//These functions provide a convenient wrapper for
+//1D and 2D numerical integration using the GSL and NINTLIB
+//integration functions. Note that in some cases
+//memory is allocated and freed, so if these functions
+//are a bottleneck in other code, consider re-writing them
+//explicitly with memory management outside any loops
+
 //GNU Scientific Library
 //Numerical Integration
 double integrate1D(double (*f)(double x, void *params), void *params, struct IntData *idata, enum FastIntMethod fim)
@@ -24,9 +38,7 @@ double integrate1D(double (*f)(double x, void *params), void *params, struct Int
 		code = gsl_integration_qags(&F, idata->lower, idata->upper, 0.0, idata->tol, idata->limit, idata->workspace, &result, &idata->abserr);
 	} else if (fim == QAWS) {
 		code = gsl_integration_qaws(&F, idata->lower, idata->upper, idata->table, 0.0, idata->tol, idata->limit, idata->workspace, &result, &idata->abserr);
-	} /*else if (fim == CQUAD) {
-		code = gsl_integration_cquad(&F, idata->lower, idata->upper, 0.0, idata->tol, idata->cworkspace, &result, &idata->abserr, &idata->neval);
-	}*/
+	}
 
 	if (code != 0) {
 		fprintf(stderr, "GSL Error: %s\n", gsl_strerror(code));
@@ -38,6 +50,7 @@ double integrate1D(double (*f)(double x, void *params), void *params, struct Int
 
 //NINTLIB C++ Library
 //Multi-Dimensional Quadrature
+//Uses Monte Carlo Sampling
 double integrate2D(double (*f)(int dim, double x[], double *params), double lx, double ly, double ux, double uy, double *params, int &seed, int m)
 {
 	if (FNI_DEBUG) {

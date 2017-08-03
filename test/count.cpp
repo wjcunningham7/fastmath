@@ -1,5 +1,11 @@
 #include "FastBitset.h"
 
+/////////////////////////////
+//(C) Will Cunningham 2017 //
+//         DK Lab          //
+// Northeastern University //
+/////////////////////////////
+
 void countAll(FastBitset &f)
 {
 	printf("Version 1: %" PRIu64 "\n", f.count_v1());

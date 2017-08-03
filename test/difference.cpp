@@ -1,5 +1,11 @@
 #include "FastBitset.h"
 
+/////////////////////////////
+//(C) Will Cunningham 2017 //
+//         DK Lab          //
+// Northeastern University //
+/////////////////////////////
+
 void initialize(FastBitset &f, FastBitset &g)
 {
 	f.reset(); g.reset();

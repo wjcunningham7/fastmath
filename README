@@ -1,13 +1,137 @@
-/////////////////////////////
-//(C) Will Cunningham 2014 //
-//         DK Lab          //
-// Northeastern University //
-/////////////////////////////
-
-NOTE:  These functions are currently under active revision.  Double check the code before use, and compare your results to another method before implementing in your code.  Please flag known bugs on Github.
+=============================
+| (C) Will Cunningham 2014  |
+|          DK Lab           |
+|  Northeastern University  |
+=============================
 
 =========
 |Summary|
 =========
 
 This repository contains the FastMath library.  The primary functions are defined in ./src/FastMath.cpp and ./src/FastNumInt.cpp.  The latter makes use of GSL numerical integration functions.  A static library may be created in ./lib with the command 'make lib', assuming the object files already have been created in ./obj.  The binary executablesin the ./bin folder, titled 'BenchFastMath' and 'BenchFastNumInt' provide quantitative information on the speed and precision of each function defined in this repository.
+
+This repository contains code used in several other projects:
+
+1) src/FastMath.cpp:
+   Optimized implementations of double precision functions...
+     POW2: x * x
+     POW3: x * x * x
+     POW:  x ^ a
+     SQRT: x ^ 0.5
+     ABS:  |x|
+     LOG:  log(x)
+     SGN:  x / |x|
+     SIN:  sin(x)
+     COS:  cos(x)
+     TAN:  tan(x)
+     ACOS: acos(x)
+     ATAN: atan(x)
+     SINH: sinh(x)
+     COSH: cosh(x)
+     ASINH: asinh(x)
+     ACOSH: acosh(x)
+     GAMMA: tgamma(x)
+     LOGGAMMA: lgamma(x)
+     GAMMA_RATIO: tgamma(x) / tgamma(y)
+     POCHHAMMER: tgamma(x + j) / tgamma(x)
+     _2F1_An: nth term in Gauss hypergeometric series
+     _2F1: Gauss hypergeometric function 2F1(a,b,c,z)
+
+2) src/FastNumInt.cpp:
+   Wrappers for 1D and 2D numerical integration. The 1D integration uses the GSL library, with
+   QNG, QAG, QAGS, and QAWS methods supported. The 2D integration uses the NINTLIB library, with
+   a Monte Carlo sampling to evaluate integrals.
+
+3) inc/FastBitset.h
+   The FastBitset class offers an optimized bitset object with functions...
+     size() - returns the number of bits
+     getNumBlocks() - returns the number of 64-bit unsigned integers used to represent the bits
+     getBlockSize() - returns the number of bits per blocks (should be 64)
+     getAddress() - returns the address of the first block used to represent the bitset
+     any() - returns true if at least one bit is set to 1
+     any_in_range(offset, length) - returns true if at least one bit is set within a particular range
+     set(index) - set a particular bit to 1
+     unset(index) - set a particular bit to 0
+     read(index) - return the value of a particular bit
+     readBlock(index) - return the 64-bit unsigned integer representing a subset of bits
+     next_bit(index) - return the index of the first bit set to 1 in a particular block
+     next_bit() - return the index of the first bit set to 1 in the entire object
+     createBitset(size) - allocate memory and initialize the object
+     reset() - set all bits to 0
+     set() - set all bits to 1
+     reset(offset, length) - set a range of bits to zero
+
+     clone(fb) - clone this object into the FastBitset object 'fb'
+     clone(fb, offset, length) - clone a subset of blocks
+     partial_clone(fb, offset, length) - clone a subset of bits
+
+     count_bits() - count the number of bits set to 1
+     partial_count() - count the number of bits set to 1 in a particular range
+
+     setIntersection(fb) - perform a logical AND between this object and 'fb'
+     partial_intersection(fb, offset, length) - perform a logical AND on a subset of bits
+     setUnion(fb) - perform a logical OR between this object and 'fb'
+     setDisjointUnion(fb) - perform a logical XOR between this object and 'fb'
+     setDifference(fb) - perform a logical XOR followed by an AND on this object and 'fb'
+     partial_vecprod(fb, offset, length) - perform an inner product on a range of bits
+
+     toString() - return a binary string representation of this bitset in little-endian format
+     toString(v) - return a binary string representation of an integer 'v'
+     printBitset() - print the binary string representation of this bitset to stdout
+
+4) src/stopwatch.cpp
+   A stopwatch object which has precision to the microsecond
+
+5) src/ran2.cpp
+   A random number generator from Numerical Recipes. This is not intended for use in serious
+   numerical simulations.
+
+6) src/BenchFastMath.cpp, src/BenchFastNumInt.cpp
+   Benchmarking code which prints accuracy and speed data of the various approximations
+   of the code used in src/FastMath.cpp and src/FastNumInt.cpp, respectively.
+
+7) test/*.cpp
+   Files which demonstrate how to use the methods in inc/FastBitset.h, along with typical output
+
+=======================
+|Compilation and Usage|
+=======================
+
+To install:
+-----------
+cp .fastmath /home/$USER
+sh ./bootstrap.sh
+./configure
+make
+make install
+
+This will install the binaries and headers in the directory specified
+in the .fastmath file, which is /home/$USER/release/fastmath by default.
+It will compile all code into a library which can be linked against in other projects.
+It will also compile all the code in the 'test' directory.
+
+To clean:
+---------
+make distclean
+
+This will remove all files created during installation, with the exception of
+the files in the installation directory.
+
+To run:
+-------
+sh test/test.sh
+
+This will run all tests in the 'test' directory.
+
+To link against the library:
+----------------------------
+-L /home/$USER/release/fastmath/lib -lfastmath
+
+To include headers:
+-------------------
+-I /home/$USER/release/fastmath/include
+
+==============
+|Maintainence|
+==============
+Contact <w.cunningham@northeastern.edu> to report bugs or get help.

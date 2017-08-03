@@ -1,6 +1,12 @@
 #include "Coordinates.h"
 #include <cstring>
 
+/////////////////////////////
+//(C) Will Cunningham 2017 //
+//         DK Lab          //
+// Northeastern University //
+/////////////////////////////
+
 int main(int argc, char **argv)
 {
 	Coordinates c(3, 128);

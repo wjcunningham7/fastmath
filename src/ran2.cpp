@@ -1,5 +1,17 @@
 #include "ran2.h"
 
+/////////////////////////////
+//(C) Will Cunningham 2017 //
+//         DK Lab          //
+// Northeastern University //
+/////////////////////////////
+
+//---SUMMARY---//
+//This random number generator has been taken from 
+//Numerical Recipes. Note that it is not intended to 
+//be used in any simulations which use lots of random 
+//numbers. In those simulations, use a Mersenne Twister.
+
 #define IM1 2147483563
 #define IM2 2147483399
 #define AM (1.0/IM1)
@@ -62,10 +74,6 @@ double ran2(long *idum)	//Initialize with negative number
 //Thread-safe ran2
 double ran2ts(long *idum, int tid)
 {
-	//long seedts = static_cast<long>(tid * 10000 * ran2(idum));
-	//*idum = seedts;
-	//return ran2(&seedts);
-	
 	long seedts = abs(((*idum*181)*((tid-83)*359))%104729);
 	return ran2(&seedts);
 }

@@ -1,9 +1,11 @@
 #ifndef STOPWATCH_H_
 #define STOPWATCH_H_
 
-//#ifdef HAVE_CONFIG_H
-//#include "config.h"
-//#endif
+/////////////////////////////
+//(C) Will Cunningham 2017 //
+//         DK Lab          //
+// Northeastern University //
+/////////////////////////////
 
 #include <assert.h>
 #include <cstdlib>

@@ -1,6 +1,12 @@
 #ifndef BENCH_FAST_MATH_H
 #define BENCH_FAST_MATH_H
 
+/////////////////////////////
+//(C) Will Cunningham 2017 //
+//         DK Lab          //
+// Northeastern University //
+/////////////////////////////
+
 #include <fstream>
 #include <math.h>
 

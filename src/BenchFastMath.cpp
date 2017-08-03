@@ -1,5 +1,15 @@
 #include "BenchFastMath.h"
 
+/////////////////////////////
+//(C) Will Cunningham 2017 //
+//         DK Lab          //
+// Northeastern University //
+/////////////////////////////
+
+//---SUMMARY---//
+//This benchmarks all the algorithms in FastMath.cpp
+//and prints to file data on precision and timings
+
 int main(int argc, char **argv)
 {
 	double *data;
@@ -129,10 +139,10 @@ int main(int argc, char **argv)
 	asinh_t2c = measure(NULL, NULL, &ASINH, data, results, error, nnum, 2, INTEGRATION, "ASINH", "dat/asinh_wolf_vhigh_error.dat", 0, VERY_HIGH_PRECISION, true);
 	
 	//ACOSH
-	//acosh_t0 = measure(NULL, NULL, &ACOSH, data, results, NULL, nnum, 2, STL, "ACOSH", NULL, 0, DEFAULT, false);
-	//acosh_t2a = measure(NULL, NULL, &ACOSH, data, results, error, nnum, 2, INTEGRATION, "ACOSH", "dat/acosh_wolf_low_error.dat", 0, LOW_PRECISION, true);
-	//acosh_t2b = measure(NULL, NULL, &ACOSH, data, results, error, nnum, 2, INTEGRATION, "ACOSH", "dat/acosh_wolf_high_error.dat", 0, HIGH_PRECISION, true);
-	//acosh_t2c = measure(NULL, NULL, &ACOSH, data, results, error, nnum, 2, INTEGRATION, "ACOSH", "dat/acosh_wolf_vhigh_error.dat", 0, VERY_HIGH_PRECISION, true);
+	acosh_t0 = measure(NULL, NULL, &ACOSH, data, results, NULL, nnum, 2, STL, "ACOSH", NULL, 0, DEFAULT, false);
+	acosh_t2a = measure(NULL, NULL, &ACOSH, data, results, error, nnum, 2, INTEGRATION, "ACOSH", "dat/acosh_wolf_low_error.dat", 0, LOW_PRECISION, true);
+	acosh_t2b = measure(NULL, NULL, &ACOSH, data, results, error, nnum, 2, INTEGRATION, "ACOSH", "dat/acosh_wolf_high_error.dat", 0, HIGH_PRECISION, true);
+	acosh_t2c = measure(NULL, NULL, &ACOSH, data, results, error, nnum, 2, INTEGRATION, "ACOSH", "dat/acosh_wolf_vhigh_error.dat", 0, VERY_HIGH_PRECISION, true);
 
 	//GAMMA
 	gamma_t0 = measure(&GAMMA, NULL, NULL, data, results, NULL, nnum, 0, STL, "GAMMA", NULL, 0, DEFAULT, false);
@@ -209,10 +219,10 @@ int main(int argc, char **argv)
 	os << "ASINH\tw_high\t" << (asinh_t2b / nnum) << std::endl;
 	os << "ASINH\tw_vhigh\t" << (asinh_t2c / nnum) << std::endl;
 
-	//os << "ACOSH\tacosh\t" << (acosh_t0 / nnum) << std::endl;
-	//os << "ACOSH\tw_low\t" << (acosh_t2a / nnum) << std::endl;
-	//os << "ACOSH\tw_high\t" << (acosh_t2b / nnum) << std::endl;
-	//os << "ACOSH\tw_vhigh\t" << (acosh_t2c / nnum) << std::endl;
+	os << "ACOSH\tacosh\t" << (acosh_t0 / nnum) << std::endl;
+	os << "ACOSH\tw_low\t" << (acosh_t2a / nnum) << std::endl;
+	os << "ACOSH\tw_high\t" << (acosh_t2b / nnum) << std::endl;
+	os << "ACOSH\tw_vhigh\t" << (acosh_t2c / nnum) << std::endl;
 
 	os << "GAMMA\ttgamma\t" << (gamma_t0 / nnum) << std::endl;
 	os << "GAMMA\tboost\t" << (gamma_t1 / nnum) << std::endl;

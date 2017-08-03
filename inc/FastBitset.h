@@ -12,7 +12,21 @@
 // Northeastern University //
 /////////////////////////////
 
-//Note: Bits are addressed in little-endian format in this structure
+//---SUMMARY---//
+//This offers a N-bit bitset which is either 64-bit aligned, or
+//256-bit aligned if AVX2 is supported. Many algorithms here
+//have been optimized via assembly. See the paper 'Causal Set
+//Generator' by W. Cunningham for details.
+
+//VERY IMPORTANT:
+//There is no error checking here, so it is likely any
+//mistake using this will result in a segmentation fault.
+//This is intentional in order to reduce branching and other
+//unnecessary statements. A unit test bounded by pre-processor
+//flags could be added to each function in the future.
+
+//FORMATTING:
+//Bits are addressed in little-endian format in this structure.
 //As a result, when the function toString() is used, a single binary word
 //may appear to be printed backwards (least significant bit first)
 
@@ -21,7 +35,9 @@
 #define BlockTypeMPI MPI_UINT64_T
 #define popcount(x) __builtin_popcountl(x)
 #define BLOCK_SHIFT 6
+//END
 
+//Lookup tables used for counting bits
 static const unsigned int table_width = 8;
 template <bool dummy_name = true>
 struct count_table { static const unsigned char table[]; };
@@ -29,6 +45,7 @@ struct count_table { static const unsigned char table[]; };
 template <>
 struct count_table<false> {};
 
+//This one has been borrowed from Boost's dynamic_bitset<>
 template <bool b>
 const unsigned char count_table<b>::table[] =
 {
@@ -313,8 +330,6 @@ public:
 		uint64_t block_idx = offset >> BLOCK_SHIFT;
 		unsigned int idx0 = static_cast<unsigned int>(offset & (bits_per_block - 1));
 		unsigned int idx1 = static_cast<unsigned int>((offset + length) & (bits_per_block - 1));
-		//BlockType lower_mask = idx0 ? ~get_bitmask(idx0) : (BlockType)(-1);
-		//BlockType upper_mask = idx1 ? get_bitmask(idx1) : (BlockType)(-1);
 		BlockType lower_mask = masks2[idx0];
 		BlockType upper_mask = masks[idx1];
 
@@ -652,6 +667,11 @@ public:
 	}
 	#endif
 
+	//Partial inner product
+	//This combines the set intersection with an
+	//AVX implementation of the popcnt algorithm
+	//In general, this should be faster than
+	//a setIntersection() followed by count_bits()
 	inline uint64_t partial_vecprod(const FastBitset &fb, uint64_t offset, uint64_t length)
 	{
 		uint64_t block_idx = offset >> BLOCK_SHIFT;
@@ -824,6 +844,7 @@ private:
 		#endif
 	}
 
+	//Bit-counting method borrowed from Boost
 	inline uint64_t do_count(BlockType *b, uint64_t num_blocks) const
 	{
 		uint64_t num = 0;
@@ -846,7 +867,7 @@ private:
 	}
 };
 
-//Add hashing function
+//Hashing function
 namespace std
 {
 	template<>
@@ -863,6 +884,7 @@ namespace std
 	};
 };
 
+//Data structure used for binary matrices
 typedef std::vector<FastBitset> Bitvector;
 
 #endif

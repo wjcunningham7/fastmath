@@ -13,6 +13,12 @@
 // Northeastern University //
 /////////////////////////////
 
+//---SUMMARY---//
+//This is an experimental data structure
+//used to represent N-dimensional coordinates
+//for random geometric graphs. It has not been
+//tested, and its efficiency is unknown.
+
 #ifndef COORD_SAFE
 #define COORD_SAFE 0
 #endif

@@ -1,5 +1,15 @@
 #include "stopwatch.h"
 
+/////////////////////////////
+//(C) Will Cunningham 2017 //
+//         DK Lab          //
+// Northeastern University //
+/////////////////////////////
+
+//---SUMMARY---//
+//These functions are used for benchmarking.
+//Precision is to the microsecond.
+
 void stopwatchStart(struct Stopwatch *sw)
 {
 	assert (sw != NULL);

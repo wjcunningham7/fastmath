@@ -9,11 +9,12 @@
 // Northeastern University //
 /////////////////////////////
 
-////////////////////////////////////////////////////////////////////
-// Note:  At a future point, these functions will be modified to  //
-// be able to use the SSE2 functions defined in 'fastapprox.h'    //
-// This will allow functions to execute 4x in parallel using SIMD //
-////////////////////////////////////////////////////////////////////
+//---SUMMARY---//
+//These functions are optimized versions of many STL math
+//operations, though often efficiency is traded for accuracy.
+//In particular, implementations of the Gamma function, 
+//Pochhammer function, and Gauss Hypergeometric function offer
+//optimizations not found in GSL.
 
 //Approximation of x^2
 double POW2(const double x)
@@ -269,13 +270,13 @@ double SIN(const double x, const enum FastMethod fm)
 			break;
 		case FAST:
 			#if FM_DEBUG
-			assert (ABS(x, STL) < M_PI);
+			assert (fabs(x) < M_PI);
 			#endif
 			y = static_cast<double>(fastsin(static_cast<float>(x)));
 			break;
 		case FASTER:
 			#if FM_DEBUG
-			assert (ABS(x, STL) < M_PI);
+			assert (fabs(x) < M_PI);
 			#endif
 			y = static_cast<double>(fastersin(static_cast<float>(x)));
 			break;
@@ -305,13 +306,13 @@ double COS(const double x, const enum FastMethod fm)
 			break;
 		case FAST:
 			#if FM_DEBUG
-			assert (ABS(x, STL) < M_PI);
+			assert (fabs(x) < M_PI);
 			#endif
 			y = static_cast<double>(fastcos(static_cast<float>(x)));
 			break;
 		case FASTER:
 			#if FM_DEBUG
-			assert (ABS(x, STL) < M_PI);
+			assert (fabs(x) < M_PI);
 			#endif
 			y = static_cast<double>(fastercos(static_cast<float>(x)));
 			break;
@@ -341,13 +342,13 @@ double TAN(const double x, const enum FastMethod fm)
 			break;
 		case FAST:
 			#if FM_DEBUG
-			assert (ABS(x, STL) < HALF_PI);
+			assert (fabs(x) < HALF_PI);
 			#endif
 			y = static_cast<double>(fasttan(static_cast<float>(x)));
 			break;
 		case FASTER:
 			#if FM_DEBUG
-			assert (ABS(x, STL) < HALF_PI);
+			assert (fabs(x) < HALF_PI);
 			#endif
 			y = static_cast<double>(fastertan(static_cast<float>(x)));
 			break;
@@ -379,7 +380,7 @@ double ACOS(const double x, const enum FastMethod fm, const enum Precision p)
 			break;
 		case INTEGRATION:
 			//Series from Integration (for |x| < 1)
-			_x2 = POW2(x, EXACT);
+			_x2 = POW2(x);
 			if (p == VERY_HIGH_PRECISION)
 				y = ACOS_I0 + x * (_x2 * (_x2 * (_x2 * (_x2 * (_x2 * (_x2 * (ACOS_I15 * _x2 + ACOS_I13) + ACOS_I11) + ACOS_I9) + ACOS_I7) + ACOS_I5) + ACOS_I3) + ACOS_I1);
 			else if (p == HIGH_PRECISION)
@@ -391,7 +392,7 @@ double ACOS(const double x, const enum FastMethod fm, const enum Precision p)
 			break;
 		case CHEBYSHEV:
 			//Chebyshev Approximation
-			_x2 = POW2(x, EXACT);
+			_x2 = POW2(x);
 			if (p == VERY_HIGH_PRECISION)
 				y = ACOS_C0 + x * (_x2 * (_x2 * (_x2 * (ACOS_C9 * _x2 + ACOS_C7) + ACOS_C5) + ACOS_C3) + ACOS_C1);
 			else if (p == HIGH_PRECISION)
@@ -419,7 +420,7 @@ double ATAN(const double x, const enum FastMethod fm, const enum Precision p)
 
 	double y;
 	double _x2, _x2minus;
-	if (__builtin_expect(!x || ABS(x, STL) == 1.0, 0L)) {
+	if (__builtin_expect(!x || fabs(x) == 1.0, 0L)) {
 		if (!x)
 			y = x;
 		else
@@ -432,8 +433,8 @@ double ATAN(const double x, const enum FastMethod fm, const enum Precision p)
 			break;
 		case INTEGRATION:
 			//Series from Integration (for x != 1.0)
-			if (ABS(x, STL) < 1.0) {
-				_x2 = POW2(x, EXACT);
+			if (fabs(x) < 1.0) {
+				_x2 = POW2(x);
 				if (p == VERY_HIGH_PRECISION)
 					y = x * (_x2 * (_x2 * (_x2 * (_x2 * (_x2 * (_x2 * (ATAN_H15 * _x2 + ATAN_H13) + ATAN_H11) + ATAN_H9) + ATAN_H7) + ATAN_H5) + ATAN_H3) + ATAN_H1);
 				else if (p == HIGH_PRECISION)
@@ -442,8 +443,8 @@ double ATAN(const double x, const enum FastMethod fm, const enum Precision p)
 					y = x * (_x2 * (ATAN_H5 * _x2 + ATAN_H3) + ATAN_H1);
 				else
 					y = NAN;
-			} else if (ABS(x, STL) > 1.0) {
-				_x2minus = 1.0 / POW2(x, EXACT);
+			} else if (fabs(x) > 1.0) {
+				_x2minus = 1.0 / POW2(x);
 				if (p == VERY_HIGH_PRECISION)
 					y = ATAN_I0 * SGN(x, DEF) + (_x2minus * (_x2minus * (_x2minus * (_x2minus * (_x2minus * (_x2minus * (ATAN_I15 * _x2minus + ATAN_I13) + ATAN_I11) + ATAN_I9) + ATAN_I7) + ATAN_I5) + ATAN_I3) + ATAN_I1) / x;
 				else if (p == HIGH_PRECISION)
@@ -458,7 +459,7 @@ double ATAN(const double x, const enum FastMethod fm, const enum Precision p)
 			break;
 		case CHEBYSHEV:
 			//Chebyshev Approximation
-			_x2 = POW2(x, EXACT);
+			_x2 = POW2(x);
 			if (p == VERY_HIGH_PRECISION)
 				y = x * (_x2 * (_x2 * (_x2 * (ATAN_C9 * _x2 + ATAN_C7) + ATAN_C5) + ATAN_C3) + ATAN_C1);
 			else if (p == HIGH_PRECISION)
@@ -556,9 +557,9 @@ double ASINH(const double x, const enum FastMethod fm, const enum Precision p)
 		case INTEGRATION:
 			//Series from Integration (for |x| < 1)
 			#if FM_DEBUG
-			assert (ABS(x, STL) < 1.0);
+			assert (fabs(x) < 1.0);
 			#endif
-			_x2 = POW2(x, EXACT);
+			_x2 = POW2(x);
 			if (p == VERY_HIGH_PRECISION)
 				y = x * (_x2 * (_x2 * (_x2 * (_x2 * (_x2 * (_x2 * (ASINH_I15 * _x2 + ASINH_I13) + ASINH_I11) + ASINH_I9) + ASINH_I7) + ASINH_I5) + ASINH_I3) + ASINH_I1);
 			else if (p == HIGH_PRECISION)
@@ -596,10 +597,10 @@ double ACOSH(const double x, const enum FastMethod fm, const enum Precision p)
 		case INTEGRATION:
 			//Series from Integration (for x > 1)
 			#if FM_DEBUG
-			assert (ABS(x, STL) > 1.0);
+			assert (fabs(x) > 1.0);
 			#endif
-			y = LOG(2.0 * x, STL);
-			_x2minus = 1.0 / POW2(x, EXACT);
+			y = log(2.0 * x);
+			_x2minus = 1.0 / POW2(x);
 			if (p == VERY_HIGH_PRECISION)
 				y += _x2minus * (_x2minus * (_x2minus * (_x2minus * (_x2minus * (_x2minus * (ACOSH_I14 * _x2minus + ACOSH_I12) + ACOSH_I10) + ACOSH_I8) + ACOSH_I6) + ACOSH_I4) + ACOSH_I2);
 			else if (p == HIGH_PRECISION)
@@ -651,10 +652,10 @@ double GAMMA(const double x, const enum FastMethod fm)
 	} else {
 		if (x > 10.0)
 			//Use Stirling's Approximation in the Gergo Nemes form
-			y = SQRT(TWO_PI, STL) * exp(-1.0 * x) * POW(x, x - 0.5, STL);
+			y = sqrt(TWO_PI) * exp(-1.0 * x) * pow(x, x - 0.5);
 		else
 			//Use Reflection Formula, then Stirling's Approximation in the Gergo Nemes form
-			y = SQRT(HALF_PI, STL) * exp(1.0 - x) * POW(1.0 - x, x - 0.5, STL) / SIN(M_PI * x, STL);
+			y = sqrt(HALF_PI) * exp(1.0 - x) * pow(1.0 - x, x - 0.5) / sin(M_PI * x);
 	}
 
 	return y;
@@ -683,7 +684,6 @@ double LOGGAMMA(const double x, const enum FastMethod fm)
 		if (x <= 10.0) {
 			switch (fm) {
 			case STL:
-				//y = LOG(tgamma(x), STL);
 				y = lgamma(x);
 				break;
 			case BOOST:
@@ -696,7 +696,7 @@ double LOGGAMMA(const double x, const enum FastMethod fm)
 			}
 		} else
 			//Use Stirling's Approximation
-			y = (x - 0.5) * LOG(x, STL) - x + 0.5 * LOG(TWO_PI, STL);
+			y = (x - 0.5) * log(x) - x + 0.5 * log(TWO_PI);
 	} else
 		y = NAN;
 
@@ -717,22 +717,22 @@ double GAMMA_RATIO(const double x, const double y)
 	double z;
 	double sx, sy, tx, ty;
 	double c = 1.0;
-	if (ABS(x, STL) <= 10.0 && ABS(y, STL) <= 10.0)
-		z = GAMMA(x, STL) / GAMMA(y, STL);
+	if (fabs(x) <= 10.0 && fabs(y) <= 10.0)
+		z = GAMMA(x) / GAMMA(y);
 	else {
 		if (x > 0.0)
-			tx = LOGGAMMA(x, STL);
+			tx = LOGGAMMA(x);
 		else {
-			sx = SIN(M_PI * x, STL);
-			tx = LOG(GAMMA(x, STL) * sx, STL);
+			sx = sin(M_PI * x);
+			tx = log(GAMMA(x) * sx);
 			c /= sx;
 		}
 
 		if (y > 0.0)
-			ty = LOGGAMMA(y, STL);
+			ty = LOGGAMMA(y);
 		else {
-			sy = SIN(M_PI * y, STL);
-			ty = LOG(GAMMA(y, STL) * sy, STL);
+			sy = sin(M_PI * y);
+			ty = log(GAMMA(y) * sy);
 			c *= sy;
 		}
 
@@ -776,7 +776,7 @@ double POCHHAMMER(const double x, const int j)
 			y = GAMMA_RATIO(x + j, x);
 		else {
 			if (1.0 - x - j > 0.0)
-				y = POW(-1.0, static_cast<double>(j),STL) * GAMMA_RATIO(1.0 - x, 1.0 - x - j);
+				y = pow(-1.0, static_cast<double>(j)) * GAMMA_RATIO(1.0 - x, 1.0 - x - j);
 			else
 				y = 0.0;
 		}
@@ -785,7 +785,7 @@ double POCHHAMMER(const double x, const int j)
 	return y;
 }
 
-//Coefficient for the 2F1 function:
+//Coefficient for the Gauss Hypergeometric function 2F1:
 //	A_n = (a)_n * (b)_n / ((c)_n * n!)
 
 //This version is the 'fast' version
@@ -821,76 +821,76 @@ double _2F1_An(const double a, const double b, const double c, const int n)
 	double t_an, t_bn, t_cn, ta, tb, tc, tn;
 	double m = 1.0;
 
-	if (ABS(a + n, STL) <= 10.0 && ABS(b + n, STL) <= 10.0 && ABS(c + n, STL) <= 10.0 && ABS(a, STL) <= 10.0 && ABS(b, STL) <= 10.0 && ABS(c, STL) <= 10.0 && n <= 9)
-		A_n = POCHHAMMER(a, n) * POCHHAMMER(b, n) / (POCHHAMMER(c, n) * GAMMA(n + 1, STL));
+	if (fabs(a + n) <= 10.0 && fabs(b + n) <= 10.0 && fabs(c + n) <= 10.0 && fabs(a) <= 10.0 && fabs(b) <= 10.0 && fabs(c) <= 10.0 && n <= 9)
+		A_n = POCHHAMMER(a, n) * POCHHAMMER(b, n) / (POCHHAMMER(c, n) * GAMMA(n + 1));
 	else {
 		if (a + n > 0.0) {
 			if (a <= 0.0)
 				return 0.0;
-			t_an = LOGGAMMA(a + n, STL);
+			t_an = LOGGAMMA(a + n);
 		} else if (a + n != round(a + n)) {
-			s_an = SIN(M_PI * (a + n), STL);
-			t_an = LOG(GAMMA(a + n, STL) * s_an, STL);
+			s_an = sin(M_PI * (a + n));
+			t_an = log(GAMMA(a + n) * s_an);
 			m /= s_an;
 		} else {
-			t_an = LOGGAMMA(1.0 - a, STL);
-			m *= POW(-1.0, static_cast<double>(n), STL);
+			t_an = LOGGAMMA(1.0 - a);
+			m *= pow(-1.0, static_cast<double>(n));
 		}
 
 		if (b + n > 0.0) {
 			if (b <= 0.0)
 				return 0.0;
-			t_bn = LOGGAMMA(b + n, STL);
+			t_bn = LOGGAMMA(b + n);
 		} else if (b + n != round(b + n)) {
-			s_bn = SIN(M_PI * (b + n), STL);
-			t_bn = LOG(GAMMA(b + n, STL) * s_bn, STL);
+			s_bn = sin(M_PI * (b + n));
+			t_bn = log(GAMMA(b + n) * s_bn);
 			m /= s_bn;
 		} else {
-			t_bn = LOGGAMMA(1.0 - b, STL);
-			m *= POW(-1.0, static_cast<double>(n), STL);
+			t_bn = LOGGAMMA(1.0 - b);
+			m *= pow(-1.0, static_cast<double>(n));
 		}
 
 		if (c + n > 0.0) {
 			if (c <= 0.0)
 				return 0.0;
-			t_cn = LOGGAMMA(c + n, STL);
+			t_cn = LOGGAMMA(c + n);
 		} else if (c + n != round(c + n)) {
-			s_cn = SIN(M_PI * (c + n), STL);
-			t_cn = LOG(GAMMA(c + n, STL) * s_cn, STL);
+			s_cn = sin(M_PI * (c + n));
+			t_cn = log(GAMMA(c + n) * s_cn);
 			m *= s_cn;
 		} else {
-			t_cn = LOGGAMMA(1.0 - c, STL);
-			m *= POW(-1.0, static_cast<double>(n), STL);
+			t_cn = LOGGAMMA(1.0 - c);
+			m *= pow(-1.0, static_cast<double>(n));
 		}
 
 		if (a > 0.0)
-			ta = LOGGAMMA(a, STL);
+			ta = LOGGAMMA(a);
 		else if (a != round(a)) {
-			sa = SIN(M_PI * a, STL);
-			ta = LOG(GAMMA(a, STL) * sa, STL);
+			sa = sin(M_PI * a);
+			ta = log(GAMMA(a) * sa);
 			m *= sa;
 		} else
-			ta = LOGGAMMA(1.0 - a - n, STL);
+			ta = LOGGAMMA(1.0 - a - n);
 
 		if (b > 0.0)
-			tb = LOGGAMMA(b, STL);
+			tb = LOGGAMMA(b);
 		else if (b != round(b)) {
-			sb = SIN(M_PI * b, STL);
-			tb = LOG(GAMMA(b, STL) * sb, STL);
+			sb = sin(M_PI * b);
+			tb = log(GAMMA(b) * sb);
 			m *= sb;
 		} else
-			tb = LOGGAMMA(1.0 - b - n, STL);
+			tb = LOGGAMMA(1.0 - b - n);
 
 		if (c > 0.0)
-			tc = LOGGAMMA(c, STL);
+			tc = LOGGAMMA(c);
 		else if (c != round(c)) {
-			sc = SIN(M_PI * c, STL);
-			tc = LOG(GAMMA(c, STL) * sc, STL);
+			sc = sin(M_PI * c);
+			tc = log(GAMMA(c) * sc);
 			m /= sc;
 		} else
-			tc = LOGGAMMA(1.0 - c - n, STL);
+			tc = LOGGAMMA(1.0 - c - n);
 
-		tn = LOGGAMMA(n + 1.0, STL);
+		tn = LOGGAMMA(n + 1.0);
 		A_n = exp(t_an + t_bn + tc - ta - tb - t_cn - tn) * m;
 	}
 
@@ -920,7 +920,7 @@ void _2F1(const double a, const double b, const double c, const double z, double
 		} else if (c <= 0.0 && round(c) == c) {
 			//Solution will be complex infinity
 			*sol = NAN;
-		} else if (ABS(z, STL) >= 1.0) {
+		} else if (fabs(z) >= 1.0) {
 			//Series will not converge in this region
 			*sol = NAN;
 		} else if (*nterms == -1 && *err <= 0.0) {
@@ -932,22 +932,20 @@ void _2F1(const double a, const double b, const double c, const double z, double
 		//Specify desired error, calculate number of terms needed
 		//Should give at least 1 term
 		if (*nterms == -1)
-			*nterms = static_cast<int>(LOG(*err, FAST) / LOG(ABS(z, STL), FAST)) + 1;
+			*nterms = static_cast<int>(LOG(*err, FAST) / LOG(fabs(z), FAST)) + 1;
 
 		*sol = 0.0;
 		for (int i = 0; i < *nterms; i++) {
 			double An = _2F1_An(a, b, c, i);
-			//printf("\nAn(a = %f, b = %f, c = %f, i = %d) =  %f\n", a, b, c, i, An);
 			if (!!An)
-				*sol += An * POW(z, static_cast<double>(i), STL);
+				*sol += An * pow(z, static_cast<double>(i));
 			else {
 				*nterms = i;
 				break;
 			}
 		}
-		*err = ABS(POW(z, static_cast<double>(*nterms), STL), STL);
+		*err = fabs(pow(z, static_cast<double>(*nterms)));
 	}
-
 }
 
 //Faster algorithm
@@ -958,9 +956,6 @@ void _2F1_F(const double a, const double b, const double c, const double z, doub
 	assert (sol != NULL);
 	assert (err != NULL);
 	assert (nterms != NULL);
-	//assert (a > 0.0);
-	//assert (b > 0.0);
-	//assert (c > 0.0);
 	assert (*nterms >= 0);
 	#endif
 
@@ -977,13 +972,14 @@ void _2F1_F(const double a, const double b, const double c, const double z, doub
 		*sol += Ai * zi;
 
 		//Update variables
-		//printf("Ai: %.8e\tzi: %.8e\n", Ai, zi);
 		Ai *= (a + i) * (b + i) / ((c + i) * (i + 1.0));
 		zi *= z;
 	}
 	*err = fabs(pow(z, *nterms));
 }
 
+//Approximates the number of terms needed in 2F1 to
+//achieve an error of 'err'
 int getNumTerms(const double &z, const double &err)
 {
 	#if FM_DEBUG
@@ -993,6 +989,12 @@ int getNumTerms(const double &z, const double &err)
 	return static_cast<int>(log(err) / log(fabs(z))) + 1;
 }
 
+//Used to find the proper transformation
+//so that the series approximation to 2F1
+//is valid for any |z| instead of just
+//|z|<1 like in GSL.
+//See the paper 'Computing the Hypergeometric
+//Function' by R. Forrey for details
 HyperType getHyperType(const double &z)
 {
 	HyperType ht = HyperType();

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+prefix=/home/$USER/release/fastmath
+mkdir -p $prefix

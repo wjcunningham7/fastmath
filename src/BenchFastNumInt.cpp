@@ -1,5 +1,16 @@
 #include "BenchFastNumInt.h"
 
+/////////////////////////////
+//(C) Will Cunningham 2017 //
+//         DK Lab          //
+// Northeastern University //
+/////////////////////////////
+
+//---SUMMARY---//
+//This benchmarks all the 1D GSL integration methods in FastNumInt.cpp
+//using the integrand 'testfunc' and prints to file data on precision
+//and timings
+
 int main(int argc, char **argv)
 {
 	double *data;
@@ -35,7 +46,6 @@ int main(int argc, char **argv)
 	double qag0, qag1, qag2, qag3, qag4, qag5;
 	double qags;
 	double qaws0, qaws1, qaws2, qaws3;
-	//double cquad;
 	
 	//Perform Operations
 	qng = measureFastInt(data, results, error, nnum, idata, QNG, 0, "QNG", "dat/QNG_Integration.dat");
@@ -49,13 +59,11 @@ int main(int argc, char **argv)
 
 	qags = measureFastInt(data, results, error, nnum, idata, QAGS, 0, "QAGS", "dat/QAGS_Integration.dat");
 
-	/*qaws0 = measureFastInt(data, results, error, nnum, idata, QAWS, 0, "QAWS", "dat/QAWS_0_Integration.dat");
+	qaws0 = measureFastInt(data, results, error, nnum, idata, QAWS, 0, "QAWS", "dat/QAWS_0_Integration.dat");
 	qaws1 = measureFastInt(data, results, error, nnum, idata, QAWS, 1, "QAWS", "dat/QAWS_1_Integration.dat");
 	qaws2 = measureFastInt(data, results, error, nnum, idata, QAWS, 2, "QAWS", "dat/QAWS_2_Integration.dat");
-	qaws3 = measureFastInt(data, results, error, nnum, idata, QAWS, 3, "QAWS", "dat/QAWS_3_Integration.dat");*/
+	qaws3 = measureFastInt(data, results, error, nnum, idata, QAWS, 3, "QAWS", "dat/QAWS_3_Integration.dat");
 
-	//cquad = measureFastInt(data, results, error, nnum, idata, CQUAD, 0, "CQUAD", "dat/CQUAD_Integration.dat");
-	
 	//Print Method Times
 	std::ofstream os("dat/fast_int_method_times.dat");
 
@@ -70,10 +78,10 @@ int main(int argc, char **argv)
 
 	os << "QAGS\t\t" << (qags / nnum) << std::endl;
 
-	/*os << "QAWS\t0\t" << (qaws0 / nnum) << std::endl;
+	os << "QAWS\t0\t" << (qaws0 / nnum) << std::endl;
 	os << "QAWS\t1\t" << (qaws1 / nnum) << std::endl;
 	os << "QAWS\t2\t" << (qaws2 / nnum) << std::endl;
-	os << "QAWS\t3\t" << (qaws3 / nnum) << std::endl;*/
+	os << "QAWS\t3\t" << (qaws3 / nnum) << std::endl;
 	
 	os.flush();
 	os.close();
@@ -84,7 +92,7 @@ int main(int argc, char **argv)
 	free(error);	
 }
 
-double tToEtaUniverse(double t, void *params)
+double testfunc(double t, void *params)
 {
 	return POW(SINH(1.5 * t, STL), (-2.0 / 3.0), STL);
 }
@@ -105,7 +113,7 @@ double measureFastInt(double * const data, double * const results, double * cons
 	printf("Measuring %s-%d Integration.....\n", funcname, variation);
 	fflush(stdout);
 
-	if (fim == QAG || fim == QAGS || fim == QAWS /*|| fim == CQUAD*/) {
+	if (fim == QAG || fim == QAGS || fim == QAWS) {
 		idata.workspace = gsl_integration_workspace_alloc(idata.nintervals);
 
 		if (fim == QAG)
@@ -119,26 +127,23 @@ double measureFastInt(double * const data, double * const results, double * cons
 				fprintf(stderr, "Failed to allocate qaws_table!\n");
 				return 0.0;
 			}
-		} /*else if (fim == CQUAD)
-			idata.cworkspace = gsl_integration_cquad_workspace_alloc(idata.nintervals);*/
+		}
 	}
 	
 
 	stopwatchStart(&watch);
 	for (i = 0; i < nnum; i++) {
 		idata.upper = data[i];
-		results[i] = integrate1D(&tToEtaUniverse, NULL, &idata, fim);
+		results[i] = integrate1D(&testfunc, NULL, &idata, fim);
 		error[i] = idata.abserr;
 	}
 	stopwatchStop(&watch);
 
-	if (fim == QAG || fim == QAGS || fim == QAWS /*|| fim == CQUAD*/) {
+	if (fim == QAG || fim == QAGS || fim == QAWS) {
 		gsl_integration_workspace_free(idata.workspace);
 
 		if (fim == QAWS)
 			gsl_integration_qaws_table_free(idata.table);
-		/*else if (fim == CQUAD)
-			gsl_integration_cquad_workspace_free(idata.cworkspace);*/
 	}
 
 	time = watch.elapsedTime;

@@ -1,5 +1,11 @@
 #!/bin/sh
 
+###########################
+#(C) Will Cunningham 2017 #
+#         DK Lab          #
+# Northeastern University #
+###########################
+
 set -eu -o pipefail
 
 ./general
