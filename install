@@ -1,3 +1,0 @@
-#!/bin/bash
-
-sh ./bootstrap.sh && ./configure "$@" && make clean && make && make install
