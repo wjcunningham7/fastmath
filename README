@@ -93,6 +93,10 @@ This repository contains code used in several other projects:
 7) test/*.cpp
    Files which demonstrate how to use the methods in inc/FastBitset.h, along with typical output
 
+8) ax_fastmath.m4
+   This can be added into the m4 directory of other projects which use the library generated
+   by this code.
+
 =======================
 |Compilation and Usage|
 =======================

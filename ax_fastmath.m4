@@ -1,3 +1,9 @@
+###########################
+#(C) Will Cunningham 2014 #
+#         DK Lab          #
+# Northeastern University #
+###########################
+
 AC_DEFUN([AX_FASTMATH],
 [
 AC_PROVIDE([AX_FASTMATH])
