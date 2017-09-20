@@ -8,8 +8,8 @@ AC_PREREQ([2.63])
 AC_INIT([FastMath], [1.2], [w.cunningham@northeastern.edu])
 AM_INIT_AUTOMAKE
 
-if [[ -e /home/$USER/.fastmath ]] ; then
-  source /home/$USER/.fastmath
+if [[ -e $HOME/.fastmath ]] ; then
+  source $HOME/.fastmath
 fi
 
 AC_CONFIG_MACRO_DIR([m4])
