@@ -101,6 +101,13 @@ This repository contains code used in several other projects:
 |Compilation and Usage|
 =======================
 
+Preparation:
+------------
+1) Boost: Make sure you have Boost v1.55.0 or later installed.  This may be found on the website <http://boost.org>.  When installing, unpack the tar.gz file, and copy the directory it creates (such as boost_1_55_0 for v1.55.0) into /usr/local. Add the following lines to the end of your ~/.bashrc file:
+export BOOST_ROOT=/usr/local/boost_1_55_0
+export PATH=$BOOST_ROOT:$BOOST_ROOT/boost:$PATH
+and make sure the version in BOOST_ROOT matches the version you downloaded. Reload the .bashrc file using 'source ~/.bashrc'
+
 To install:
 -----------
 cp .fastmath /home/$USER

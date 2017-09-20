@@ -27,6 +27,7 @@ AX_COMPARE_VERSION([$ax_cv_cxx_compiler_version], [ge], [4.8.1],, AC_MSG_ERROR([
 AX_CXX_COMPILE_STDCXX([11])
 AX_PATH_GSL([1.13],, AC_MSG_ERROR([Could not find the required version of GSL.]))
 BOOST_REQUIRE([1.55.0])
+CXXFLAGS="$CXXFLAGS $BOOST_CPPFLAGS"
 
 AC_CHECK_LIB([m], [cos],, AC_MSG_ERROR([Could not find the library "libm"]))
 AC_CHECK_LIB([gslcblas], [cblas_dgemm],, AC_MSG_ERROR([Could not find the library "libgslcblas"]))
@@ -34,7 +35,7 @@ AC_CHECK_LIB([gsl], [gsl_blas_dgemm],, AC_MSG_ERROR([Could not find the library 
 AC_CHECK_LIB([stdc++], [main],, AC_MSG_ERROR([Could not find the library "libstdc++"]))
 
 AC_CHECK_FILES([src/stopwatch.cpp src/FastMath.cpp src/FastNumInt.cpp],, AC_MSG_ERROR([Could not find fastmath source files.]))
-AC_CHECK_FILES([inc/stopwatch.h inc/FastMath.h inc/FastNumInt.h inc/FastBitset.h inc/fastapprox.h],, AC_MSG_ERROR([Could not find fastmath header files.]))
+AC_CHECK_FILES([inc/stopwatch.h inc/FastMath.h inc/FastNumInt.h inc/fastapprox.h],, AC_MSG_ERROR([Could not find fastmath header files.]))
 AC_CHECK_FILES([nint/nint.cpp nint/nint.h],, AC_MSG_ERROR([Could not find nint files.]))
 
 AC_CHECK_HEADERS([assert.h cstdlib algorithm cstring inttypes.h limits.h math.h new stddef.h stdio.h stdlib.h sstream stdint.h],, AC_MSG_ERROR([Could not find system header files.]))
