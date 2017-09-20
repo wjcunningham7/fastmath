@@ -209,14 +209,14 @@ public:
 
 	//Set the bit at location 'idx' to 1
 	//NOTE: This operation is not thread-safe
-	void set(uint64_t idx)
+	inline void set(uint64_t idx)
 	{
 		bits[idx >> BLOCK_SHIFT] |= (BlockType)1 << (idx & block_size_m);
 	}
 
 	//Set the bit at location 'idx' to 0
 	//NOTE: This operation is not thread-safe
-	void unset(uint64_t idx)
+	inline void unset(uint64_t idx)
 	{
 		bits[idx >> BLOCK_SHIFT] &= ~((BlockType)1 << (idx & block_size_m));
 	}
