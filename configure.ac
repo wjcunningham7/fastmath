@@ -34,8 +34,8 @@ AC_CHECK_LIB([gslcblas], [cblas_dgemm],, AC_MSG_ERROR([Could not find the librar
 AC_CHECK_LIB([gsl], [gsl_blas_dgemm],, AC_MSG_ERROR([Could not find the library "libgsl"]))
 AC_CHECK_LIB([stdc++], [main],, AC_MSG_ERROR([Could not find the library "libstdc++"]))
 
-AC_CHECK_FILES([src/stopwatch.cpp src/FastMath.cpp src/FastNumInt.cpp],, AC_MSG_ERROR([Could not find fastmath source files.]))
-AC_CHECK_FILES([inc/stopwatch.h inc/FastMath.h inc/FastNumInt.h inc/fastapprox.h],, AC_MSG_ERROR([Could not find fastmath header files.]))
+AC_CHECK_FILES([src/progressbar.cpp src/stopwatch.cpp src/FastMath.cpp src/FastNumInt.cpp],, AC_MSG_ERROR([Could not find fastmath source files.]))
+AC_CHECK_FILES([inc/progressbar.h inc/stopwatch.h inc/FastMath.h inc/FastNumInt.h inc/fastapprox.h],, AC_MSG_ERROR([Could not find fastmath header files.]))
 AC_CHECK_FILES([nint/nint.cpp nint/nint.h],, AC_MSG_ERROR([Could not find nint files.]))
 
 AC_CHECK_HEADERS([assert.h cstdlib algorithm cstring inttypes.h limits.h math.h new stddef.h stdio.h stdlib.h sstream stdint.h],, AC_MSG_ERROR([Could not find system header files.]))
