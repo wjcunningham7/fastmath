@@ -259,6 +259,28 @@ public:
 		return n;
 	}
 
+	//Read next bit set (reverse direction, right to left)
+	inline uint64_t prev_bit(uint64_t idx) const
+	{
+		uint64_t loc_idx;
+		if (!!bits[idx]) {
+			asm volatile("bsrq %1, %0" : "=r" (loc_idx) : "r" (bits[idx]));
+			return loc_idx + (idx << BLOCK_SHIFT);
+		}
+		return 0;
+	}
+
+	//Use this if the block is not known
+	inline uint64_t prev_bit() const
+	{
+		if (any()) {
+			for (uint64_t i = nb; i-- > 0; )
+				if (!!bits[i])
+					return prev_bit(i);
+		}
+		return 0;
+	}
+
 	//---------------//
 	// Create Bitset //
 	//---------------//
@@ -297,6 +319,13 @@ public:
 		memset(bits+offset, 0, sizeof(BlockType) * length);
 	}
 
+	//Flip all bits:  1->0, 0->1
+	inline void flip()
+	{
+		for (uint64_t i = nb; i-- > 0; )
+			bits[i] = ~bits[i];
+	}
+
 	//--------------------//
 	// Cloning Operations //
 	//--------------------//
@@ -304,7 +333,7 @@ public:
 	//Use this with fb as your workspace
 	//to avoid unnecessary malloc and free operations
 	//It is important fb be at least as large as this object
-	inline void clone(FastBitset &fb)
+	inline void clone(FastBitset &fb) const
 	{
 		fb.n = n;
 		fb.nb = nb;
@@ -315,7 +344,7 @@ public:
 	//Clone only a subset of the bitset
 	//NOTE: The offset and the length are for blocks, not bits!
 	//It is important fb be at least as large as this object
-	inline void clone(FastBitset &fb, const uint64_t offset, const uint64_t length)
+	inline void clone(FastBitset &fb, const uint64_t offset, const uint64_t length) const
 	{
 		fb.n = length * bits_per_block;
 		fb.nb = length;
@@ -325,7 +354,7 @@ public:
 
 	//This copies a subset of bits, but does not
 	//modify the parameters of 'fb' like the above method does
-	inline void partial_clone(FastBitset &fb, const uint64_t offset, const uint64_t length)
+	inline void partial_clone(FastBitset &fb, const uint64_t offset, const uint64_t length) const
 	{
 		uint64_t block_idx = offset >> BLOCK_SHIFT;
 		unsigned int idx0 = static_cast<unsigned int>(offset & (bits_per_block - 1));
