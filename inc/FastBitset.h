@@ -324,6 +324,21 @@ public:
 	{
 		for (uint64_t i = nb; i-- > 0; )
 			bits[i] = ~bits[i];
+
+		//Make sure padding stays zero
+		uint64_t length = nb * bits_per_block - n;
+		if (length > 0) {
+			uint64_t block_idx = n >> BLOCK_SHIFT;
+			unsigned int idx0 = static_cast<unsigned int>(n & (bits_per_block - 1));
+			BlockType lower_mask = masks2[idx0];
+
+			bits[block_idx] = (bits[block_idx] & ~lower_mask);
+			if (length > bits_per_block) {
+				uint64_t nmid = (length - 1) >> BLOCK_SHIFT;
+				memset(bits + block_idx + 1, 0, sizeof(BlockType) * nmid);
+			}
+
+		}
 	}
 
 	//--------------------//

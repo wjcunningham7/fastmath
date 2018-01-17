@@ -43,4 +43,18 @@ int main(int argc, char **argv)
 		f.unset(next);
 	}
 	g.printBitset();
+
+	printf("\nTesting flip().\n");
+	FastBitset F(200);
+	F.set(0);
+	F.set(3);
+	F.set(5);
+	F.set(6);
+	for (int i = 0; i < 256; i++)
+		printf("%d", F.read(i));
+	printf("\n");
+	F.flip();
+	for (int i = 0; i < 256; i++)
+		printf("%d", F.read(i));
+	printf("\n");
 }

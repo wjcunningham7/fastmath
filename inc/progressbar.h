@@ -7,6 +7,7 @@
 // Northeastern University //
 /////////////////////////////
 
+#include <math.h>
 #include <stdio.h>
 
 struct ProgressBar {
@@ -19,7 +20,7 @@ struct ProgressBar {
 
 	inline float get_progress() { return static_cast<float>(step) / steps; }
 	inline int get_pos() { return bar_width * get_progress(); }
-	inline int get_unit() { return steps / 100; }
+	inline int get_unit() { return (int)ceil(float(steps) / 100); }
 };
 
 void printProgress(ProgressBar &pb);
