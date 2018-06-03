@@ -233,6 +233,12 @@ public:
 		return bits[idx];
 	}
 
+	//Write to the block at location 'idx'
+	inline void writeBlock(const BlockType val, uint64_t idx)
+	{
+		bits[idx] = val;
+	}
+
 	//Read next bit set
 	//'idx' is the block number to read
 	//Make sure to call unset() afterwards to use this multiple times
