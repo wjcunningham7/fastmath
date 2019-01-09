@@ -4,13 +4,13 @@
 # Northeastern University #
 ###########################
 
-AC_PREREQ([2.63])
-AC_INIT([FastMath], [1.2], [w.cunningham@northeastern.edu])
+AC_PREREQ([2.69])
+AC_INIT([FastMath], [2.0], [wcunningham@perimeterinstitute.ca])
 AM_INIT_AUTOMAKE
 
-if [[ -e $HOME/.fastmath ]] ; then
-  source $HOME/.fastmath
-fi
+#if [[ -e $HOME/.fastmath ]] ; then
+#  source $HOME/.fastmath
+#fi
 
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/FastMath.cpp])
@@ -23,7 +23,8 @@ AC_PROG_RANLIB
 AC_LANG([C++])
 
 AX_COMPILER_VERSION
-AX_COMPARE_VERSION([$ax_cv_cxx_compiler_version], [ge], [4.8.1],, AC_MSG_ERROR([GNU compiler must be at least version 4.8.1]))
+#AX_COMPARE_VERSION([$ax_cv_cxx_compiler_version], [ge], [4.8.1],, AC_MSG_ERROR([GNU compiler must be at least version 4.8.1]))
+AX_COMPARE_VERSION([$ax_cv_cxx_compiler_version], [ge], [6.4.0],, AC_MSG_ERROR([GNU compiler must be at least version 6.4.0]))
 AX_CXX_COMPILE_STDCXX([11])
 AX_PATH_GSL([1.13],, AC_MSG_ERROR([Could not find the required version of GSL.]))
 BOOST_REQUIRE([1.55.0])
@@ -54,9 +55,12 @@ AC_C_INLINE
 AC_C_CONST
 AC_C_VOLATILE
 
-CXXFLAGS="$CXXFLAGS -g -O3 -DBOOST_NO_FENV_H -Wno-narrowing -mpopcnt"
-AX_GCC_X86_CPU_SUPPORTS([avx2], [CXXFLAGS="$CXXFLAGS -mavx2 -DAVX2_ENABLED";], [CXXFLAGS+=""])
-AX_GCC_X86_CPU_SUPPORTS([popcnt],, AC_MSG_ERROR([CPU does not support popcnt instruction.]))
+CXXFLAGS="$CXXFLAGS -g -O3 -DBOOST_NO_FENV_H -Wno-narrowing -mpopcnt -fPIC"
+if [[ "$(uname -s)" == "Linux" ]] ; then
+  AX_GCC_X86_CPU_SUPPORTS([avx2], [CXXFLAGS="$CXXFLAGS -mavx2 -DAVX2_ENABLED";], [CXXFLAGS+=""])
+  AX_GCC_X86_CPU_SUPPORTS([avx512f], [CXXFLAGS="$CXXFLAGS -mavx512f -DAVX512_ENABLED";], [CXXFLAGS+=""])
+  AX_GCC_X86_CPU_SUPPORTS([popcnt],, AC_MSG_ERROR([CPU does not support popcnt instruction.]))
+fi
 AX_GCC_ARCHFLAG([no],, AC_MSG_ERROR([CPU architecture could not be identified.]))
 CXXFLAGS="$CXXFLAGS $ax_cv_gcc_archflag"
 

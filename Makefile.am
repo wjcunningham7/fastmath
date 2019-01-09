@@ -14,4 +14,4 @@ libfastmath_a_LIBADD = nint/nint.o src/FastMath.o src/FastNumInt.o src/stopwatch
 libfastmath_a_SOURCES = 
 
 distclean-local:
-	rm -rf $(top_builddir)/{autom4te.cache,aclocal.m4,AUTHORS,ChangeLog,config.guess,config.log,config.status,config.sub,configure,depcomp,install-sh,Makefile,Makefile.in,missing,NEWS,.deps,inc/config.h*,inc/Makefile.in,src/.dirstamp,src/Makefile.in,nint/Makefile.in,test/Makefile.in}
+	rm -rf $(top_builddir)/{autom4te.cache,aclocal.m4,AUTHORS,ChangeLog,config.guess,config.log,config.status,config.sub,configure,depcomp,install-sh,Makefile,Makefile.in,missing,NEWS,.deps,inc/config.h*,inc/Makefile.in,src/.dirstamp,src/Makefile.in,nint/Makefile.in,test/Makefile.in,compile}

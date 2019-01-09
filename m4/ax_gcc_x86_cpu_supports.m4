@@ -1,6 +1,6 @@
-# ===========================================================================
-#  http://www.gnu.org/software/autoconf-archive/ax_gcc_x86_cpu_supports.html
-# ===========================================================================
+# ============================================================================
+#  https://www.gnu.org/software/autoconf-archive/ax_gcc_x86_cpu_supports.html
+# ============================================================================
 #
 # SYNOPSIS
 #
@@ -42,7 +42,7 @@
 #   Public License for more details.
 #
 #   You should have received a copy of the GNU General Public License along
-#   with this program. If not, see <http://www.gnu.org/licenses/>.
+#   with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 #   As a special exception, the respective Autoconf Macro's copyright owner
 #   gives unlimited permission to copy, distribute and modify the configure
@@ -57,7 +57,7 @@
 #   modified version of the Autoconf Macro, you may extend this special
 #   exception to the GPL to apply to your modified version as well.
 
-#serial 1
+#serial 3
 
 AC_DEFUN_ONCE([_AX_GCC_X86_CPU_INIT],
  [AC_LANG_PUSH([C])
@@ -78,10 +78,10 @@ AC_DEFUN([AX_GCC_X86_CPU_SUPPORTS],
    AC_REQUIRE([_AX_GCC_X86_CPU_INIT])
    AC_LANG_PUSH([C])
    AS_VAR_PUSHDEF([gcc_x86_feature], [AS_TR_SH([ax_cv_gcc_x86_cpu_supports_$1])])
-   AC_CACHE_CHECK([for x86 $1 instruction support], 
+   AC_CACHE_CHECK([for x86 $1 instruction support],
      [gcc_x86_feature],
      [AC_RUN_IFELSE(
-       [AC_LANG_PROGRAM( [#include <stdlib.h> ], 
+       [AC_LANG_PROGRAM( [#include <stdlib.h> ],
        [ __builtin_cpu_init ();
          if (__builtin_cpu_supports("$1"))
            return 0;

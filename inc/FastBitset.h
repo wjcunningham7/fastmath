@@ -4,7 +4,9 @@
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 #include <boost/functional/hash/hash.hpp>
+#ifdef AVX2_ENABLED
 #include "intrinsics/x86intrin.h"
+#endif
 
 /////////////////////////////
 //(C) Will Cunningham 2016 //
@@ -58,6 +60,16 @@ const unsigned char count_table<b>::table[] =
 	2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
 	3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
 };
+
+#ifdef AVX512_ENABLED
+const unsigned long avx512_table[] =
+{
+	0x0302020102010100llu, 0x0403030203020201llu,
+	0x0302020102010100llu, 0x0403030203020201llu,
+        0x0302020102010100llu, 0x0403030203020201llu,
+        0x0302020102010100llu, 0x0403030203020201llu
+};
+#endif
 
 #ifdef AVX2_ENABLED
 const unsigned char avx_table[] =
@@ -717,6 +729,146 @@ public:
 	}
 	#endif
 
+	#ifdef AVX512_ENABLED
+	inline uint64_t partial_vecprod_avx512(const FastBitset &fb, uint64_t offset, uint64_t length)
+	{
+		uint64_t block_idx = offset >> BLOCK_SHIFT;
+		unsigned int idx0 = static_cast<unsigned int>(offset & block_size_m);
+		unsigned int idx1 = static_cast<unsigned int>((offset + length) & block_size_m);
+		BlockType lower_mask = masks2[idx0];
+		BlockType upper_mask = masks[idx1];
+		uint64_t cnt[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+		uint64_t nmid, rem, max;
+		
+		if (length <= bits_per_block && (idx0 < idx1 || idx0 + idx1 == 0 || (idx0 > idx1 && idx1 == 0))) {
+			return popcount(bits[block_idx] & fb.bits[block_idx] & lower_mask & upper_mask);
+		} else {
+			nmid = (length - 1) >> BLOCK_SHIFT;
+			if (idx0 < idx1 || idx0 == 0 || idx1 == 0) nmid--;
+			rem = nmid & 7;
+			max = nmid - rem;
+
+			if (max && n >= 8192) {
+				uint64_t __attribute__ ((unused)) *cntp = &cnt[0];
+				unsigned char mask = 0xf;
+				asm volatile(
+				"movq %4, %%rax				\n\t"
+				"movq %3, %%rcx				\n\t"
+				"vzeroall				\n\t"
+				"vmovdqu64 (%5), %%zmm2			\n\t"	//lookup in zmm2
+				"vpbroadcastb (%6), %%zmm3		\n\t"	//low_mask in zmm3
+			
+				"forloop%=:				\n\t"
+				"vmovdqu64 (%1,%%rcx,16), %%zmm0	\n\t"
+				"vmovdqu64 (%2,%%rcx,16), %%zmm1	\n\t"
+				"vpandd %%zmm0, %%zmm1, %%zmm0		\n\t"	//a & b in zmm0
+
+				"vpandd %%zmm0, %%zmm3, %%zmm4		\n\t"	//lo in zmm4
+				"vpsrld $4, %%zmm0, %%zmm5		\n\t"	//hi in zmm5
+				"vpandd %%zmm5, %%zmm3, %%zmm5		\n\t" 
+
+				"vpshufb %%zmm4, %%zmm2, %%zmm4		\n\t"	//p1 in zmm4
+				"vpshufb %%zmm5, %%zmm2, %%zmm5		\n\t"	//p2 in zmm5
+
+				"vpaddb %%zmm4, %%zmm5, %%zmm5		\n\t"	//sum in zmm5
+				"vpsadbw %%zmm5, %%zmm7, %%zmm5		\n\t"
+				"vpaddq %%zmm5, %%zmm6, %%zmm6		\n\t"	//total in zmm6
+
+				"addq $4, %%rcx				\n\t"
+				"cmpq %%rax, %%rcx			\n\t"
+				"jl forloop%=				\n\t"
+
+				"vmovdqu64 %%zmm6, (%0)			\n\t"	//result in cnt
+				: "+r" (cntp)
+				: "r" (bits), "r" (fb.bits), "r" (block_idx + 1), "r" (max + block_idx), "r" (avx512_table), "r" (&mask)
+				: "%rax", "%rcx", "memory");
+			}
+
+			if (rem)
+				for (uint64_t i = max + 1; i <= nmid; i++)
+					cnt[i-max-1] += popcount(bits[block_idx+i] & fb.bits[block_idx+i]);
+
+			cnt[7] += popcount(bits[block_idx] & fb.bits[block_idx] & lower_mask) + popcount(bits[block_idx + nmid + 1] & fb.bits[block_idx + nmid + 1] & upper_mask);
+		}
+
+		return cnt[0] + cnt[1] + cnt[2] + cnt[3] + cnt[4] + cnt[5] + cnt[6] + cnt[7];
+	}
+	#endif
+
+	#ifdef AVX2_ENABLED
+	inline uint64_t partial_vecprod_small(const FastBitset &fb, uint64_t i, uint64_t j)
+	{
+		uint64_t block0 = i >> BLOCK_SHIFT; //{ 0, 1, 2, or 3 }
+		uint64_t block1 = j >> BLOCK_SHIFT;
+		uint64_t idx0 = i & block_size_m;
+		uint64_t idx1 = j & block_size_m;
+		uint64_t cnt[4] = { 0, 0, 0, 0 };
+
+		//First 64 Bits
+		uint64_t bits0 = (bits[0] & fb.bits[0]);
+		//Lower Mask:
+		//if (block0 == 0) bits0 &= masks2[idx0] & ~0ULL;
+		//else bits0 &= masks2[idx0] & 0ULL;
+		bits0 &= (~0ULL >> ((!!block0) << 6)) & masks2[idx0];
+		//Upper Mask:
+		//if (block1 == 0) bits0 &= masks[idx1] & ~0ULL;
+		//else bits0 &= ~0ULL;
+		bits0 &= (~0ULL << ((!block1) << 6)) | masks[idx1];
+		cnt[0] = popcount(bits0);
+
+		//Second 64 bits
+		uint64_t bits1 = (bits[1] & fb.bits[1]);
+		//Lower Mask:
+		//if (block0 == 1) bits1 &= masks2[idx0];
+		//else if (block0 > 1) bits1 &= 0ULL;
+		//Input: 1 Output: masks2[idx0]
+		//Input: Not 1 Output: ~0
+		uint64_t msk1L = (~0ULL >> ((block0 == 1) << 6)) | masks2[idx0];
+		//Goal:
+		//Input: <2 Output: ~0
+		//Input: >=2 Output: 0
+		msk1L &= ~0ULL >> ((block0 > 1) << 6);
+		bits1 &= msk1L;
+		//Upper Mask:
+		//if (block1 == 1) bits1 &= masks[idx1];
+		//else if (block1 < 1) bits1 &= 0ULL;
+		uint64_t msk1U = (~0ULL << ((block1 == 1) << 6)) | masks[idx1];
+		//Input: <1 Output: 0
+		//Input: >=1 Output: ~0
+		msk1U &= ~0ULL >> ((block1 < 1) << 6);
+		bits1 &= msk1U;
+		cnt[1] = popcount(bits1);
+
+		//Third 64 bits
+		uint64_t bits2 = (bits[2] & fb.bits[2]);
+		//Lower Mask:
+		//if (block0 == 2) bits2 &= masks2[idx0];
+		//else if (block0 > 2) bits2 &= 0ULL;
+		uint64_t msk2L = (~0ULL >> ((block0 == 2) << 6)) | masks2[idx0];
+		msk2L &= ~0ULL >> ((block0 > 2) << 6);
+		bits1 &= msk2L;
+		//Upper Mask:
+		uint64_t msk2U = (~0ULL << ((block1 == 2) << 6)) | masks[idx1];
+		msk2U &= ~0ULL >> ((block1 < 2) << 6);
+		bits1 &= msk2U;
+		cnt[2] = popcount(bits2);
+
+		//Fourth 64 bits
+		uint64_t bits3 = (bits[3] & fb.bits[3]);
+		//Lower Mask:
+		//if (block0 == 3) bits3 &= masks2[idx0];
+		//else bits3 &= ~0ULL;
+		bits3 &= (~0ULL >> ((block0 == 3) << 6)) | masks2[idx0];
+		//Upper Mask:
+		//if (block1 == 3) bits3 &= masks[idx1];
+		//else bits3 &= 0ULL
+		bits3 &= (~0ULL << ((block1 < 3) << 6)) & masks[idx1];
+		cnt[3] = popcount(bits3);
+
+		return cnt[0] + cnt[1] + cnt[2] + cnt[3];
+	}
+	#endif
+
 	//Partial inner product
 	//This combines the set intersection with an
 	//AVX implementation of the popcnt algorithm
@@ -871,10 +1023,14 @@ private:
 		}
 	}
 
+	#ifdef AVX512_ENABLED
+	static const size_t block_size = 512;	//Enforces 64-byte alignment
+	#else
 	#ifdef AVX2_ENABLED
 	static const size_t block_size = 256;	//Enforces 32-byte alignment
 	#else
 	static const size_t block_size = bits_per_block;
+	#endif
 	#endif
 	static const size_t block_size_m = bits_per_block - 1;	//Used to speed up reads and writes
 	BlockType *bits;	//The bitset array (bits in groups of block_size)
@@ -887,10 +1043,14 @@ private:
 	//However, the size of BlockType is not equal to block_size in this case.
 	inline uint64_t get_num_blocks(uint64_t _n)
 	{
+		#ifdef AVX512_ENABLED
+		return ((_n + block_size - 1) >> (BLOCK_SHIFT + 3)) << 3;
+		#else
 		#ifdef AVX2_ENABLED
 		return ((_n + block_size - 1) >> (BLOCK_SHIFT + 2)) << 2;
 		#else
 		return (_n + block_size - 1) >> BLOCK_SHIFT;
+		#endif
 		#endif
 	}
 

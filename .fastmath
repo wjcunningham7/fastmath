@@ -1,4 +1,3 @@
 #!/bin/bash
 
-prefix=/home/$USER/release/fastmath
-mkdir -p $prefix
+prefix=/opt/fastmath
