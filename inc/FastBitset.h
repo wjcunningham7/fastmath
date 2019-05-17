@@ -8,6 +8,26 @@
 #include "intrinsics/x86intrin.h"
 #endif
 
+#ifndef FBALIGN
+#include "config.h"
+#endif
+
+#if !(FBALIGN == 64 | FBALIGN == 256 | FBALIGN == 512)
+#error "Invalid alignment."
+#endif
+
+#ifdef AVX512_ENABLED 
+#if FBALIGN != 512
+#error "Invalid alignment."
+#endif
+#endif
+
+#ifdef AVX2_ENABLED
+#if FBALIGN == 64
+#error "Invalid alignment."
+#endif
+#endif
+
 /////////////////////////////
 //(C) Will Cunningham 2016 //
 //         DK Lab          //
@@ -747,6 +767,10 @@ public:
 			if (idx0 < idx1 || idx0 == 0 || idx1 == 0) nmid--;
 			rem = nmid & 7;
 			max = nmid - rem;
+			/*printf("bidx: %u\n", (unsigned)block_idx);
+			printf("nmid: %u\n", (unsigned)nmid);
+			printf("rem: %u\n", (unsigned)rem);
+			printf("max: %u\n", (unsigned)max);*/
 
 			if (max && n >= 8192) {
 				uint64_t __attribute__ ((unused)) *cntp = &cnt[0];
@@ -759,8 +783,8 @@ public:
 				"vpbroadcastb (%6), %%zmm3		\n\t"	//low_mask in zmm3
 			
 				"forloop%=:				\n\t"
-				"vmovdqu64 (%1,%%rcx,16), %%zmm0	\n\t"
-				"vmovdqu64 (%2,%%rcx,16), %%zmm1	\n\t"
+				"vmovdqu64 (%1,%%rcx,8), %%zmm0		\n\t"
+				"vmovdqu64 (%2,%%rcx,8), %%zmm1		\n\t"
 				"vpandd %%zmm0, %%zmm1, %%zmm0		\n\t"	//a & b in zmm0
 
 				"vpandd %%zmm0, %%zmm3, %%zmm4		\n\t"	//lo in zmm4
@@ -774,7 +798,7 @@ public:
 				"vpsadbw %%zmm5, %%zmm7, %%zmm5		\n\t"
 				"vpaddq %%zmm5, %%zmm6, %%zmm6		\n\t"	//total in zmm6
 
-				"addq $4, %%rcx				\n\t"
+				"addq $8, %%rcx				\n\t"
 				"cmpq %%rax, %%rcx			\n\t"
 				"jl forloop%=				\n\t"
 
@@ -782,6 +806,21 @@ public:
 				: "+r" (cntp)
 				: "r" (bits), "r" (fb.bits), "r" (block_idx + 1), "r" (max + block_idx), "r" (avx512_table), "r" (&mask)
 				: "%rax", "%rcx", "memory");
+			} else {
+				for (uint64_t i = 1; i <= max; i += 4) {
+					asm volatile(
+					"popcntq %4, %4	\n\t"
+					"addq %4, %0	\n\t"
+					"popcntq %5, %5	\n\t"
+					"addq %5, %1	\n\t"
+					"popcntq %6, %6	\n\t"
+					"addq %6, %2	\n\t"
+					"popcntq %7, %7	\n\t"
+					"addq %7, %3	\n\t"
+					: "+r" (cnt[0]), "+r" (cnt[1]), "+r" (cnt[2]), "+r" (cnt[3])
+					: "r" (bits[block_idx+i] & fb.bits[block_idx+i]), "r" (bits[block_idx+i+1] & fb.bits[block_idx+i+1]),
+				  "r" (bits[block_idx+i+2] & fb.bits[block_idx+i+2]), "r" (bits[block_idx+i+3] & fb.bits[block_idx+i+3]));
+				}
 			}
 
 			if (rem)
@@ -1002,7 +1041,7 @@ private:
 			}
 			masks[0] = (BlockType)(-1);
 			masks2[0] = masks[0];
-		} catch (std::bad_alloc) {
+		} catch (std::bad_alloc &) {
 			fprintf(stderr, "Memory allocation failure in %s on line %d!\n", __FILE__, __LINE__);
 			fflush(stderr);
 			destroyBitset(_bits);
@@ -1023,7 +1062,7 @@ private:
 		}
 	}
 
-	#ifdef AVX512_ENABLED
+	/*#ifdef AVX512_ENABLED
 	static const size_t block_size = 512;	//Enforces 64-byte alignment
 	#else
 	#ifdef AVX2_ENABLED
@@ -1031,7 +1070,10 @@ private:
 	#else
 	static const size_t block_size = bits_per_block;
 	#endif
-	#endif
+	#endif*/
+
+	static const size_t block_size = FBALIGN;
+
 	static const size_t block_size_m = bits_per_block - 1;	//Used to speed up reads and writes
 	BlockType *bits;	//The bitset array (bits in groups of block_size)
 	uint64_t n;		//Number of bits (not including padding)
@@ -1043,7 +1085,7 @@ private:
 	//However, the size of BlockType is not equal to block_size in this case.
 	inline uint64_t get_num_blocks(uint64_t _n)
 	{
-		#ifdef AVX512_ENABLED
+		/*#ifdef AVX512_ENABLED
 		return ((_n + block_size - 1) >> (BLOCK_SHIFT + 3)) << 3;
 		#else
 		#ifdef AVX2_ENABLED
@@ -1051,7 +1093,16 @@ private:
 		#else
 		return (_n + block_size - 1) >> BLOCK_SHIFT;
 		#endif
-		#endif
+		#endif*/
+
+		if (block_size == 512)
+			return ((_n + block_size - 1) >> (BLOCK_SHIFT + 3)) << 3;
+		else if (block_size == 256)
+			return ((_n + block_size - 1) >> (BLOCK_SHIFT + 2)) << 2;
+		else if (block_size == bits_per_block)
+			return (_n + block_size - 1) >> BLOCK_SHIFT;
+		else
+			return 0;
 	}
 
 	//Bit-counting method borrowed from Boost

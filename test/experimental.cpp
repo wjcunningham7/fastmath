@@ -17,6 +17,7 @@ int main(int argc, char **argv)
 		printf("%s ", f.toString(bits[i]).c_str());
 	printf("\n"); fflush(stdout);
 
+	#ifdef AVX2_ENABLED
 	//Shift each 128-bit range by 8 bits (1 byte)
 	/*__m256i ymm0 = _mm256_loadu_si256((__m256i const*)bits);
 	__m256i ymm1 = _mm256_slli_si256(ymm0, 1);
@@ -71,4 +72,5 @@ int main(int argc, char **argv)
 	for (unsigned i = 0; i < 4; i++)
 		printf("%s ", f.toString(bits[i]).c_str());
 	printf("\n"); fflush(stdout);
+	#endif
 }

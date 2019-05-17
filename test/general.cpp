@@ -51,10 +51,10 @@ int main(int argc, char **argv)
 	F.set(5);
 	F.set(6);
 	for (int i = 0; i < 256; i++)
-		printf("%d", F.read(i));
+		printf("%d", (int)F.read(i));
 	printf("\n");
 	F.flip();
 	for (int i = 0; i < 256; i++)
-		printf("%d", F.read(i));
+		printf("%d", (int)F.read(i));
 	printf("\n");
 }

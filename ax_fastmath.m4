@@ -37,7 +37,7 @@ fi
 
 if [[[ $VALID_FASTMATH == "yes" ]]] ; then
   FASTMATH_INCLUDE="-I $FASTMATH_HOME/include"
-  FASTMATH_LDFLAGS="-L $FASTMATH_HOME/lib -lfastmath"
+  FASTMATH_LDFLAGS="-L $FASTMATH_HOME/lib -lfastmath$2"
 
   cxx_flags=$CXXFLAGS
   ld_flags=$LDFLAGS
@@ -48,9 +48,10 @@ if [[[ $VALID_FASTMATH == "yes" ]]] ; then
   AC_CHECK_HEADER([FastMath.h],, AC_MSG_WARN([Could not find FastMath.h]); VALID_FASTMATH=no, [#include <FastMath.h>])
   AC_CHECK_HEADER([nint.h],, AC_MSG_WARN([Could not find nint.h]); VALID_FASTMATH=no, [#include <nint.h>])
   AC_CHECK_HEADER([FastNumInt.h],, AC_MSG_WARN([Could not find FastNumInt.h]); VALID_FASTMATH=no, [#include <FastNumInt.h>])
+dnl This next line sometimes gives errors for newer compilers, so we will exclude it
   AC_CHECK_HEADER([FastBitset.h],, AC_MSG_WARN([Could not find FastBitset.h]); VALID_FASTMATH=no, [#include <FastBitset.h>])
   AC_CHECK_HEADER([stopwatch.h],, AC_MSG_WARN([Could not find stopwatch.h]); VALID_FASTMATH=no, [#include <stopwatch.h>])
-  AC_CHECK_FILE([$FASTMATH_HOME/lib/libfastmath.a],, AC_MSG_WARN([Could not find libfastmath]); VALID_FASTMATH=no)
+  AC_CHECK_FILE([$FASTMATH_HOME/lib/libfastmath$2.a],, AC_MSG_WARN([Could not find libfastmath]); VALID_FASTMATH=no)
 
   CXXFLAGS=$cxx_flags
   LDFLAGS=$ld_flags
@@ -64,7 +65,7 @@ if [[[ $VALID_FASTMATH == "yes" ]]] ; then
   AC_SUBST([FASTMATH_ENABLED], [yes])
 else
   AC_MSG_RESULT([no])
-  if [[[ "$#" -ge 2 && "$2" == "mandatory" ]]] ; then
+  if [[[ "$#" -ge 2 && "$3" == "mandatory" ]]] ; then
     AC_MSG_ERROR([Fastmath is required for this package.])
   fi
 fi

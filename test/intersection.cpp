@@ -63,7 +63,7 @@ int main(int argc, char **argv)
 	f.printBitset();
 
 	printf("\nVector product:\n");
-	unsigned int N = 5000;
+	unsigned int N = 8192;
 	FastBitset m(N);
 	FastBitset n(N);
 	srand(time(NULL));
@@ -77,4 +77,19 @@ int main(int argc, char **argv)
 	m.partial_intersection(n, 0, m.size());
 	c = m.count_bits();
 	printf("Count (COR): %" PRIu64 "\n", c);
+
+	#ifdef AVX512_ENABLED
+	printf("\nVector product (AVX512):\n");
+	m.reset();
+	n.reset();
+	for (unsigned int i = 0; i < N; i++) {
+		if ((float)rand() / RAND_MAX > 0.5) m.set(i);
+		if ((float)rand() / RAND_MAX > 0.5) n.set(i);
+	}
+
+	c = m.partial_vecprod_avx512(n, 0, N);
+	printf("Count (VPD512): %" PRIu64 "\n", c);
+	c = m.partial_vecprod(n, 0, N);
+	printf("Count (VPD256): %" PRIu64 "\n", c);
+	#endif
 }
