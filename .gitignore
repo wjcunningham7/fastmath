@@ -58,3 +58,5 @@ nint/.deps/**
 nint/Makefile
 nint/Makefile.in
 test/.deps/**
+
+.stignore

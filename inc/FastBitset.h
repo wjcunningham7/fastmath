@@ -484,7 +484,7 @@ public:
 
 	//Count a subset of bits
 	//NOTE: The offset and the length are for bits, not blocks!
-	inline uint64_t partial_count(uint64_t offset, uint64_t length)
+	inline uint64_t partial_count(uint64_t offset, uint64_t length) const
 	{
 		uint64_t block_idx = offset >> BLOCK_SHIFT;
 		unsigned int idx0 = static_cast<unsigned int>(offset & block_size_m);
