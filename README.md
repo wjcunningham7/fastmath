@@ -7,19 +7,19 @@ This repository contains the FastMath library. It provides numerical approximati
 ##Environment Variables
 There are several environment variables one should export in the $HOME/.bashrc file before installation:
 
-1\. FASTMATH\_HOME - This will be the directory where the package is installed, and where other programs may find it later. Some options are
+1\. **FASTMATH\_HOME** - This will be the directory where the package is installed, and where other programs may find it later. Some options are
 
         $ export FASTMATH_HOME=/usr/local
         $ export FASTMATH_HOME=/opt
         $ export FASTMATH_HOME=$HOME/release
 
-2\. FBALIGN - This is the alignment of the FastBitset. If your CPU supports AVX2 (AVX-512) it will be set automatically to 256 (512). If not set, the installation script will determine this for you. Options are
+2\. **FBALIGN** - This is the alignment of the FastBitset. If your CPU supports AVX2 (AVX-512) it will be set automatically to 256 (512). If not set, the installation script will determine this for you. Options are
 
         $ export FBALIGN=64
         $ export FBALIGN=256
         $ export FBALIGN=512
 
-3\. PLATFORM - This is the name of the system on which you are installing the package. If you are using a workstation, try
+3\. **PLATFORM** - This is the name of the system on which you are installing the package. If you are using a workstation, try
 
         $ export PLATFORM=$HOSTNAME
 
@@ -29,13 +29,13 @@ There are several environment variables one should export in the $HOME/.bashrc f
 
    supposing that "general" is the name of the default partition.
 
-4\. BOOST\_ROOT - This is the installation directory of Boost. See below for more information on dependencies. If you installed Boost using a package manager, or you installed it from source without specifying the installation directory, you do not need to set this variable.
+4\. **BOOST\_ROOT** - This is the installation directory of Boost. See below for more information on dependencies. If you installed Boost using a package manager, or you installed it from source without specifying the installation directory, you do not need to set this variable.
 
-5\. CPATH - This tells the compiler where to search for headers. If other packages cannot find the FastMath headers, try the following:
+5\. **CPATH** - This tells the compiler where to search for headers. If other packages cannot find the FastMath headers, try the following:
 
         $ export CPATH=$FASTMATH_HOME/include:$CPATH
 
-6\. LD\_LIBRARY\_PATH - Likewise, if FastMath is installed into a non-standard directory, you may need to add the following for other packages to find the FastMath library:
+6\. **LD\_LIBRARY\_PATH** - Likewise, if FastMath is installed into a non-standard directory, you may need to add the following for other packages to find the FastMath library:
 
         $ export LD_LIBRARY_PATH=$FASTMATH_HOME/lib:$LD_LIBRARY_PATH
 
@@ -159,4 +159,4 @@ and include the headers with
 ##Maintainers
 Please direct all questions and report all bugs to Will Cunningham at <wcunningham AT perimeterinstitute DOT ca>
 
-&copy; Will Cunningham 2014-2019
+(C) Will Cunningham 2014-2019
