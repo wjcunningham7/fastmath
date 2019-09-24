@@ -45,12 +45,7 @@ if [[[ $VALID_FASTMATH == "yes" ]]] ; then
   CXXFLAGS="$CXXFLAGS $FASTMATH_INCLUDE"
   LDFLAGS="$LDFLAGS $FASTMATH_LDFLAGS"
 
-  AC_CHECK_HEADER([FastMath.h],, AC_MSG_WARN([Could not find FastMath.h]); VALID_FASTMATH=no, [#include <FastMath.h>])
-  AC_CHECK_HEADER([nint.h],, AC_MSG_WARN([Could not find nint.h]); VALID_FASTMATH=no, [#include <nint.h>])
-  AC_CHECK_HEADER([FastNumInt.h],, AC_MSG_WARN([Could not find FastNumInt.h]); VALID_FASTMATH=no, [#include <FastNumInt.h>])
-dnl This next line sometimes gives errors for newer compilers, so we will exclude it
-  AC_CHECK_HEADER([FastBitset.h],, AC_MSG_WARN([Could not find FastBitset.h]); VALID_FASTMATH=no, [#include <FastBitset.h>])
-  AC_CHECK_HEADER([stopwatch.h],, AC_MSG_WARN([Could not find stopwatch.h]); VALID_FASTMATH=no, [#include <stopwatch.h>])
+  AC_CHECK_HEADER([fastmath/fastmath.h],, AC_MSG_WARN([Could not find fastmath headers]); VALID_FASTMATH=no, [#include <fastmath/fastmath.h>])
   AC_CHECK_FILE([$FASTMATH_HOME/lib/libfastmath$2.a],, AC_MSG_WARN([Could not find libfastmath]); VALID_FASTMATH=no)
 
   CXXFLAGS=$cxx_flags

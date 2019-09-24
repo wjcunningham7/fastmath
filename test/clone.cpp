@@ -1,10 +1,12 @@
-#include "FastBitset.h"
+#include "fastbitset.h"
 
 /////////////////////////////
 //(C) Will Cunningham 2017 //
 //         DK Lab          //
 // Northeastern University //
 /////////////////////////////
+
+using namespace fastmath;
 
 int main(int argc, char **argv)
 {

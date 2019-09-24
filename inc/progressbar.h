@@ -1,5 +1,5 @@
-#ifndef PROGRESSBAR_H_
-#define PROGRESSBAR_H_
+#ifndef FASTMATH_PROGRESSBAR_H
+#define FASTMATH_PROGRESSBAR_H
 
 /////////////////////////////
 //(C) Will Cunningham 2018 //
@@ -9,6 +9,8 @@
 
 #include <math.h>
 #include <stdio.h>
+
+namespace fastmath {
 
 struct ProgressBar {
 	ProgressBar() : bar_width(70), steps(0), step(0) {}
@@ -26,5 +28,7 @@ struct ProgressBar {
 void printProgress(ProgressBar &pb);
 void updateProgress(ProgressBar &pb, int step);
 void completeProgress(ProgressBar &pb);
+
+}
 
 #endif

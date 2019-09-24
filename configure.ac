@@ -5,11 +5,11 @@
 ###########################
 
 AC_PREREQ([2.69])
-AC_INIT([FastMath], [2.0], [wcunningham@perimeterinstitute.ca])
+AC_INIT([FastMath], [3.0], [wcunningham@perimeterinstitute.ca])
 AM_INIT_AUTOMAKE
 
 AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_SRCDIR([src/FastMath.cpp])
+AC_CONFIG_SRCDIR([src/fastmath.cpp])
 AC_CONFIG_HEADERS([inc/config.h])
 
 AC_PROG_CC
@@ -25,19 +25,19 @@ AX_CXX_COMPILE_STDCXX([11])
 AX_PATH_GSL([1.13],, AC_MSG_ERROR([Could not find the required version of GSL.]))
 BOOST_REQUIRE([1.55.0])
 CXXFLAGS="$CXXFLAGS $BOOST_CPPFLAGS"
+AX_LIB_HDF5
 AX_PLATFORM([$PLATFORM])
 
 AC_CHECK_LIB([m], [cos],, AC_MSG_ERROR([Could not find the library "libm"]))
-#AC_CHECK_LIB([gslcblas], [cblas_dgemm],, AC_MSG_ERROR([Could not find the library "libgslcblas"]))
-#AC_CHECK_LIB([gsl], [gsl_blas_dgemm],, AC_MSG_ERROR([Could not find the library "libgsl"]))
+AC_CHECK_LIB([gslcblas], [cblas_dgemm],, AC_MSG_ERROR([Could not find the library "libgslcblas"]))
+AC_CHECK_LIB([gsl], [gsl_blas_dgemm],, AC_MSG_ERROR([Could not find the library "libgsl"]))
 AC_CHECK_LIB([stdc++], [main],, AC_MSG_ERROR([Could not find the library "libstdc++"]))
 
-AC_CHECK_FILES([src/progressbar.cpp src/stopwatch.cpp src/FastMath.cpp src/FastNumInt.cpp],, AC_MSG_ERROR([Could not find fastmath source files.]))
-AC_CHECK_FILES([inc/progressbar.h inc/stopwatch.h inc/FastMath.h inc/FastNumInt.h inc/fastapprox.h],, AC_MSG_ERROR([Could not find fastmath header files.]))
-AC_CHECK_FILES([nint/nint.cpp nint/nint.h],, AC_MSG_ERROR([Could not find nint files.]))
+AC_CHECK_FILES([src/fastmath.cpp],, AC_MSG_ERROR([Could not find fastmath source files.]))
+AC_CHECK_FILES([inc/fastmath.h],, AC_MSG_ERROR([Could not find fastmath header files.]))
 
 AC_CHECK_HEADERS([assert.h cstdlib algorithm cstring inttypes.h limits.h math.h new stddef.h stdio.h stdlib.h sstream stdint.h],, AC_MSG_ERROR([Could not find system header files.]))
-AC_CHECK_HEADER([emmintrin.h],, AC_MSG_ERROR([Could not find SSE header file.]))
+AC_CHECK_HEADER([x86intrin.h],, AC_MSG_ERROR([Could not find SSE/AVX header file.]))
 AC_CHECK_HEADERS([gsl/gsl_errno.h gsl/gsl_integration.h],, AC_MSG_ERROR([Could not find GSL header files.]))
 AC_CHECK_HEADER([boost/functional/hash/hash.hpp],, AC_MSG_ERROR([Could not find Boost header files.]))
 AC_HEADER_STDC
@@ -70,8 +70,8 @@ fi
 AX_GCC_ARCHFLAG([no],, AC_MSG_ERROR([CPU architecture could not be identified.]))
 CXXFLAGS="$CXXFLAGS $ax_cv_gcc_archflag"
 
-xtra=($(for file in $(find inc/intrinsics -type f) ; do echo intrinsics/$(basename $file) ; done))
-AC_SUBST([xtra], ["${xtra[[@]]}"])
+#xtra=($(for file in $(find inc/intrinsics -type f) ; do echo intrinsics/$(basename $file) ; done))
+#AC_SUBST([xtra], ["${xtra[[@]]}"])
 
-AC_CONFIG_FILES([Makefile nint/Makefile src/Makefile inc/Makefile test/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile inc/Makefile test/Makefile])
 AC_OUTPUT

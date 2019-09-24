@@ -1,4 +1,5 @@
 #!/bin/bash
 
 source $HOME/.bashrc
-sh ./bootstrap.sh && ./configure --prefix=$FASTMATH_HOME/fastmath --with-alignment=$FBALIGN && make clean && make #&& make install
+ln -fs inc fastmath
+sh ./bootstrap.sh && ./configure --prefix=$FASTMATH_HOME/fastmath --with-alignment=$FBALIGN && make clean && make

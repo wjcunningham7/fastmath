@@ -1,4 +1,4 @@
-#include "FastBitset.h"
+#include "fastbitset.h"
 
 int main(int argc, char **argv)
 {

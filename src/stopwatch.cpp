@@ -1,4 +1,4 @@
-#include "stopwatch.h"
+#include <fastmath/stopwatch.h>
 
 /////////////////////////////
 //(C) Will Cunningham 2017 //
@@ -9,6 +9,8 @@
 //---SUMMARY---//
 //These functions are used for benchmarking.
 //Precision is to the microsecond.
+
+namespace fastmath {
 
 void stopwatchStart(struct Stopwatch *sw)
 {
@@ -32,4 +34,6 @@ void stopwatchReset(struct Stopwatch *sw)
 	sw->startTime = (struct timeval){0,0};
 	sw->stopTime = (struct timeval){0,0};
 	sw->elapsedTime = 0.0;
+}
+
 }

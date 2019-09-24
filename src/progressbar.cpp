@@ -1,10 +1,12 @@
-#include "progressbar.h"
+#include <fastmath/progressbar.h>
 
 /////////////////////////////
 //(C) Will Cunningham 2018 //
 //         DK Lab          //
 // Northeastern University //
 /////////////////////////////
+
+namespace fastmath {
 
 void printProgress(ProgressBar &pb)
 {
@@ -36,4 +38,6 @@ void completeProgress(ProgressBar &pb)
 	printf("] 100%%\n");
 	fflush(stdout);
 	return;
+}
+
 }

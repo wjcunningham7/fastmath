@@ -1,10 +1,12 @@
-#include "FastBitset.h"
+#include "fastbitset.h"
 
 /////////////////////////////
 //(C) Will Cunningham 2017 //
 //         DK Lab          //
 // Northeastern University //
 /////////////////////////////
+
+using namespace fastmath;
 
 int main(int argc, char **argv)
 {
@@ -55,6 +57,15 @@ int main(int argc, char **argv)
 	printf("\n");
 	F.flip();
 	for (int i = 0; i < 256; i++)
+		printf("%d", (int)F.read(i));
+	printf("\n");
+
+	printf("\nTesting flip(0).\n");
+	F.flip(0);
+	F.printBitset();
+	printf("Testing flip(63).\n");
+	F.flip(63);
+	for (int i = 0; i < 64; i++)
 		printf("%d", (int)F.read(i));
 	printf("\n");
 }

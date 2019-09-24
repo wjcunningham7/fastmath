@@ -7,6 +7,7 @@
 AUTOMAKE_OPTIONS = foreign
 ACLOCAL_AMFLAGS = -I m4 --install
 
-include_HEADERS = config.h Coordinates.h fastapprox.h FastBitset.h FastMath.h FastNumInt.h MersenneRNG.h progressbar.h stopwatch.h
-nobase_include_HEADERS = @xtra@
-EXTRA_HEADERS =
+otherincludedir=$(includedir)/fastmath
+otherinclude_HEADERS = config.h fastapprox.h fastbitset.h fastmath.h integration.h mersenne.h nint.h printcolor.h progressbar.h stopwatch.h resources.h
+#nobase_include_HEADERS = @xtra@
+#EXTRA_HEADERS =

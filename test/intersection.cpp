@@ -1,11 +1,13 @@
-#include "FastBitset.h"
-#include "stdlib.h"
+#include "fastbitset.h"
+#include <stdlib.h>
 
 /////////////////////////////
 //(C) Will Cunningham 2017 //
 //         DK Lab          //
 // Northeastern University //
 /////////////////////////////
+
+using namespace fastmath;
 
 void initialize(FastBitset &f, FastBitset &g)
 {
