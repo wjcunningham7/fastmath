@@ -22,31 +22,28 @@ namespace fastmath {
 
 typedef boost::mt19937 Engine;
 typedef boost::uniform_real<double> UDistribution;
-typedef boost::variate_generator< Engine &, UDistribution > UGenerator;
+typedef boost::variate_generator<Engine &, UDistribution> UGenerator;
 
 class MersenneRNG {
-public:
-	MersenneRNG() : dist(0.0, 1.0), rng(eng, dist)  {}
-	~MersenneRNG() {}
+  public:
+    MersenneRNG() : dist(0.0, 1.0), rng(eng, dist) {}
+    ~MersenneRNG() {}
 
-	void seed(long _seed)
-	{
-		rng.engine().seed(_seed);
-		rng.distribution().reset();
-	}
+    void seed(long _seed) {
+        rng.engine().seed(_seed);
+        rng.distribution().reset();
+    }
 
-	void thermalize(uint64_t iterations)
-	{
-		for (unsigned int i = 0; i < iterations; i++)
-			rng();
-	}
+    void thermalize(uint64_t iterations) {
+        for (unsigned int i = 0; i < iterations; i++)
+            rng();
+    }
 
-	Engine eng;
-	UDistribution dist;
-	UGenerator rng;
+    Engine eng;
+    UDistribution dist;
+    UGenerator rng;
 };
 
-}
+} // namespace fastmath
 
 #endif
-

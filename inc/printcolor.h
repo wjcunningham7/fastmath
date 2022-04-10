@@ -24,6 +24,6 @@ void printf_yel();
 void printf_mag();
 void printf_std();
 
-}
+} // namespace fastmath
 
 #endif

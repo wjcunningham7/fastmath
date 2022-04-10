@@ -15,17 +15,19 @@
 namespace fastmath {
 
 struct Stopwatch {
-	Stopwatch() : startTime((struct timeval){0,0}), stopTime((struct timeval){0,0}), elapsedTime(0.0) {}
+    Stopwatch()
+        : startTime((struct timeval){0, 0}), stopTime((struct timeval){0, 0}),
+          elapsedTime(0.0) {}
 
-	struct timeval startTime;
-	struct timeval stopTime;
-	double elapsedTime;
+    struct timeval startTime;
+    struct timeval stopTime;
+    double elapsedTime;
 };
 
 void stopwatchStart(struct Stopwatch *sw);
 void stopwatchStop(struct Stopwatch *sw);
 void stopwatchReset(struct Stopwatch *sw);
 
-}
+} // namespace fastmath
 
 #endif

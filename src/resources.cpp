@@ -15,42 +15,41 @@
 
 namespace fastmath {
 
-//MPI Print Variadic Function
-//Allows only the master process to print to stdout
-//If MPI is not enabled, rank == 0
-int printf_mpi(int rank, const char * format, ...)
-{
-	int retval = 0;
+// MPI Print Variadic Function
+// Allows only the master process to print to stdout
+// If MPI is not enabled, rank == 0
+int printf_mpi(int rank, const char *format, ...) {
+    int retval = 0;
 
-	if (rank == 0) {
-		va_list argp;
-		va_start(argp, format);
-		vprintf(format, argp);
-		va_end(argp);
-	}
+    if (rank == 0) {
+        va_list argp;
+        va_start(argp, format);
+        vprintf(format, argp);
+        va_end(argp);
+    }
 
-	return retval;
+    return retval;
 }
 
-//Debug Print Variadic Function
-int printf_dbg(const char * format, ...)
-{
-	printf_mag();
-	va_list argp;
-	va_start(argp, format);
-	vprintf(format, argp);
-	va_end(argp);
-	printf_std();
-	fflush(stdout);
+// Debug Print Variadic Function
+int printf_dbg(const char *format, ...) {
+    printf_mag();
+    va_list argp;
+    va_start(argp, format);
+    vprintf(format, argp);
+    va_end(argp);
+    printf_std();
+    fflush(stdout);
 
-	return 0;
+    return 0;
 }
 
-void printFinish(const char **argv, const int &exename_start, const int &rank, int iStatus)
-{
-	const char *sStatus[] = { "FAILED", "PASSED", "WAIVED", NULL };
-	printf_mpi(rank, "[%s] results...\n%s\n\n", &(argv[0][exename_start]), sStatus[iStatus]);
-	fflush(stdout);
+void printFinish(const char **argv, const int &exename_start, const int &rank,
+                 int iStatus) {
+    const char *sStatus[] = {"FAILED", "PASSED", "WAIVED", NULL};
+    printf_mpi(rank, "[%s] results...\n%s\n\n", &(argv[0][exename_start]),
+               sStatus[iStatus]);
+    fflush(stdout);
 }
 
-}
+} // namespace fastmath
