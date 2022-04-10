@@ -8,7 +8,8 @@
 /////////////////////////////
 
 #include <assert.h>
-#include <cstdlib>
+//#include <cstdlib>
+#include <stdlib.h>
 #include <sys/time.h>
 
 namespace fastmath {

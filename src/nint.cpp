@@ -1,3 +1,20 @@
+/* Copyright 2014-2022 Will Cunningham
+ *
+ * This file is part of FastMath.
+ *
+ * Licensed under the MIT License (the "License"). A copy of the
+ * License may be obtained with this software package or at
+ *
+ *     https://opensource.org/licenses/MIT
+ *
+ * FastMath is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. */
+
+// This file has been borrowed from nintlib and modified. See
+// https://people.math.sc.edu/Burkardt/cpp_src/nintlib/nintlib.html
+// for details.
+//
 # include <cstdlib>
 # include <iostream>
 # include <iomanip>
@@ -12,7 +29,7 @@ namespace fastmath {
 
 //****************************************************************************80
 
-double box_nd ( double func ( int dim_num, double x[] ), int dim_num, 
+double box_nd ( double func ( int dim_num, double x[] ), int dim_num,
   int order, double xtab[], double weight[], int *eval_num )
 
 //****************************************************************************80
@@ -30,7 +47,7 @@ double box_nd ( double func ( int dim_num, double x[] ), int dim_num,
 //
 //  Licensing:
 //
-//    This code is distributed under the GNU LGPL license. 
+//    This code is distributed under the GNU LGPL license.
 //
 //  Modified:
 //
@@ -53,7 +70,7 @@ double box_nd ( double func ( int dim_num, double x[] ), int dim_num,
 //
 //    Input, double FUNC ( int dim_num, double x[] ), evaluates
 //    the function to be integrated.
-//      
+//
 //    Input, int DIM_NUM, the spatial dimension.
 //
 //    Input, int ORDER, the number of points used in the 1D rule.
@@ -141,7 +158,7 @@ int i4_huge ( void )
 //
 //  Licensing:
 //
-//    This code is distributed under the GNU LGPL license. 
+//    This code is distributed under the GNU LGPL license.
 //
 //  Modified:
 //
@@ -170,7 +187,7 @@ int i4_power ( int i, int j )
 //
 //  Licensing:
 //
-//    This code is distributed under the GNU LGPL license. 
+//    This code is distributed under the GNU LGPL license.
 //
 //  Modified:
 //
@@ -238,7 +255,7 @@ int i4_power ( int i, int j )
 }
 //****************************************************************************80
 
-double monte_carlo_nd ( double func ( int dim_num, double x[], double *params ), int dim_num, 
+double monte_carlo_nd ( double func ( int dim_num, double x[], double *params ), int dim_num,
   double a[], double b[], double *params, int eval_num, int *seed )
 
 //****************************************************************************80
@@ -250,12 +267,12 @@ double monte_carlo_nd ( double func ( int dim_num, double x[], double *params ),
 //  Discussion:
 //
 //    Unlike the other routines, this routine requires the user to specify
-//    the number of function evaluations as an INPUT quantity.  
+//    the number of function evaluations as an INPUT quantity.
 //    No attempt at error estimation is made.
 //
 //  Licensing:
 //
-//    This code is distributed under the GNU LGPL license. 
+//    This code is distributed under the GNU LGPL license.
 //
 //  Modified:
 //
@@ -325,7 +342,7 @@ double monte_carlo_nd ( double func ( int dim_num, double x[], double *params ),
 }
 //****************************************************************************80
 
-double p5_nd ( double func ( int dim_num, double x[] ), int dim_num, 
+double p5_nd ( double func ( int dim_num, double x[] ), int dim_num,
   double a[], double b[], int *eval_num )
 
 //****************************************************************************80
@@ -336,12 +353,12 @@ double p5_nd ( double func ( int dim_num, double x[] ), int dim_num,
 //
 //  Discussion:
 //
-//    The routine uses a method which is exact for polynomials of total 
+//    The routine uses a method which is exact for polynomials of total
 //    degree 5 or less.
 //
 //  Licensing:
 //
-//    This code is distributed under the GNU LGPL license. 
+//    This code is distributed under the GNU LGPL license.
 //
 //  Modified:
 //
@@ -401,13 +418,13 @@ double p5_nd ( double func ( int dim_num, double x[] ), int dim_num,
     cout << "  DIM_NUM < 1, DIM_NUM = " << dim_num << "\n";
     exit ( 1 );
   }
- 
+
   a2 = 25.0 / 324.0;
   a3 = sqrt ( 0.6 );
   en = ( double ) ( dim_num );
   a0 = ( 25.0 * en * en - 115.0 * en + 162.0 ) / 162.0;
   a1 = ( 70.0 - 25.0 * en ) / 162.0;
- 
+
   volume = 1.0;
   for ( dim = 0; dim < dim_num; dim++ )
   {
@@ -419,7 +436,7 @@ double p5_nd ( double func ( int dim_num, double x[] ), int dim_num,
   {
     work[dim] = 0.5 * ( a[dim] + b[dim] );
   }
- 
+
   result = 0.0;
   if ( volume == 0.0 )
   {
@@ -429,7 +446,7 @@ double p5_nd ( double func ( int dim_num, double x[] ), int dim_num,
     delete [] work;
     return result;
   }
- 
+
   sum1 = a0 * func ( dim_num, work );
   *eval_num = *eval_num + 1;
 
@@ -452,16 +469,16 @@ double p5_nd ( double func ( int dim_num, double x[] ), int dim_num,
   if ( 1 < dim_num )
   {
     a4 = a3;
- 
+
     for ( ; ; )
     {
       for ( i = 0; i < dim_num - 1; i++ )
       {
         work[i] = 0.5 * ( ( a[i] + b[i] ) + a4 * ( b[i] - a[i] ) );
         a5 = a3;
- 
+
         for ( ; ; )
-        { 
+        {
           for ( j = i + 1; j < dim_num; j++ )
           {
             work[j] = 0.5 * ( ( a[j] + b[j] ) + a5 * ( b[j] - a[j] ) );
@@ -469,7 +486,7 @@ double p5_nd ( double func ( int dim_num, double x[] ), int dim_num,
             *eval_num = *eval_num + 1;
             work[j] = 0.5 * ( a[j]+ b[j] );
           }
- 
+
           a5 = -a5;
 
           if ( 0.0 <= a5 )
@@ -479,7 +496,7 @@ double p5_nd ( double func ( int dim_num, double x[] ), int dim_num,
         }
         work[i] = 0.5 * ( a[i] + b[i] );
       }
- 
+
       a4 = -a4;
 
       if ( 0.0 <= a4 )
@@ -488,11 +505,11 @@ double p5_nd ( double func ( int dim_num, double x[] ), int dim_num,
       }
     }
   }
- 
+
   result = volume * ( sum1 + a1 * sum2 + a2 * sum3 );
 
   delete [] work;
- 
+
   return result;
 }
 //****************************************************************************80
@@ -507,7 +524,7 @@ double r8_abs ( double x )
 //
 //  Licensing:
 //
-//    This code is distributed under the GNU LGPL license. 
+//    This code is distributed under the GNU LGPL license.
 //
 //  Modified:
 //
@@ -529,7 +546,7 @@ double r8_abs ( double x )
   if ( 0.0 <= x )
   {
     value = x;
-  } 
+  }
   else
   {
     value = -x;
@@ -548,15 +565,15 @@ double r8_epsilon ( void )
 //
 //  Discussion:
 //
-//    The roundoff unit is a number R which is a power of 2 with the 
+//    The roundoff unit is a number R which is a power of 2 with the
 //    property that, to the precision of the computer's arithmetic,
 //      1 < 1 + R
-//    but 
+//    but
 //      1 = ( 1 + R / 2 )
 //
 //  Licensing:
 //
-//    This code is distributed under the GNU LGPL license. 
+//    This code is distributed under the GNU LGPL license.
 //
 //  Modified:
 //
@@ -606,7 +623,7 @@ double *r8vec_uniform_01_new ( int n, int *seed )
 //
 //  Licensing:
 //
-//    This code is distributed under the GNU LGPL license. 
+//    This code is distributed under the GNU LGPL license.
 //
 //  Modified:
 //
@@ -675,8 +692,8 @@ double *r8vec_uniform_01_new ( int n, int *seed )
 }
 //****************************************************************************80
 
-double romberg_nd ( double func ( int dim_num, double x[] ), double a[], 
-  double b[], int dim_num, int sub_num[], int it_max, double tol, int *ind, 
+double romberg_nd ( double func ( int dim_num, double x[] ), double a[],
+  double b[], int dim_num, int sub_num[], int it_max, double tol, int *ind,
   int *eval_num )
 
 //****************************************************************************80
@@ -696,7 +713,7 @@ double romberg_nd ( double func ( int dim_num, double x[] ), double a[],
 //
 //  Licensing:
 //
-//    This code is distributed under the GNU LGPL license. 
+//    This code is distributed under the GNU LGPL license.
 //
 //  Modified:
 //
@@ -789,7 +806,7 @@ double romberg_nd ( double func ( int dim_num, double x[] ), double a[],
     cout << "  DIM_NUM is less than 1.  DIM_NUM = " << dim_num << "\n";
     exit ( 1 );
   }
- 
+
   if ( it_max < 1 )
   {
     cout << "\n";
@@ -797,7 +814,7 @@ double romberg_nd ( double func ( int dim_num, double x[] ), double a[],
     cout << "  IT_MAX is less than 1.  IT_MAX = " << it_max << "\n";
     exit ( 1 );
   }
- 
+
   for ( i = 0; i < dim_num; i++ )
   {
     if ( sub_num[i] <= 0 )
@@ -810,7 +827,7 @@ double romberg_nd ( double func ( int dim_num, double x[] ), double a[],
       exit ( 1 );
     }
   }
- 
+
   iwork = new int[dim_num];
   iwork2 = new int[it_max];
   sub_num2 = new int[dim_num];
@@ -824,18 +841,18 @@ double romberg_nd ( double func ( int dim_num, double x[] ), double a[],
   for ( dim = 0; dim < dim_num; dim++ )
   {
     sub_num2[dim] = sub_num[dim];
-  } 
+  }
   if ( 1 < it_max )
   {
     iwork2[1] = 2;
   }
- 
+
   it = 1;
- 
+
   for ( ; ; )
   {
     sum1 = 0.0;
- 
+
     weight = 1.0;
     for ( dim = 0; dim < dim_num; dim++ )
     {
@@ -848,13 +865,13 @@ double romberg_nd ( double func ( int dim_num, double x[] ), double a[],
     {
       iwork[dim] = 1;
     }
-    
+
     for ( ; ; )
     {
       for ( dim = 0; dim < dim_num; dim++ )
       {
-        x[dim] = 
-         ( ( double ) ( 2 * sub_num2[dim] - 2 * iwork[dim] + 1 ) * a[dim] 
+        x[dim] =
+         ( ( double ) ( 2 * sub_num2[dim] - 2 * iwork[dim] + 1 ) * a[dim]
          + ( double ) (                   + 2 * iwork[dim] - 1 ) * b[dim] )
          / ( double ) ( 2 * sub_num2[dim]                      );
       }
@@ -864,7 +881,7 @@ double romberg_nd ( double func ( int dim_num, double x[] ), double a[],
 
       kdim = dim_num;
 
-      while ( 0 < kdim ) 
+      while ( 0 < kdim )
       {
         if ( iwork[kdim-1] < sub_num2[kdim-1] )
         {
@@ -905,15 +922,15 @@ double romberg_nd ( double func ( int dim_num, double x[] ), double a[],
     }
 //
 //  Compute the difference table for Richardson extrapolation.
-// 
+//
     for ( ll = 2; ll <= it; ll++ )
     {
       i = it + 1 - ll;
-      factor = ( double ) ( iwork2[i-1] * iwork2[i-1] ) 
+      factor = ( double ) ( iwork2[i-1] * iwork2[i-1] )
         / ( double ) ( iwork2[it-1] * iwork2[it-1] - iwork2[i-1] * iwork2[i-1] );
       table[i] = table[i] + ( table[i] - table[i-1] ) * factor;
     }
- 
+
     result = table[0];
 //
 //  Terminate successfully if the estimated error is acceptable.
@@ -956,8 +973,8 @@ double romberg_nd ( double func ( int dim_num, double x[] ), double a[],
 }
 //****************************************************************************80
 
-void sample_nd ( double func ( int dim_num, double x[] ), int k1, int k2, 
-  int dim_num, double est1[], double err1[], double dev1[], double est2[], 
+void sample_nd ( double func ( int dim_num, double x[] ), int k1, int k2,
+  int dim_num, double est1[], double err1[], double dev1[], double est2[],
   double err2[], double dev2[], int *eval_num )
 
 //****************************************************************************80
@@ -968,9 +985,9 @@ void sample_nd ( double func ( int dim_num, double x[] ), int k1, int k2,
 //
 //  Discussion:
 //
-//    This routine computes two sequences of integral estimates, EST1 
-//    and EST2, for indices K going from K1 to K2.  These estimates are 
-//    produced by the generation of 'random' abscissas in the region.  
+//    This routine computes two sequences of integral estimates, EST1
+//    and EST2, for indices K going from K1 to K2.  These estimates are
+//    produced by the generation of 'random' abscissas in the region.
 //    The process can become very expensive if high accuracy is needed.
 //
 //    The total number of function evaluations is
@@ -980,7 +997,7 @@ void sample_nd ( double func ( int dim_num, double x[] ), int k1, int k2,
 //
 //  Licensing:
 //
-//    This code is distributed under the GNU LGPL license. 
+//    This code is distributed under the GNU LGPL license.
 //
 //  Modified:
 //
@@ -1049,15 +1066,15 @@ void sample_nd ( double func ( int dim_num, double x[] ), int k1, int k2,
   double ak1;
   double akn;
   double al[DIM_MAX] = {
-       0.4142135623730950, 
-       0.7320508075688773, 
-       0.2360679774997897, 
-       0.6457513110645906, 
-       0.3166247903553998, 
-       0.6055512754639893, 
-       0.1231056256176605, 
-       0.3589989435406736, 
-       0.7958315233127195, 
+       0.4142135623730950,
+       0.7320508075688773,
+       0.2360679774997897,
+       0.6457513110645906,
+       0.3166247903553998,
+       0.6055512754639893,
+       0.1231056256176605,
+       0.3589989435406736,
+       0.7958315233127195,
        0.3851648071345040 };
   double b;
   double *be;
@@ -1097,7 +1114,7 @@ void sample_nd ( double func ( int dim_num, double x[] ), int k1, int k2,
     cout << "  but DIM_NUM = " << dim_num << "\n";
     exit ( 1 );
   }
- 
+
   if ( DIM_MAX < dim_num )
   {
     cout << "\n";
@@ -1106,7 +1123,7 @@ void sample_nd ( double func ( int dim_num, double x[] ), int k1, int k2,
     cout << "  but DIM_NUM = " << dim_num << "\n";
     exit ( 1 );
   }
- 
+
   if ( k1 < 1 )
   {
     cout << "\n";
@@ -1114,7 +1131,7 @@ void sample_nd ( double func ( int dim_num, double x[] ), int k1, int k2,
     cout << "  K1 must be at least 1, but K1 = " << k1 << "\n";
     exit ( 1 );
   }
- 
+
   if ( k2 < k1 )
   {
     cout << "\n";
@@ -1124,7 +1141,7 @@ void sample_nd ( double func ( int dim_num, double x[] ), int k1, int k2,
     cout << "  K2 = " << k2 << "\n";
     exit ( 1 );
   }
- 
+
   be = new double[dim_num];
   dex = new double[dim_num];
   ga = new double[dim_num];
@@ -1137,17 +1154,17 @@ void sample_nd ( double func ( int dim_num, double x[] ), int k1, int k2,
   {
     be[dim] = al[dim];
   }
- 
+
   for ( dim = 0; dim < dim_num; dim++ )
   {
     ga[dim] = al[dim];
   }
- 
+
   for ( dim = 0; dim < dim_num; dim++ )
   {
     dex[dim] = 0.0;
   }
- 
+
   for ( k = k1; k <= k2; k++ )
   {
     ak = ( double ) ( k );
@@ -1160,9 +1177,9 @@ void sample_nd ( double func ( int dim_num, double x[] ), int k1, int k2,
     akn = pow ( ak, dim_num );
     t = sqrt ( pow ( ak, dim_num ) ) * ak;
     bk = 1.0 / ak;
- 
+
     for ( ; ; )
-    { 
+    {
       key = key + 1;
 
       if ( key != 1 )
@@ -1177,7 +1194,7 @@ void sample_nd ( double func ( int dim_num, double x[] ), int k1, int k2,
             more = true;
             break;
           }
- 
+
           dex[j] = 0.0;
         }
 
@@ -1186,7 +1203,7 @@ void sample_nd ( double func ( int dim_num, double x[] ), int k1, int k2,
           break;
         }
       }
- 
+
       for ( i = 0; i < dim_num; i++ )
       {
         b = be[i] + al[i];
@@ -1218,7 +1235,7 @@ void sample_nd ( double func ( int dim_num, double x[] ), int k1, int k2,
         p3[i] = ( dex[i] + ga[i] ) * bk;
         p4[i] = ( dex[i] + 1.0 - ga[i] ) * bk;
       }
- 
+
       y1 = func ( dim_num, p1 );
       *eval_num = *eval_num + 1;
 //
@@ -1237,15 +1254,15 @@ void sample_nd ( double func ( int dim_num, double x[] ), int k1, int k2,
       s2 = s2 + y3 + y4;
       d2 = d2 + ( y1 + y3 - y2 - y4 ) * ( y1 + y3 - y2 - y4 );
     }
-  
+
     est1[k-1] = 0.5 * s1 / akn;
     err1[k-1] = 1.5 * sqrt ( d1 ) / akn;
     dev1[k-1] = err1[k-1] * t;
     est2[k-1] = 0.25 * ( s1 + s2 ) / akn;
     err2[k-1] = 0.75 * sqrt ( d2 ) / akn;
-    dev2[k-1] = err2[k-1] * t * ak; 
+    dev2[k-1] = err2[k-1] * t * ak;
   }
- 
+
   delete [] be;
   delete [] dex;
   delete [] ga;
@@ -1259,7 +1276,7 @@ void sample_nd ( double func ( int dim_num, double x[] ), int k1, int k2,
 }
 //****************************************************************************80
 
-double sum2_nd ( double func ( int dim_num, double x[] ), double xtab[], 
+double sum2_nd ( double func ( int dim_num, double x[] ), double xtab[],
   double weight[], int order[], int dim_num, int *eval_num )
 
 //****************************************************************************80
@@ -1281,7 +1298,7 @@ double sum2_nd ( double func ( int dim_num, double x[] ), double xtab[],
 //
 //  Licensing:
 //
-//    This code is distributed under the GNU LGPL license. 
+//    This code is distributed under the GNU LGPL license.
 //
 //  Modified:
 //
@@ -1306,10 +1323,10 @@ double sum2_nd ( double func ( int dim_num, double x[] ), double xtab[],
 //    Input, double FUNC ( int dim_num, double x[] ), evaluates
 //    the function to be integrated.
 //
-//    Input, double XTAB[DIM_NUM*ORDER_MAX].  XTAB(I,J) is the 
+//    Input, double XTAB[DIM_NUM*ORDER_MAX].  XTAB(I,J) is the
 //    I-th abscissa of the J-th rule.
 //
-//    Input, double WEIGHT[DIM_NUM*ORDER_MAX].  WEIGHT(I,J) is the 
+//    Input, double WEIGHT[DIM_NUM*ORDER_MAX].  WEIGHT(I,J) is the
 //    I-th weight for the J-th rule.
 //
 //    Input, int ORDER[DIM_NUM].  ORDER(I) is the number of
@@ -1345,7 +1362,7 @@ double sum2_nd ( double func ( int dim_num, double x[] ), double xtab[],
     cout << "  DIM_NUM = " << dim_num << "\n";
     exit ( 1 );
   }
- 
+
   for ( i = 0; i < dim_num; i++ )
   {
     if ( order[i] < 1 )
@@ -1366,11 +1383,11 @@ double sum2_nd ( double func ( int dim_num, double x[] ), double xtab[],
   {
     iwork[dim] = 1;
   }
- 
+
   for ( ; ; )
   {
     k = 1;
- 
+
     w1 = 1.0;
     for ( i = 0; i < dim_num; i++ )
     {
@@ -1416,7 +1433,7 @@ void timestamp ( void )
 //
 //  Licensing:
 //
-//    This code is distributed under the GNU LGPL license. 
+//    This code is distributed under the GNU LGPL license.
 //
 //  Modified:
 //
@@ -1491,7 +1508,7 @@ void tuple_next ( int m1, int m2, int n, int *rank, int x[] )
 //
 //  Licensing:
 //
-//    This code is distributed under the GNU LGPL license. 
+//    This code is distributed under the GNU LGPL license.
 //
 //  Modified:
 //

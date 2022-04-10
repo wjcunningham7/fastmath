@@ -25,7 +25,6 @@
 ./lib/*
 ./bin/*
 ./obj/*
-Makefile
 ./local/**
 
 # Autoconf files
@@ -33,30 +32,17 @@ autom4te.cache/**
 aclocal.m4
 AUTHORS
 ChangeLog
-config.guess
-config.log
-config.status
-config.sub
+config.*
 configure
 depcomp
 install-sh
-Makefile.in
 missing
 NEWS
-.deps/**
-src/.deps/**
-src/.dirstamp
-src/Makefile
-src/Makefile.in
 inc/stamp-h1
 inc/config.h
 inc/config.h.in
 inc/config.h.in~
-inc/Makefile
-inc/Makefile.in
-nint/.deps/**
-nint/Makefile
-nint/Makefile.in
-test/.deps/**
-
-.stignore
+**/Makefile
+**/Makefile.in
+**/.deps/**
+**/.dirstamp

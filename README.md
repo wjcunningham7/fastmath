@@ -1,25 +1,28 @@
 FastMath Library
 ================
 
-##Summary
+## Overview
 This repository contains the FastMath library. It provides numerical approximations for math functions (especially for the Gauss Hypergeometric function) numerical integration wrappers, compact data structures (such as the FastBitset), and other useful utility functions. This package is intended to be copmpiled and installed on the platform on which it will ultimately be used.  It is **not** portable once installed.  **NOTE**: This package is officially maintained for Linux only, though some users have had success using it on MacOS as well.
 
-##Environment Variables
+## Environment Variables
 There are several environment variables one should export in the $HOME/.bashrc file before installation:
 
-1\. **FASTMATH\_HOME** - This will be the directory where the package is installed, and where other programs may find it later. Some options are
+#### Installation Path
+`FASTMATH_HOME` is the directory where the package is installed, and where other programs may find it later. Some typical options are
 
         $ export FASTMATH_HOME=/usr/local
         $ export FASTMATH_HOME=/opt
         $ export FASTMATH_HOME=$HOME/release
 
-2\. **FBALIGN** - This is the alignment of the FastBitset. If your CPU supports AVX2 (AVX-512) it will be set automatically to 256 (512). If not set, the installation script will determine this for you. Options are
+#### Bitset Alignment
+`FBALIGN` is the alignment of the `FastBitset`. If your CPU supports AVX2 (AVX-512) it will be set automatically to 256 (512). If not set, the installation script will determine this for you. Options are
 
         $ export FBALIGN=64
         $ export FBALIGN=256
         $ export FBALIGN=512
 
-3\. **PLATFORM** - This is the name of the system on which you are installing the package. If you are using a workstation, try
+#### Platform Name
+`PLATFORM` is the name of the system on which you are installing the package. If you are using a workstation, try
 
         $ export PLATFORM=$HOSTNAME
 
@@ -27,22 +30,26 @@ There are several environment variables one should export in the $HOME/.bashrc f
 
         $ export PLATFORM=general
 
-   supposing that "general" is the name of the default partition.
+   supposing that `general` is the name of the default partition.
 
-4\. **BOOST\_ROOT** - This is the installation directory of Boost. See below for more information on dependencies. If you installed Boost using a package manager, or you installed it from source without specifying the installation directory, you do not need to set this variable.
+#### Boost Installation Path
+`BOOST_ROOT` is the installation directory of Boost. See below for more information on dependencies. If you installed Boost using a package manager, or you installed it from source without specifying the installation directory, you do not need to set this variable.
 
-5\. **CPATH** - This tells the compiler where to search for headers. If other packages cannot find the FastMath headers, try the following:
+#### FastMath Headers
+`CPATH` tells the compiler where to search for header files. If other packages cannot find the FastMath headers, try the following:
 
         $ export CPATH=$FASTMATH_HOME/include:$CPATH
 
-6\. **LD\_LIBRARY\_PATH** - Likewise, if FastMath is installed into a non-standard directory, you may need to add the following for other packages to find the FastMath library:
+#### FastMath Libraries
+`LD_LIBRARY_PATH` tells the compiler where to look for compiled libraries. If FastMath is installed into a non-standard directory, you may need to add the following for other packages to find the FastMath library:
 
         $ export LD_LIBRARY_PATH=$FASTMATH_HOME/lib:$LD_LIBRARY_PATH
 
-##Prerequisites
+## Prerequisites
 The following packages should be installed prior to installation of this package:
 
-1\. **Boost** v1.55.0 or newer. There is not guaranteed support for the newest releases. It can be installed via the Linux package managers in the following way:
+#### Boost v1.55.0 or Newer
+There is not guaranteed support for the newest releases. It can be installed via the Linux package managers in the following way:
 
    Ubuntu/Debian:
 
@@ -62,7 +69,8 @@ The following packages should be installed prior to installation of this package
 
    If you wish to install a particular version from source, visit the [Boost](www.boost.org) webpage and follow their instructions.
 
-2\. **GNU Scientific Library** v1.13 or newer. It can be installed via the Linux package managers in the following way:
+#### GNU Scientific Library v1.13 or Newer
+This can be installed via the Linux package managers in the following way:
 
    Ubuntu/Debian:
 
@@ -80,15 +88,18 @@ The following packages should be installed prior to installation of this package
 
         $ sudo emerge gsl
 
-3\. **GCC/GCC++** v.5.4.0 or newer. Note that the version of Boost you choose will determine which compiler version you need, e.g., it is unwise to use a very old or very new compiler with the newest release of Boost.  To determine your compiler version, run
+#### GNU Compilers v5.4.0 or Newer
+The version of Boost you choose will determine which compiler version you need, e.g., it is unwise to use a very old or very new compiler with the newest release of Boost.  To determine your compiler version, run
 
         $ gcc --version
 
-4\. **Binutils** v2.24 or newer. This is needed so AVX2 and AVX-512 instructions are recognized by your assembler, supposing they are supported by the hardware.  To determine your assembler version, run
+#### Binutils v2.24 or Newer
+This is needed so AVX2 and AVX-512 instructions are recognized by your assembler, supposing they are supported by the hardware.  To determine your assembler version, run
 
         $ as -v
 
-5\. **Autotools** v2.69 or newer. This is the Linux utility used to generate the configure and Makefile scripts. It may be installed via the package managers in the following way:
+#### Autotools v2.69 or Newer
+This is the Linux utility used to generate the configure and Makefile scripts. It may be installed via the package managers in the following way:
 
    Ubuntu/Debian:
 
@@ -111,7 +122,7 @@ The following packages should be installed prior to installation of this package
         $ autoconf --version
 
 ## Compilation and Installation
-The script **install** will compile the code. Run it with
+Do not attempt to compile and install this package until the dependencies are installed and the environment is properly configured. Once you are ready, run the installation script:
 
         $ ./install
 
@@ -119,7 +130,7 @@ Once it has been executed, if there are no errors you may run
 
         $ sudo make install
 
-to install it system-wide.  Make sure all environment variables are set and all prerequisites are satisfied before attempting this.  To clean up the directory, you can reverse the above with
+to install it system-wide. To clean up the directory, you can reverse the above with
 
         $ make distclean
 
@@ -130,12 +141,12 @@ If you wish to uninstall it system-wide, you should first run
 before cleaning up.
 
 ## Testing
-There are several test scripts which are used to verify the assembly code used in inc/FastBitset.h is working. You can try this with
+There are several test scripts which are used to verify the assembly code used in `inc/fastbitset.h` is working. You can try this with
 
         $ (cd test && sh ./test.sh)
 
 ## Usage
-If you intend to use this with another package, and that package is compiled using autotools, you can use the M4 file **ax_fastmath.m4**.  Alternatively, you can link directly against the library with
+If you intend to use this with another package, and that package is compiled using autotools, you can use the M4 file `m4/ax_fastmath.m4`.  Alternatively, you can link directly against the library with
 
         $ -L $FASTMATH_HOME/lib -lfastmath$_PLATFORM
 
@@ -156,7 +167,10 @@ and include the headers with
 
 * MersenneRNG: A data structure based on Boost's Mersenne Twister (19937) random number generator, useful for efficiently generating reliably random numbers in large simulations.
 
-##Maintainers
-Please direct all questions and report all bugs to Will Cunningham at <wcunningham AT perimeterinstitute DOT ca>
+## Release Notes
 
-(C) Will Cunningham 2014-2019
+Release notes are available in the [Changelog](https://github.com/wjcunningham7/fastmath/blob/master/CHANGELOG.md).
+
+## License
+
+FastMath is licensed under the MIT License. See the [LICENSE](https://github.com/wjcunningham7/fastmath/blog/master/LICENSE) file for more details.

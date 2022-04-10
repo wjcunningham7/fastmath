@@ -1,20 +1,26 @@
+/* Copyright 2014-2022 Will Cunningham
+ *
+ * This file is part of FastMath.
+ *
+ * Licensed under the MIT License (the "License"). A copy of the
+ * License may be obtained with this software package or at
+ *
+ *     https://opensource.org/licenses/MIT
+ *
+ * FastMath is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. */
+
 #include <boost/math/special_functions/gamma.hpp>
 
-#include <fastmath/fastapprox.h>
-#include <fastmath/fastmath.h>
+#include "fastapprox.h"
+#include "fastmath.h"
 
-/////////////////////////////
-//(C) Will Cunningham 2014 //
-//         DK Lab          //
-// Northeastern University //
-/////////////////////////////
-
-//---SUMMARY---//
-//These functions are optimized versions of many STL math
-//operations, though often efficiency is traded for accuracy.
-//In particular, implementations of the Gamma function, 
-//Pochhammer function, and Gauss Hypergeometric function offer
-//optimizations not found in GSL.
+/* These functions are optimized versions of many STL math
+ * operations, though often efficiency is traded for accuracy. In
+ * particular, implementations of the Gamma function, Pochhammer
+ * function, and Gauss Hypergeometric function offer optimizations
+ * not found in GSL. */
 
 namespace fastmath {
 
@@ -31,7 +37,7 @@ double POW2(const double x, const enum FastMethod fm)
 	#endif
 
 	double y;
-	if (__builtin_expect(!x, 0L)) 
+	if (__builtin_expect(!x, 0L))
 		y = 0.0;
 	else {
 		switch (fm) {
@@ -141,7 +147,7 @@ double SQRT(const double x, const enum FastMethod fm)
 			y = sqrt(x);
 			break;
 		case BITWISE:
-			//NOTE: I'm not entirely sure where I found this - double check results
+			//NOTE: Not rigorously tested
 			z = static_cast<float>(x);
 			i = *(unsigned int*) &z;
 			i += 127 << 23;
@@ -176,7 +182,7 @@ double ABS(const double x, const enum FastMethod fm)
 			y = fabs(x);
 			break;
 		case BITWISE:
-			//NOTE: I'm not entirely sure where I found this - double check results
+			//NOTE: Not rigorously tested
 			z = static_cast<float>(x);
 			i = *(int*) &z;
 			i &= 0x7FFFFFFF;
@@ -225,7 +231,7 @@ double SGN(const double x)
 }
 
 double SGN(const double x, const enum FastMethod fm)
-{	
+{
 	#if FM_DEBUG
 	assert (fm == DEF || fm == BITWISE);
 	#endif
@@ -241,7 +247,7 @@ double SGN(const double x, const enum FastMethod fm)
 			y = table[x > 0.0];
 			break;
 		case BITWISE:
-			//NOTE: I'm not entirely sure where I found this - double check results
+			//NOTE: Not rigorously tested
 			z = static_cast<float>(x);
 			(int&)z |= ((int&)z & 0x80000000);
 			y = static_cast<double>(z);
@@ -624,7 +630,7 @@ double ACOSH(const double x, const enum FastMethod fm, const enum Precision p)
 //Approximation of the Gamma Function
 double GAMMA(const double x)
 {
-	return boost::math::tgamma(x);
+	return boost::math::tgamma<double>(x);
 }
 
 double GAMMA(const double x, const enum FastMethod fm)
@@ -645,7 +651,7 @@ double GAMMA(const double x, const enum FastMethod fm)
 			break;
 		case BOOST:
 			//Lanczos Approximation
-			y = boost::math::tgamma(x);
+			y = boost::math::tgamma<double>(x);
 			break;
 		default:
 			y = NAN;

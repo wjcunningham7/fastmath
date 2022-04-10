@@ -1,3 +1,16 @@
+/* Copyright 2014-2022 Will Cunningham
+ *
+ * This file is part of FastMath.
+ *
+ * Licensed under the MIT License (the "License"). A copy of the
+ * License may be obtained with this software package or at
+ *
+ *     https://opensource.org/licenses/MIT
+ *
+ * FastMath is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. */
+
 #ifndef FASTMATH_FASTBITSET_H
 #define FASTMATH_FASTBITSET_H
 
@@ -16,50 +29,37 @@
 #error "Invalid alignment."
 #endif
 
-#ifdef AVX512_ENABLED 
-#if FBALIGN != 512
-#error "Invalid alignment."
-#endif
-#endif
-
 #ifdef AVX2_ENABLED
 #if FBALIGN == 64
 #error "Invalid alignment."
 #endif
 #endif
 
-/////////////////////////////
-//(C) Will Cunningham 2016 //
-//         DK Lab          //
-// Northeastern University //
-/////////////////////////////
-
-//---SUMMARY---//
-//This offers a N-bit bitset which is either 64-bit aligned, or
-//256-bit aligned if AVX2 is supported. Many algorithms here
-//have been optimized via assembly. See the paper 'Causal Set
-//Generator' by W. Cunningham for details.
-
-//VERY IMPORTANT:
-//There is no error checking here, so it is likely any
-//mistake using this will result in a segmentation fault.
-//This is intentional in order to reduce branching and other
-//unnecessary statements. A unit test bounded by pre-processor
-//flags could be added to each function in the future.
-
-//FORMATTING:
-//Bits are addressed in little-endian format in this structure.
-//As a result, when the function toString() is used, a single binary word
-//may appear to be printed backwards (least significant bit first)
+/* The FastBitset class offers highly efficient bitset data
+ * structures and algorithms. The class holds an N-bit bitset which
+ * is either 64-bit aligned, or 256-bit aligned if AVX2 is supported.
+ * Many algorithms here have been optimized via assembly. See the
+ * paper 'Causal Set Generator' by W. Cunningham and D. Kriouikov for
+ * details.
+ *
+ * Error Handling:
+ * There is no error checking here, so it is likely any mistake using
+ * this will result in a segmentation fault. This is intentional in
+ * order to reduce branching and other unnecessary statements. A unit
+ * test bounded by pre-processor flags will be added to each function
+ * in the future.
+ *
+ * Formatting:
+ * Bits are addressed in little-endian format in this structure. As a
+ * result, when the function toString() is used, a single binary word
+ * may appear to be printed backwards (least significant bit first). */
 
 namespace fastmath {
 
-//DO NOT CHANGE THESE
 #define BlockType unsigned long
 #define BlockTypeMPI MPI_UINT64_T
 #define popcount(x) __builtin_popcountl(x)
 #define BLOCK_SHIFT 6
-//END
 
 //Lookup tables used for counting bits
 static const unsigned int table_width = 8;
@@ -69,7 +69,7 @@ struct count_table { static const unsigned char table[]; };
 template <>
 struct count_table<false> {};
 
-//This one has been borrowed from Boost's dynamic_bitset<>
+//This table has been borrowed from Boost's dynamic_bitset<>
 template <bool b>
 const unsigned char count_table<b>::table[] =
 {
@@ -95,7 +95,7 @@ const unsigned long avx512_table[] =
 
 #ifdef AVX2_ENABLED
 const unsigned char avx_table[] =
-{ 
+{
 	0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
 	0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
 	0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
@@ -140,7 +140,7 @@ public:
 	}
 
 	//Overloaded Assignment Operator
-	FastBitset& operator= (const FastBitset& other)
+	FastBitset& operator=(const FastBitset& other)
 	{
 		if (__builtin_expect(this != &other, 1L)) {
 			BlockType *_bits = NULL;
@@ -366,8 +366,22 @@ public:
 			bits[i] = ~bits[i];
 
 		//Make sure padding stays zero
+		trim();
+	}
+
+	//Flip individual bit
+	inline void flip(uint64_t idx)
+	{
+		uint64_t block_idx = idx >> BLOCK_SHIFT;
+		uint64_t mask = (uint64_t)1 << (idx & (bits_per_block - 1));
+		bits[block_idx] ^= mask;
+	}
+
+	//Trim makes sure the bits in the range [n,bits_per_block*nb] are zero
+	inline void trim()
+	{
 		uint64_t length = nb * bits_per_block - n;
-		if (length > 0) {
+		if (length) {
 			uint64_t block_idx = n >> BLOCK_SHIFT;
 			unsigned int idx0 = static_cast<unsigned int>(n & (bits_per_block - 1));
 			BlockType lower_mask = masks2[idx0];
@@ -377,16 +391,7 @@ public:
 				uint64_t nmid = (length - 1) >> BLOCK_SHIFT;
 				memset(bits + block_idx + 1, 0, sizeof(BlockType) * nmid);
 			}
-
 		}
-	}
-
-	//Flip individual bit
-	inline void flip(uint64_t idx)
-	{
-		uint64_t block_idx = idx >> BLOCK_SHIFT;
-		uint64_t mask = (uint64_t)1 << (idx & (bits_per_block - 1));
-		bits[block_idx] ^= mask;
 	}
 
 	//--------------------//
@@ -493,7 +498,7 @@ public:
 	}
 
 	//Count a subset of bits
-	//NOTE: The offset and the length are for bits, not blocks!
+	//NOTE: The offset and the length are for bits, not blocks
 	inline uint64_t partial_count(uint64_t offset, uint64_t length) const
 	{
 		uint64_t block_idx = offset >> BLOCK_SHIFT;
@@ -749,7 +754,7 @@ public:
 		"vmovdqu (%0,%%rcx,8), %%ymm0	\n\t"
 		"vmovdqu (%1,%%rcx,8), %%ymm1	\n\t"
 		"vpxor %%ymm0, %%ymm1, %%ymm1	\n\t"
-		"vpand %%ymm0, %%ymm1, %%ymm0	\n\t"		
+		"vpand %%ymm0, %%ymm1, %%ymm0	\n\t"
 		"vmovdqu %%ymm0, (%0,%%rcx,8)	\n\t"
 		"cmpq $0, %%rcx			\n\t"
 		"jne forloop%=			\n\t"
@@ -759,166 +764,10 @@ public:
 	}
 	#endif
 
-	#ifdef AVX512_ENABLED
-	inline uint64_t partial_vecprod_avx512(const FastBitset &fb, uint64_t offset, uint64_t length)
-	{
-		uint64_t block_idx = offset >> BLOCK_SHIFT;
-		unsigned int idx0 = static_cast<unsigned int>(offset & block_size_m);
-		unsigned int idx1 = static_cast<unsigned int>((offset + length) & block_size_m);
-		BlockType lower_mask = masks2[idx0];
-		BlockType upper_mask = masks[idx1];
-		uint64_t cnt[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-		uint64_t nmid, rem, max;
-		
-		if (length <= bits_per_block && (idx0 < idx1 || idx0 + idx1 == 0 || (idx0 > idx1 && idx1 == 0))) {
-			return popcount(bits[block_idx] & fb.bits[block_idx] & lower_mask & upper_mask);
-		} else {
-			nmid = (length - 1) >> BLOCK_SHIFT;
-			if (idx0 < idx1 || idx0 == 0 || idx1 == 0) nmid--;
-			rem = nmid & 7;
-			max = nmid - rem;
-			/*printf("bidx: %u\n", (unsigned)block_idx);
-			printf("nmid: %u\n", (unsigned)nmid);
-			printf("rem: %u\n", (unsigned)rem);
-			printf("max: %u\n", (unsigned)max);*/
+	///////////////////////////
+	// Partial Inner Product //
+	///////////////////////////
 
-			if (max && n >= 8192) {
-				uint64_t __attribute__ ((unused)) *cntp = &cnt[0];
-				unsigned char mask = 0xf;
-				asm volatile(
-				"movq %4, %%rax				\n\t"
-				"movq %3, %%rcx				\n\t"
-				"vzeroall				\n\t"
-				"vmovdqu64 (%5), %%zmm2			\n\t"	//lookup in zmm2
-				"vpbroadcastb (%6), %%zmm3		\n\t"	//low_mask in zmm3
-			
-				"forloop%=:				\n\t"
-				"vmovdqu64 (%1,%%rcx,8), %%zmm0		\n\t"
-				"vmovdqu64 (%2,%%rcx,8), %%zmm1		\n\t"
-				"vpandd %%zmm0, %%zmm1, %%zmm0		\n\t"	//a & b in zmm0
-
-				"vpandd %%zmm0, %%zmm3, %%zmm4		\n\t"	//lo in zmm4
-				"vpsrld $4, %%zmm0, %%zmm5		\n\t"	//hi in zmm5
-				"vpandd %%zmm5, %%zmm3, %%zmm5		\n\t" 
-
-				"vpshufb %%zmm4, %%zmm2, %%zmm4		\n\t"	//p1 in zmm4
-				"vpshufb %%zmm5, %%zmm2, %%zmm5		\n\t"	//p2 in zmm5
-
-				"vpaddb %%zmm4, %%zmm5, %%zmm5		\n\t"	//sum in zmm5
-				"vpsadbw %%zmm5, %%zmm7, %%zmm5		\n\t"
-				"vpaddq %%zmm5, %%zmm6, %%zmm6		\n\t"	//total in zmm6
-
-				"addq $8, %%rcx				\n\t"
-				"cmpq %%rax, %%rcx			\n\t"
-				"jl forloop%=				\n\t"
-
-				"vmovdqu64 %%zmm6, (%0)			\n\t"	//result in cnt
-				: "+r" (cntp)
-				: "r" (bits), "r" (fb.bits), "r" (block_idx + 1), "r" (max + block_idx), "r" (avx512_table), "r" (&mask)
-				: "%rax", "%rcx", "memory");
-			} else {
-				for (uint64_t i = 1; i <= max; i += 4) {
-					asm volatile(
-					"popcntq %4, %4	\n\t"
-					"addq %4, %0	\n\t"
-					"popcntq %5, %5	\n\t"
-					"addq %5, %1	\n\t"
-					"popcntq %6, %6	\n\t"
-					"addq %6, %2	\n\t"
-					"popcntq %7, %7	\n\t"
-					"addq %7, %3	\n\t"
-					: "+r" (cnt[0]), "+r" (cnt[1]), "+r" (cnt[2]), "+r" (cnt[3])
-					: "r" (bits[block_idx+i] & fb.bits[block_idx+i]), "r" (bits[block_idx+i+1] & fb.bits[block_idx+i+1]),
-				  "r" (bits[block_idx+i+2] & fb.bits[block_idx+i+2]), "r" (bits[block_idx+i+3] & fb.bits[block_idx+i+3]));
-				}
-			}
-
-			if (rem)
-				for (uint64_t i = max + 1; i <= nmid; i++)
-					cnt[i-max-1] += popcount(bits[block_idx+i] & fb.bits[block_idx+i]);
-
-			cnt[7] += popcount(bits[block_idx] & fb.bits[block_idx] & lower_mask) + popcount(bits[block_idx + nmid + 1] & fb.bits[block_idx + nmid + 1] & upper_mask);
-		}
-
-		return cnt[0] + cnt[1] + cnt[2] + cnt[3] + cnt[4] + cnt[5] + cnt[6] + cnt[7];
-	}
-	#endif
-
-	#ifdef AVX2_ENABLED
-	inline uint64_t partial_vecprod_small(const FastBitset &fb, uint64_t i, uint64_t j)
-	{
-		uint64_t block0 = i >> BLOCK_SHIFT; //{ 0, 1, 2, or 3 }
-		uint64_t block1 = j >> BLOCK_SHIFT;
-		uint64_t idx0 = i & block_size_m;
-		uint64_t idx1 = j & block_size_m;
-		uint64_t cnt[4] = { 0, 0, 0, 0 };
-
-		//First 64 Bits
-		uint64_t bits0 = (bits[0] & fb.bits[0]);
-		//Lower Mask:
-		//if (block0 == 0) bits0 &= masks2[idx0] & ~0ULL;
-		//else bits0 &= masks2[idx0] & 0ULL;
-		bits0 &= (~0ULL >> ((!!block0) << 6)) & masks2[idx0];
-		//Upper Mask:
-		//if (block1 == 0) bits0 &= masks[idx1] & ~0ULL;
-		//else bits0 &= ~0ULL;
-		bits0 &= (~0ULL << ((!block1) << 6)) | masks[idx1];
-		cnt[0] = popcount(bits0);
-
-		//Second 64 bits
-		uint64_t bits1 = (bits[1] & fb.bits[1]);
-		//Lower Mask:
-		//if (block0 == 1) bits1 &= masks2[idx0];
-		//else if (block0 > 1) bits1 &= 0ULL;
-		//Input: 1 Output: masks2[idx0]
-		//Input: Not 1 Output: ~0
-		uint64_t msk1L = (~0ULL >> ((block0 == 1) << 6)) | masks2[idx0];
-		//Goal:
-		//Input: <2 Output: ~0
-		//Input: >=2 Output: 0
-		msk1L &= ~0ULL >> ((block0 > 1) << 6);
-		bits1 &= msk1L;
-		//Upper Mask:
-		//if (block1 == 1) bits1 &= masks[idx1];
-		//else if (block1 < 1) bits1 &= 0ULL;
-		uint64_t msk1U = (~0ULL << ((block1 == 1) << 6)) | masks[idx1];
-		//Input: <1 Output: 0
-		//Input: >=1 Output: ~0
-		msk1U &= ~0ULL >> ((block1 < 1) << 6);
-		bits1 &= msk1U;
-		cnt[1] = popcount(bits1);
-
-		//Third 64 bits
-		uint64_t bits2 = (bits[2] & fb.bits[2]);
-		//Lower Mask:
-		//if (block0 == 2) bits2 &= masks2[idx0];
-		//else if (block0 > 2) bits2 &= 0ULL;
-		uint64_t msk2L = (~0ULL >> ((block0 == 2) << 6)) | masks2[idx0];
-		msk2L &= ~0ULL >> ((block0 > 2) << 6);
-		bits1 &= msk2L;
-		//Upper Mask:
-		uint64_t msk2U = (~0ULL << ((block1 == 2) << 6)) | masks[idx1];
-		msk2U &= ~0ULL >> ((block1 < 2) << 6);
-		bits1 &= msk2U;
-		cnt[2] = popcount(bits2);
-
-		//Fourth 64 bits
-		uint64_t bits3 = (bits[3] & fb.bits[3]);
-		//Lower Mask:
-		//if (block0 == 3) bits3 &= masks2[idx0];
-		//else bits3 &= ~0ULL;
-		bits3 &= (~0ULL >> ((block0 == 3) << 6)) | masks2[idx0];
-		//Upper Mask:
-		//if (block1 == 3) bits3 &= masks[idx1];
-		//else bits3 &= 0ULL
-		bits3 &= (~0ULL << ((block1 < 3) << 6)) & masks[idx1];
-		cnt[3] = popcount(bits3);
-
-		return cnt[0] + cnt[1] + cnt[2] + cnt[3];
-	}
-	#endif
-
-	//Partial inner product
 	//This combines the set intersection with an
 	//AVX implementation of the popcnt algorithm
 	//In general, this should be faster than
@@ -1005,6 +854,305 @@ public:
 		return cnt[0] + cnt[1] + cnt[2] + cnt[3];
 	}
 
+	//Same as the above, optimized for AVX-512
+	#ifdef AVX512_ENABLED
+	inline uint64_t partial_vecprod_avx512(const FastBitset &fb, uint64_t offset, uint64_t length)
+	{
+		uint64_t block_idx = offset >> BLOCK_SHIFT;
+		unsigned int idx0 = static_cast<unsigned int>(offset & block_size_m);
+		unsigned int idx1 = static_cast<unsigned int>((offset + length) & block_size_m);
+		BlockType lower_mask = masks2[idx0];
+		BlockType upper_mask = masks[idx1];
+		uint64_t cnt[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+		uint64_t nmid, rem, max;
+
+		if (length <= bits_per_block && (idx0 < idx1 || idx0 + idx1 == 0 || (idx0 > idx1 && idx1 == 0))) {
+			return popcount(bits[block_idx] & fb.bits[block_idx] & lower_mask & upper_mask);
+		} else {
+			nmid = (length - 1) >> BLOCK_SHIFT;
+			if (idx0 < idx1 || idx0 == 0 || idx1 == 0) nmid--;
+			rem = nmid & 7;
+			max = nmid - rem;
+
+			if (max && n >= 8192) {
+				uint64_t __attribute__ ((unused)) *cntp = &cnt[0];
+				unsigned char mask = 0xf;
+				asm volatile(
+				"movq %4, %%rax				\n\t"
+				"movq %3, %%rcx				\n\t"
+				"vzeroall				\n\t"
+				"vmovdqu64 (%5), %%zmm2			\n\t"	//lookup in zmm2
+				"vpbroadcastb (%6), %%zmm3		\n\t"	//low_mask in zmm3
+
+				"forloop%=:				\n\t"
+				"vmovdqu64 (%1,%%rcx,8), %%zmm0		\n\t"
+				"vmovdqu64 (%2,%%rcx,8), %%zmm1		\n\t"
+				"vpandd %%zmm0, %%zmm1, %%zmm0		\n\t"	//a & b in zmm0
+
+				"vpandd %%zmm0, %%zmm3, %%zmm4		\n\t"	//lo in zmm4
+				"vpsrld $4, %%zmm0, %%zmm5		\n\t"	//hi in zmm5
+				"vpandd %%zmm5, %%zmm3, %%zmm5		\n\t"
+
+				"vpshufb %%zmm4, %%zmm2, %%zmm4		\n\t"	//p1 in zmm4
+				"vpshufb %%zmm5, %%zmm2, %%zmm5		\n\t"	//p2 in zmm5
+
+				"vpaddb %%zmm4, %%zmm5, %%zmm5		\n\t"	//sum in zmm5
+				"vpsadbw %%zmm5, %%zmm7, %%zmm5		\n\t"
+				"vpaddq %%zmm5, %%zmm6, %%zmm6		\n\t"	//total in zmm6
+
+				"addq $8, %%rcx				\n\t"
+				"cmpq %%rax, %%rcx			\n\t"
+				"jl forloop%=				\n\t"
+
+				"vmovdqu64 %%zmm6, (%0)			\n\t"	//result in cnt
+				: "+r" (cntp)
+				: "r" (bits), "r" (fb.bits), "r" (block_idx + 1), "r" (max + block_idx), "r" (avx512_table), "r" (&mask)
+				: "%rax", "%rcx", "memory");
+			} else {
+				for (uint64_t i = 1; i <= max; i += 4) {
+					asm volatile(
+					"popcntq %4, %4	\n\t"
+					"addq %4, %0	\n\t"
+					"popcntq %5, %5	\n\t"
+					"addq %5, %1	\n\t"
+					"popcntq %6, %6	\n\t"
+					"addq %6, %2	\n\t"
+					"popcntq %7, %7	\n\t"
+					"addq %7, %3	\n\t"
+					: "+r" (cnt[0]), "+r" (cnt[1]), "+r" (cnt[2]), "+r" (cnt[3])
+					: "r" (bits[block_idx+i] & fb.bits[block_idx+i]), "r" (bits[block_idx+i+1] & fb.bits[block_idx+i+1]),
+				  "r" (bits[block_idx+i+2] & fb.bits[block_idx+i+2]), "r" (bits[block_idx+i+3] & fb.bits[block_idx+i+3]));
+				}
+			}
+
+			if (rem)
+				for (uint64_t i = max + 1; i <= nmid; i++)
+					cnt[i-max-1] += popcount(bits[block_idx+i] & fb.bits[block_idx+i]);
+
+			cnt[7] += popcount(bits[block_idx] & fb.bits[block_idx] & lower_mask) + popcount(bits[block_idx + nmid + 1] & fb.bits[block_idx + nmid + 1] & upper_mask);
+		}
+
+		return cnt[0] + cnt[1] + cnt[2] + cnt[3] + cnt[4] + cnt[5] + cnt[6] + cnt[7];
+	}
+	#endif
+
+	//Intended for use with small bitsets, up to 256 bits
+	#ifdef AVX2_ENABLED
+	inline uint64_t partial_vecprod_small(const FastBitset &fb, uint64_t i, uint64_t j)
+	{
+		uint64_t block0 = i >> BLOCK_SHIFT;
+		uint64_t block1 = j >> BLOCK_SHIFT;
+		uint64_t idx0 = i & block_size_m;
+		uint64_t idx1 = j & block_size_m;
+		uint64_t cnt[4] = { 0, 0, 0, 0 };
+
+		//First 64 Bits
+		uint64_t bits0 = (bits[0] & fb.bits[0]);
+		bits0 &= (~0ULL >> ((!!block0) << 6)) & masks2[idx0];
+		bits0 &= (~0ULL << ((!block1) << 6)) | masks[idx1];
+		cnt[0] = popcount(bits0);
+
+		//Second 64 bits
+		uint64_t bits1 = (bits[1] & fb.bits[1]);
+		uint64_t msk1L = (~0ULL >> ((block0 == 1) << 6)) | masks2[idx0];
+		msk1L &= ~0ULL >> ((block0 > 1) << 6);
+		bits1 &= msk1L;
+		uint64_t msk1U = (~0ULL << ((block1 == 1) << 6)) | masks[idx1];
+		msk1U &= ~0ULL >> ((block1 < 1) << 6);
+		bits1 &= msk1U;
+		cnt[1] = popcount(bits1);
+
+		//Third 64 bits
+		uint64_t bits2 = (bits[2] & fb.bits[2]);
+		uint64_t msk2L = (~0ULL >> ((block0 == 2) << 6)) | masks2[idx0];
+		msk2L &= ~0ULL >> ((block0 > 2) << 6);
+		bits1 &= msk2L;
+		uint64_t msk2U = (~0ULL << ((block1 == 2) << 6)) | masks[idx1];
+		msk2U &= ~0ULL >> ((block1 < 2) << 6);
+		bits1 &= msk2U;
+		cnt[2] = popcount(bits2);
+
+		//Fourth 64 bits
+		uint64_t bits3 = (bits[3] & fb.bits[3]);
+		bits3 &= (~0ULL >> ((block0 == 3) << 6)) | masks2[idx0];
+		bits3 &= (~0ULL << ((block1 < 3) << 6)) & masks[idx1];
+		cnt[3] = popcount(bits3);
+
+		return cnt[0] + cnt[1] + cnt[2] + cnt[3];
+	}
+	#endif
+
+	//////////////////////
+	// Shift Operations //
+	//////////////////////
+
+	//Note: we require 0 < shift < 64
+	inline void shift_left(FastBitset &workspace, unsigned shift)
+	{
+		workspace.bits[nb-1] = 0;
+		for (uint64_t i = nb - 1; i > 0 ; i--) {
+			workspace.bits[i-1] = masks[shift];
+			workspace.bits[i-1] &= bits[i];
+			bits[i] >>= shift;
+			bits[i] |= workspace.bits[i] << (64 - shift);
+		}
+		bits[0] >>= shift;
+		bits[0] |= workspace.bits[0] << (64 - shift);
+	}
+
+	inline void shift_right(FastBitset &workspace, unsigned shift)
+	{
+		workspace.bits[0] = 0;
+		for (uint64_t i = 0; i < nb - 1; i++) {
+			workspace.bits[i+1] = masks[shift] << (64 - shift);
+			workspace.bits[i+1] &= bits[i];
+			bits[i] <<= shift;
+			bits[i] |= workspace.bits[i] >> (64 - shift);
+		}
+		bits[nb-1] <<= shift;
+		bits[nb-1] |= workspace.bits[nb-1] >> (64 - shift);
+	}
+
+	/////////////////////
+	// Swap Operations //
+	/////////////////////
+
+	inline void swap_block(FastBitset &fb, uint64_t blockidx)
+	{
+		bits[blockidx] ^= fb.bits[blockidx];
+		fb.bits[blockidx] ^= bits[blockidx];
+		bits[blockidx] ^= fb.bits[blockidx];
+	}
+
+	//We require workspace.size() >= 2
+	inline void swap_range(FastBitset &fb, uint64_t offset0, uint64_t offset1, uint64_t length, FastBitset &workspace0, FastBitset &workspace1, FastBitset &workspace2)
+	{
+		//1. Copy bits into the workspace
+		this->clone(workspace0);
+
+		//2. Copy fb.bits into the workspace
+		fb.clone(workspace1);
+
+		//3. Align the ranges of bits on offset0
+		if (offset0 < offset1) //Shift left
+			workspace1.shift_left(workspace2, offset1 - offset0);
+		else if (offset0 > offset1) //Shift right
+			workspace1.shift_right(workspace2, offset0 - offset1);
+
+		//4. Block indices and masks
+		uint64_t block_idx = offset0 >> BLOCK_SHIFT;
+		unsigned int idx0 = static_cast<unsigned int>(offset0 & block_size_m);
+		unsigned int idx1 = static_cast<unsigned int>((offset0 + length) & block_size_m);
+		BlockType lower_mask = masks2[idx0];
+		BlockType upper_mask = masks[idx1];
+
+		//5. Do the swap
+		if (length <= bits_per_block && (idx0 < idx1 || idx0 + idx1 == 0 || (idx0 > idx1 && idx1 == 0))) {
+			//5a. Mask the unused bits in the workspace
+			workspace0.bits[block_idx] &= lower_mask & upper_mask;
+			workspace1.bits[block_idx] &= lower_mask & upper_mask;
+
+			//5b. Mask the range being swapped in 'bits'
+			bits[block_idx] &= ~(lower_mask & upper_mask);
+
+			//5c. Insert the swapped bits using OR
+			bits[block_idx] |= workspace1.bits[block_idx];
+
+			//5d. Mask the range being swapped in 'fb.bits'
+			workspace1.reset();
+			workspace1.bits[block_idx] |= lower_mask & upper_mask;
+			if (offset0 < offset1)
+				workspace1.shift_right(workspace2, offset1 - offset0);
+			else
+				workspace1.shift_left(workspace2, offset0 - offset1);
+			workspace1.flip();
+
+			//5e. Mask the range in 'fb.bits'
+			fb.setIntersection(workspace1);
+
+			//5f. Insert the swapped bits
+			if (offset0 < offset1)
+				workspace0.shift_right(workspace1, offset1 - offset0);
+			else
+				workspace0.shift_left(workspace1, offset0 - offset1);
+			fb.setUnion(workspace0);
+		} else {
+			fprintf(stderr, "This is not supported.\n"); fflush(stderr);
+			assert(false);
+		}
+	}
+
+	inline void swap_range_v2(FastBitset &fb, uint64_t offset0, uint64_t offset1, uint64_t length, FastBitset &workspace0, FastBitset &workspace1, FastBitset &workspace2)
+	{
+		//1. Copy bits into the workspaces
+		this->clone(workspace0);
+		fb.clone(workspace1);
+
+		//2. Shift the target bits to their new positions
+		if (offset1 < offset0) {
+			workspace0.shift_left(workspace2, offset0 - offset1);
+			workspace1.shift_right(workspace2, offset0 - offset1);
+		} else {
+			workspace0.shift_right(workspace2, offset1 - offset0);
+			workspace1.shift_left(workspace2, offset1 - offset0);
+		}
+
+		//3. Set up the masks
+		uint64_t block_idx0 = offset0 >> BLOCK_SHIFT;
+		uint64_t block_idx1 = offset1 >> BLOCK_SHIFT;
+		unsigned l_idx0 = offset0 & block_size_m;
+		unsigned l_idx1 = offset1 & block_size_m;
+		unsigned u_idx0 = (offset0 + length) & block_size_m;
+		unsigned u_idx1 = (offset1 + length) & block_size_m;
+
+		BlockType l_mask0 = masks2[l_idx0];
+		BlockType l_mask1 = masks2[l_idx1];
+		BlockType u_mask0 = masks[u_idx0];
+		BlockType u_mask1 = masks[u_idx1];
+
+		//4. Single-block swap
+		if (length <= bits_per_block &&
+		    (l_idx0 < u_idx0 || l_idx0 + u_idx0 == 0 || (l_idx0 > u_idx0 && u_idx0 == 0)) &&
+		    (l_idx1 < u_idx1 || l_idx1 + u_idx1 == 0 || (l_idx1 > u_idx1 && u_idx1 == 0))) {
+			//4a. Apply the masks
+			workspace0.bits[block_idx1] &= l_mask1 & u_mask1;
+			workspace1.bits[block_idx0] &= l_mask0 & u_mask0;
+			bits[block_idx0] &= ~(l_mask0 & u_mask0);
+			fb.bits[block_idx1] &= ~(l_mask1 & u_mask1);
+
+			//4b. Insert the copied bits
+			bits[block_idx0] |= workspace1.bits[block_idx0];
+			fb.bits[block_idx1] |= workspace0.bits[block_idx1];
+		} else {
+		//5. Multiple-block swap
+			uint64_t nmid0 = (length - 1) >> BLOCK_SHIFT, nmid1 = nmid0;
+			if (l_idx0 < u_idx0 || l_idx0 == 0 || u_idx0 == 0) nmid0--;
+			if (l_idx1 < u_idx1 || l_idx1 == 0 || u_idx1 == 0) nmid1--;
+
+			//5a. Whole blocks
+			if (nmid1)
+				workspace0.clone(fb, block_idx1 + 1, nmid1);
+			if (nmid0)
+				workspace1.clone(*this, block_idx0 + 1, nmid0);
+
+			//5b. Initial blocks
+			workspace0.bits[block_idx1] &= l_mask1;
+			workspace1.bits[block_idx0] &= l_mask0;
+			bits[block_idx0] &= ~l_mask0;
+			bits[block_idx0] |= workspace1.bits[block_idx0];
+			fb.bits[block_idx1] &= ~l_mask1;
+			fb.bits[block_idx1] |= workspace0.bits[block_idx1];
+
+			//5c. Final blocks
+			workspace0.bits[block_idx1+nmid1+1] &= u_mask1;
+			workspace1.bits[block_idx0+nmid0+1] &= u_mask0;
+			bits[block_idx0+nmid0+1] &= ~u_mask0;
+			bits[block_idx0+nmid1+1] |= workspace1.bits[block_idx0+nmid0+1];
+			fb.bits[block_idx1+nmid1+1] &= ~u_mask1;
+			fb.bits[block_idx1+nmid1+1] |= workspace0.bits[block_idx1+nmid1+1];
+		}
+	}
+
 	//----------//
 	// Printing //
 	//----------//
@@ -1012,8 +1160,11 @@ public:
 	std::string toString() const
 	{
 		std::ostringstream s;
-		for (uint64_t i = 0; i < n; i++)
+		for (uint64_t i = 0; i < n; i++) {
+			if (i > 0 && !(i % 64))
+				s << " ";
 			s << read(i);
+		}
 		return s.str();
 	}
 
@@ -1032,8 +1183,9 @@ public:
 	static const size_t bits_per_block = sizeof(BlockType) * CHAR_BIT;
 
 private:
-	BlockType masks[64];	//Masks used for partial* functions
+	BlockType masks[64];	//Masks used for partial-bitset functions
 	BlockType masks2[64];
+
 	inline void createBitset(BlockType *& _bits, uint64_t _n, uint64_t _nb)
 	{
 		try {
@@ -1072,16 +1224,6 @@ private:
 		}
 	}
 
-	/*#ifdef AVX512_ENABLED
-	static const size_t block_size = 512;	//Enforces 64-byte alignment
-	#else
-	#ifdef AVX2_ENABLED
-	static const size_t block_size = 256;	//Enforces 32-byte alignment
-	#else
-	static const size_t block_size = bits_per_block;
-	#endif
-	#endif*/
-
 	static const size_t block_size = FBALIGN;
 
 	static const size_t block_size_m = bits_per_block - 1;	//Used to speed up reads and writes
@@ -1095,16 +1237,6 @@ private:
 	//However, the size of BlockType is not equal to block_size in this case.
 	inline uint64_t get_num_blocks(uint64_t _n)
 	{
-		/*#ifdef AVX512_ENABLED
-		return ((_n + block_size - 1) >> (BLOCK_SHIFT + 3)) << 3;
-		#else
-		#ifdef AVX2_ENABLED
-		return ((_n + block_size - 1) >> (BLOCK_SHIFT + 2)) << 2;
-		#else
-		return (_n + block_size - 1) >> BLOCK_SHIFT;
-		#endif
-		#endif*/
-
 		if (block_size == 512)
 			return ((_n + block_size - 1) >> (BLOCK_SHIFT + 3)) << 3;
 		else if (block_size == 256)

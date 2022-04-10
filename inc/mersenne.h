@@ -1,10 +1,18 @@
+/* Copyright 2014-2022 Will Cunningham
+ *
+ * This file is part of FastMath.
+ *
+ * Licensed under the MIT License (the "License"). A copy of the
+ * License may be obtained with this software package or at
+ *
+ *     https://opensource.org/licenses/MIT
+ *
+ * FastMath is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. */
+
 #ifndef FASTMATH_MERSENNE_H
 #define FASTMATH_MERSENNE_H
-
-/////////////////////////////
-//(C) Will Cunningham 2018 //
-//    Perimeter Institute  //
-/////////////////////////////
 
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_real.hpp>

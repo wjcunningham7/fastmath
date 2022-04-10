@@ -1,3 +1,16 @@
+/* Copyright 2014-2022 Will Cunningham
+ *
+ * This file is part of FastMath.
+ *
+ * Licensed under the MIT License (the "License"). A copy of the
+ * License may be obtained with this software package or at
+ *
+ *     https://opensource.org/licenses/MIT
+ *
+ * FastMath is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. */
+
 #ifndef FASTMATH_H
 #define FASTMATH_H
 
@@ -17,12 +30,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sstream>
-
-/////////////////////////////
-//(C) Will Cunningham 2014 //
-//         DK Lab          //
-// Northeastern University //
-/////////////////////////////
 
 namespace fastmath {
 
@@ -114,7 +121,7 @@ enum FastMethod {
 	STL = 0,	//STL from <math.h>
 	FAST = 1,	//fastX from fastapprox.h
 	FASTER = 2,	//fasterX from fastapprox.h
-	BITWISE = 3,	//Bitwise operation
+	BITWISE = 3,	//Bitwise approximation
 	CHEBYSHEV = 4,	//Chebyshev series approximation
 	INTEGRATION = 5,//Integration of binomial approximation
 	BOOST = 6,	//Boost library function

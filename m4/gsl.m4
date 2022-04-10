@@ -66,7 +66,7 @@ char*
 my_strdup (const char *str)
 {
   char *new_str;
-  
+
   if (str)
     {
       new_str = (char *)malloc ((strlen (str) + 1) * sizeof(char));
@@ -74,7 +74,7 @@ my_strdup (const char *str)
     }
   else
     new_str = NULL;
-  
+
   return new_str;
 }
 
@@ -99,9 +99,9 @@ int main (void)
    if (($gsl_major_version > major) ||
       (($gsl_major_version == major) && ($gsl_minor_version > minor)) ||
       (($gsl_major_version == major) && ($gsl_minor_version == minor) && ($gsl_micro_version >= micro)))
-     { 
+     {
        exit(0);
-     }   
+     }
    else
      {
        exit(1);
@@ -115,7 +115,7 @@ int main (void)
   fi
   if test "x$no_gsl" = x ; then
      AC_MSG_RESULT(yes)
-     ifelse([$2], , :, [$2])     
+     ifelse([$2], , :, [$2])
   else
      AC_MSG_RESULT(no)
      if test "$GSL_CONFIG" = "no" ; then

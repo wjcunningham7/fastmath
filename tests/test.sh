@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # Copyright 2014-2022 Will Cunningham
 #
@@ -15,11 +15,18 @@
 
 set -eu -o pipefail
 
-if [[ ! -z ${FASTMATH_HOME+x} ]] ; then
-  prefix="--prefix=$FASTMATH_HOME/fastmath"
-fi
-
-sh ./bootstrap.sh
-./configure $prefix
-make clean
-make
+./general
+echo -e '\n'
+./clone
+echo -e '\n'
+./count
+echo -e '\n'
+./intersection
+echo -e '\n'
+./union
+echo -e '\n'
+./disjointunion
+echo -e '\n'
+./difference
+echo -e '\n'
+echo 'Completed all tests on FastBitset.'

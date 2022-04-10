@@ -1,5 +1,3 @@
-#!/bin/bash
-#
 # Copyright 2014-2022 Will Cunningham
 #
 # This file is part of FastMath.
@@ -13,13 +11,21 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-set -eu -o pipefail
+exclude: ".git"
+default_stages: [commit]
+fail_fast: true
 
-if [[ ! -z ${FASTMATH_HOME+x} ]] ; then
-  prefix="--prefix=$FASTMATH_HOME/fastmath"
-fi
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-added-large-files
+        args: ["--maxkb=100"]
+      - id: check-merge-conflict
 
-sh ./bootstrap.sh
-./configure $prefix
-make clean
-make
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v13.0.1
+    hooks:
+      - id: clang-format

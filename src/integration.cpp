@@ -1,18 +1,24 @@
+/* Copyright 2014-2022 Will Cunningham
+ *
+ * This file is part of FastMath.
+ *
+ * Licensed under the MIT License (the "License"). A copy of the
+ * License may be obtained with this software package or at
+ *
+ *     https://opensource.org/licenses/MIT
+ *
+ * FastMath is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. */
+
 #include <fastmath/integration.h>
 
-/////////////////////////////
-//(C) Will Cunningham 2017 //
-//         DK Lab          //
-// Northeastern University //
-/////////////////////////////
-
-//---SUMMARY---//
-//These functions provide a convenient wrapper for
-//1D and 2D numerical integration using the GSL and NINTLIB
-//integration functions. Note that in some cases
-//memory is allocated and freed, so if these functions
-//are a bottleneck in other code, consider re-writing them
-//explicitly with memory management outside any loops
+/* These functions provide a convenient wrapper for 1D and 2D
+ * numerical integration using the GSL and NINTLIB integration
+ * functions. Note that in some cases memory is allocated and freed,
+ * so if these functions are a bottleneck in other code, consider
+ * re-writing them explicitly with memory management outside any
+ * loops. */
 
 namespace fastmath {
 

@@ -14,6 +14,14 @@
 AUTOMAKE_OPTIONS = foreign
 ACLOCAL_AMFLAGS = -I m4 --install
 
-noinst_LIBRARIES = libfast.a
-libfast_a_SOURCES = printcolor.cpp progressbar.cpp stopwatch.cpp fastmath.cpp nint.cpp integration.cpp resources.cpp
+bin_PROGRAMS = general clone count intersection union disjointunion difference hdf5
+general_SOURCES = general.cpp
+clone_SOURCES = clone.cpp
+count_SOURCES = count.cpp
+intersection_SOURCES = intersection.cpp
+union_SOURCES = union.cpp
+disjointunion_SOURCES = disjointunion.cpp
+difference_SOURCES = difference.cpp
+hdf5_SOURCES = hdf5.cpp
+
 AM_CXXFLAGS = -I $(top_builddir) -I $(top_builddir)/inc

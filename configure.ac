@@ -1,11 +1,18 @@
-###########################
-#(C) Will Cunningham 2017 #
-#         DK Lab          #
-# Northeastern University #
-###########################
+# Copyright 2014-2022 Will Cunningham
+#
+# This file is part of FastMath.
+#
+# Licensed under the MIT License (the "License"). A copy of the
+# License may be obtained with this software package or at
+#
+#     https://opensource.org/licenses/MIT
+#
+# FastMath is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 AC_PREREQ([2.69])
-AC_INIT([FastMath], [3.0], [wcunningham@perimeterinstitute.ca])
+AC_INIT([fastmath], m4_normalize(m4_include([VERSION])), [wjcunningham7@gmail.com])
 AM_INIT_AUTOMAKE
 
 AC_CONFIG_MACRO_DIR([m4])
@@ -20,12 +27,11 @@ AC_LANG([C++])
 
 AX_COMPILER_VERSION
 AX_COMPARE_VERSION([$ax_cv_cxx_compiler_version], [ge], [4.8.1],, AC_MSG_ERROR([GNU compiler must be at least version 4.8.1]))
-#AX_COMPARE_VERSION([$ax_cv_cxx_compiler_version], [ge], [6.4.0],, AC_MSG_ERROR([GNU compiler must be at least version 6.4.0]))
 AX_CXX_COMPILE_STDCXX([11])
 AX_PATH_GSL([1.13],, AC_MSG_ERROR([Could not find the required version of GSL.]))
 BOOST_REQUIRE([1.55.0])
 CXXFLAGS="$CXXFLAGS $BOOST_CPPFLAGS"
-AX_LIB_HDF5
+AX_LIB_HDF5([parallel])
 AX_PLATFORM([$PLATFORM])
 
 AC_CHECK_LIB([m], [cos],, AC_MSG_ERROR([Could not find the library "libm"]))
@@ -52,7 +58,7 @@ AC_C_INLINE
 AC_C_CONST
 AC_C_VOLATILE
 
-CXXFLAGS="$CXXFLAGS -g -O3 -DBOOST_NO_FENV_H -Wno-narrowing -mpopcnt -fPIC"
+CXXFLAGS="$CXXFLAGS -g -O3 -DBOOST_NO_FENV_H -Wno-narrowing -mpopcnt -fPIC -fmax-errors=5 $HDF5_CPPFLAGS $HDF5_LDFLAGS $HDF5_LIBS"
 if [[ "$(uname -s)" == "Linux" ]] ; then
   AX_GCC_X86_CPU_SUPPORTS([avx2], [CXXFLAGS="$CXXFLAGS -mavx2 -DAVX2_ENABLED"; FBALIGN=256;], [CXXFLAGS+=""])
   AX_GCC_X86_CPU_SUPPORTS([avx512f], [CXXFLAGS="$CXXFLAGS -mavx512f -DAVX512_ENABLED"; FBALIGN=512], [CXXFLAGS+=""])
@@ -70,8 +76,5 @@ fi
 AX_GCC_ARCHFLAG([no],, AC_MSG_ERROR([CPU architecture could not be identified.]))
 CXXFLAGS="$CXXFLAGS $ax_cv_gcc_archflag"
 
-#xtra=($(for file in $(find inc/intrinsics -type f) ; do echo intrinsics/$(basename $file) ; done))
-#AC_SUBST([xtra], ["${xtra[[@]]}"])
-
-AC_CONFIG_FILES([Makefile src/Makefile inc/Makefile test/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile inc/Makefile tests/Makefile])
 AC_OUTPUT
