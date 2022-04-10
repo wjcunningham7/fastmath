@@ -163,19 +163,6 @@ and include the headers with
 
         $ -I $FASTMATH_HOME/include
 
-##Package Contents
-* FastMath:  contains approximations of many mathematical functions. In particular, the \_2F1() function permits one to specify the number of terms _or_ the desired error when using a series solution. The header also defines many constants.
-
-* FastBitset: a header-only class used for efficient bitset algorithms. The Bitvector object is a vector of FastBitsets, often used to represent an adjacency matrix.
-
-* FastNumInt: A wrapper for numerical integration in 1D and 2D.
-
-* Stopwatch: A data structure and some functions for a stopwatch accurate to the millisecond.
-
-* ProgressBar: A data structure and some functions used to produce an on-screen progress bar, often useful for Monte Carlo experiments.
-
-* MersenneRNG: A data structure based on Boost's Mersenne Twister (19937) random number generator, useful for efficiently generating reliably random numbers in large simulations.
-
 ## Release Notes
 
 Release notes are available in the [Changelog](https://github.com/wjcunningham7/fastmath/blob/master/CHANGELOG.md).
