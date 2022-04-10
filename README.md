@@ -6,6 +6,7 @@ FastMath Library
 [![version](https://img.shields.io/github/v/tag/wjcunningham7/fastmath?include_prereleases&label=version)](https://github.com/wjcunningham7/fastmath)
 ![platform](https://img.shields.io/badge/platform-linux-lightgrey)
 [![license](https://img.shields.io/github/license/wjcunningham7/fastmath)](https://opensource.org/licenses/MIT)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6432268.svg)](https://doi.org/10.5281/zenodo.6432268)
 
 </div>
 
@@ -178,6 +179,12 @@ and include the headers with
 ## Release Notes
 
 Release notes are available in the [Changelog](https://github.com/wjcunningham7/fastmath/blob/master/CHANGELOG.md).
+
+## Citation
+
+Please use the following citation in any publications:
+
+> W. J. Cunningham. *FastMath.* Zenodo, 2022. https://doi.org/10.5281/zenodo.6432268
 
 ## License
 
