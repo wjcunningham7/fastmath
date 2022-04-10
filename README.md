@@ -3,7 +3,7 @@ FastMath Library
 
 <div align="center">
 
-[![version](https://img.shields.io/github/v/tag/wjcunningham7/fastmath?include_prereleases)](https://github.com/wjcunningham7/fastmath)
+[![version](https://img.shields.io/github/v/tag/wjcunningham7/fastmath?include_prereleases&label=version)](https://github.com/wjcunningham7/fastmath)
 ![platform](https://img.shields.io/badge/platform-linux-lightgrey)
 [![license](https://img.shields.io/github/license/wjcunningham7/fastmath)](https://opensource.org/licenses/MIT)
 
