@@ -28,6 +28,7 @@ Source0:	%{name}-%{version}.tar.gz
 
 BuildArch:	x86_64
 
+BuildRequires:	autoconf
 BuildRequires:	make
 
 Requires:	boost >= 1.55.0
