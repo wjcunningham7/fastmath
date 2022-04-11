@@ -17,7 +17,7 @@ jobs:
       - name: Generate spec
         run: |
           cd recipes
-          sh ./build-rpm.sh
+          bash ./build-rpm.sh
       - name: Build RPM
         id: rpm
         uses: naveenrajm7/rpmbuild@master
