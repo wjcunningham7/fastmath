@@ -2,15 +2,20 @@
 #
 # This file is part of FastMath.
 #
-# Licensed under the MIT License (the "License"). A copy of the
-# License may be obtained with this software package or at
+# Licensed under the GNU General Public License 3.0 (the "License").
+# A copy of the License may be obtained with this software package or at
 #
-#     https://opensource.org/licenses/MIT
+#     https://www.gnu.org/licenses/gpl-3.0.en.html
 #
-# FastMath is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
+# Use of this file is prohibited except in compliance with the License. Any
+# modifications or derivative works of this file must retain this copyright
+# notice, and modified files must contain a notice indicating that they have
+# been altered from the originals.
+#
+# FastMath is distributed in the hope that it will be useful, but WITHOUT 
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+# FITNESS FOR A PARTICULAR PURPOSE. See the License for more details.
+#
 #serial 1
 
 AC_DEFUN([AX_FASTMATH],
@@ -46,30 +51,24 @@ fi
 
 if [[[ $VALID_FASTMATH == "yes" ]]] ; then
   FASTMATH_INCLUDE="-I $FASTMATH_HOME/include"
-  FASTMATH_LDFLAGS="-L $FASTMATH_HOME/lib -lfastmath$2"
 
   cxx_flags=$CXXFLAGS
-  ld_flags=$LDFLAGS
 
   CXXFLAGS="$CXXFLAGS $FASTMATH_INCLUDE"
-  LDFLAGS="$LDFLAGS $FASTMATH_LDFLAGS"
 
   AC_CHECK_HEADER([fastmath/fastmath.h],, AC_MSG_WARN([Could not find fastmath headers]); VALID_FASTMATH=no, [#include <fastmath/fastmath.h>])
-  AC_CHECK_FILE([$FASTMATH_HOME/lib/libfastmath$2.a],, AC_MSG_WARN([Could not find libfastmath]); VALID_FASTMATH=no)
 
   CXXFLAGS=$cxx_flags
-  LDFLAGS=$ld_flags
 fi
 
 AC_MSG_CHECKING([if fastmath will be used])
 if [[[ $VALID_FASTMATH == "yes" ]]] ; then
   AC_MSG_RESULT([yes])
   AC_SUBST([FASTMATH_FLAGS], [$FASTMATH_INCLUDE])
-  AC_SUBST([FASTMATH_LDFLAGS], [$FASTMATH_LDFLAGS])
   AC_SUBST([FASTMATH_ENABLED], [yes])
 else
   AC_MSG_RESULT([no])
-  if [[[ "$#" -ge 2 && "$3" == "mandatory" ]]] ; then
+  if [[[ "$#" -ge 1 && "$2" == "mandatory" ]]] ; then
     AC_MSG_ERROR([Fastmath is required for this package.])
   fi
 fi

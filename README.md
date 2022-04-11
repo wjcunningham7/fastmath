@@ -175,4 +175,4 @@ Please use the following citation in any publications:
 
 ## License
 
-FastMath is licensed under the MIT License. See the [LICENSE](https://github.com/wjcunningham7/fastmath/blog/master/LICENSE) file for more details.
+FastMath is licensed under the GNU GPL 3.0 License. See the [LICENSE](https://github.com/wjcunningham7/fastmath/blob/master/LICENSE) file for more details.
