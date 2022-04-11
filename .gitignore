@@ -33,16 +33,14 @@ aclocal.m4
 AUTHORS
 ChangeLog
 config.*
-configure
 depcomp
-install-sh
-missing
 NEWS
 **/stamp-h1
 **/config.h
-**/config.h.in
 **/config.h.in~
 **/Makefile
-**/Makefile.in
 **/.deps/**
 **/.dirstamp
+
+# Build files
+build/**

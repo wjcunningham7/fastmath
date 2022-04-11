@@ -9,8 +9,7 @@ mkdir -p $BUILD/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
 tar cvzf fastmath-$VERSION.tar.gz $PKG_ROOT/{\
 include,\
-Makefile.am,\
-configure.ac,\
+configure,\
 LICENSE\
 }
 
@@ -28,7 +27,6 @@ Source0:	%{name}-%{version}.tar.gz
 
 BuildArch:	x86_64
 
-BuildRequires:	autoconf
 BuildRequires:	make
 
 Requires:	boost >= 1.55.0
@@ -38,9 +36,7 @@ Requires:	gsl-devel >= 1.13
 The FastMath toolkit provides efficient numerical approximations and compact data structures
 
 %build
-touch NEWS AUTHORS ChangeLog
-autoreconf -vfi
-./configure \$@
+./configure
 
 %install
 make install
