@@ -15,12 +15,14 @@ jobs:
         with:
           persist-credentials: false
       - name: Generate spec
-        run: bash ./build-rpm.sh
+        run: |
+          bash ./build-rpm.sh
+          ls -la build/SPEC
       - name: Build RPM
         id: rpm
         uses: naveenrajm7/rpmbuild@master
         with:
-          spec_file: "fastmath/build/SPEC/fastmath.spec"
+          spec_file: "build/SPEC/fastmath.spec"
       - name: Upload artifact
         uses: actions/upload-artifact@v1.0.0
         with:
