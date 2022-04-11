@@ -20,7 +20,7 @@ jobs:
         id: rpm
         uses: naveenrajm7/rpmbuild@master
         with:
-          spec_file: "./build/SPEC/fastmath.spec"
+          spec_file: "fastmath/build/SPEC/fastmath.spec"
       - name: Upload artifact
         uses: actions/upload-artifact@v1.0.0
         with:
