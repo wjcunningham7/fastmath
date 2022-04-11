@@ -22,8 +22,8 @@ Release:	1
 Summary:	FastMath Toolkit
 
 License:	GPLv3
-URL: 		https://github.com/wjcunningham7/%{name}
-Source0:	%{name}-%{version}.tar.gz
+URL: 		https://github.com/wjcunningham7/fastmath
+Source0:	fastmath-$VERSION.tar.gz
 
 BuildArch:	x86_64
 
