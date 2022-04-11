@@ -9,20 +9,31 @@ on:
 jobs:
   buildrpm:
     runs-on: ubuntu-latest
+    container: centos:centos7
     steps:
-      - name: Check out master
-        uses: actions/checkout@v2
+      - name: Check out head
+        uses: actions/checkout@v3
         with:
           persist-credentials: false
+      - name: Read version
+        run: |
+          VERSION=`cat VERSION`
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+      - name: Build tarball
+        run: |
+          mkdir -p $HOME/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+          mkdir fastmath-$VERSION
+          cp -r include configure LICENSE Makefile.in missing fastmath-$VERSION
+          tar cvzf fastmath-$VERSION.tar.gz fastmath-$VERSION
+          mv fastmath-$VERSION.tar.gz $HOME/rpmbuild/SOURCES
       - name: Generate spec
-        run: bash ./build-rpm-spec.sh
+        run: |
+          bash ./build-rpm-spec.sh
+          mv fastmath.spec $HOME/rpmbuild/SPECS
       - name: Build RPM
-        id: rpm
-        uses: naveenrajm7/rpmbuild@master
-        with:
-          spec_file: "fastmath.spec"
+        rpmbuild -bs $HOME/rpmbuild/SPECS/fastmath.spec
       - name: Upload artifact
         uses: actions/upload-artifact@v1.0.0
         with:
           name: FastMath RPM
-          path: ${{ steps.rpm.outputs.rpm_dir_path }}
+          path: $HOME/rpmbuild/SRPMS/fastmath-$VERSION-1.src.rpm
