@@ -31,7 +31,7 @@ jobs:
           bash ./build-rpm-spec.sh
           mv fastmath.spec $HOME/rpmbuild/SPECS
       - name: Build RPM
-        rpmbuild -bs $HOME/rpmbuild/SPECS/fastmath.spec
+        run: rpmbuild -bs $HOME/rpmbuild/SPECS/fastmath.spec
       - name: Upload artifact
         uses: actions/upload-artifact@v1.0.0
         with:
