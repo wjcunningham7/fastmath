@@ -1,33 +1,166 @@
 /* Copyright 2014-2022 Will Cunningham
- *
+ * 
  * This file is part of FastMath.
  *
- * Licensed under the MIT License (the "License"). A copy of the
- * License may be obtained with this software package or at
+ * Licensed under the GNU General Public License 3.0 (the "License").
+ * A copy of the License may be obtained with this software package or at
  *
- *     https://opensource.org/licenses/MIT
+ *      https://www.gnu.org/licenses/gpl-3.0.en.html
  *
- * FastMath is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. */
+ * Use of this file is prohibited except in compliance with the License. Any
+ * modifications or derivative works of this file must retain this copyright
+ * notice, and modified files must contain a notice indicating that they have
+ * been altered from the originals.
+ *
+ * FastMath is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+ * FITNESS FOR A PARTICULAR PURPOSE. See the License for more details. */
+
+#ifndef FASTMATH_H
+#define FASTMATH_H
+
+#ifdef AVX2_ENABLED
+#include <x86intrin.h>
+#endif
+
+#include <algorithm>
+#include <assert.h>
+#include <cstring>
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
+#include <limits.h>
+#include <math.h>
+#include <new>
+#include <sstream>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include <boost/math/special_functions/gamma.hpp>
 
 #include "fastapprox.h"
-#include "fastmath.h"
-
-/* These functions are optimized versions of many STL math
- * operations, though often efficiency is traded for accuracy. In
- * particular, implementations of the Gamma function, Pochhammer
- * function, and Gauss Hypergeometric function offer optimizations
- * not found in GSL. */
 
 namespace fastmath {
 
-// Approximation of x^2
-double POW2(const double x) { return x * x; }
+// Used for Unit Testing
+#define FM_DEBUG false
 
-double POW2(const double x, const enum FastMethod fm) {
+// Machine Epsilon
+#define FM_TOL (1e-28)
+
+// Useful Constants
+#define HALF_PI 1.57079632679489661923
+#define TWO_PI 6.28318530717958647692
+#define SQRT_PI 1.77245385090551602729
+
+// ACOS Chebyshev Series Coefficients
+#define ACOS_C0 HALF_PI
+#define ACOS_C1 -1.06305396909634217923
+#define ACOS_C3 0.88385729242991187525
+#define ACOS_C5 -4.69522239734719040073
+#define ACOS_C7 7.39114112136511672686
+#define ACOS_C9 -4.02406572163211910684
+
+// ACOS Integration Series Coefficients
+#define ACOS_I0 HALF_PI
+#define ACOS_I1 -1.00000000000000000000
+#define ACOS_I3 -0.16666666666666666666
+#define ACOS_I5 -0.07500000000000000000
+#define ACOS_I7 -0.04464285714285714285
+#define ACOS_I9 -0.03038194444444444444
+#define ACOS_I11 -0.02237215909090909090
+#define ACOS_I13 -0.01735276442307692307
+#define ACOS_I15 -0.01396484375000000000
+
+// ATAN Chebyshev Series Coefficients
+#define ATAN_C1 1.04538834220118418960
+#define ATAN_C3 -0.39082098431982330905
+#define ATAN_C5 0.17944049001227966481
+#define ATAN_C7 -0.08419846479405229950
+#define ATAN_C9 0.02041955547722351862
+
+// ATAN Integration Series Coefficients (x < 0)
+#define ATAN_H1 1.00000000000000000000
+#define ATAN_H3 -0.33333333333333333333
+#define ATAN_H5 0.20000000000000000000
+#define ATAN_H7 -0.14285714285714285714
+#define ATAN_H9 0.11111111111111111111
+#define ATAN_H11 -0.09090909090909090909
+#define ATAN_H13 0.07692307692307692307
+#define ATAN_H15 -0.06666666666666666666
+
+#define ATAN_I0 HALF_PI
+#define ATAN_I1 -1.00000000000000000000
+#define ATAN_I3 0.33333333333333333333
+#define ATAN_I5 -0.20000000000000000000
+#define ATAN_I7 0.14285714285714285714
+#define ATAN_I9 -0.11111111111111111111
+#define ATAN_I11 0.09090909090909090909
+#define ATAN_I13 -0.07692307692307692307
+#define ATAN_I15 0.06666666666666666666
+
+// ASINH Integration Series Coefficients
+#define ASINH_I1 1.00000000000000000000
+#define ASINH_I3 -0.16666666666666666666
+#define ASINH_I5 0.07500000000000000000
+#define ASINH_I7 -0.04464285714285714285
+#define ASINH_I9 0.03038194444444444444
+#define ASINH_I11 -0.02237215909090909090
+#define ASINH_I13 0.01735276442307692307
+#define ASINH_I15 -0.01396484375000000000
+
+// ACOSH Integration Series Coefficients
+#define ACOSH_I2 -0.25000000000000000000
+#define ACOSH_I4 -0.09375000000000000000
+#define ACOSH_I6 -0.10416666666666666666
+#define ACOSH_I8 -0.06835937500000000000
+#define ACOSH_I10 -0.04921875000000000000
+#define ACOSH_I12 -0.03759765625000000000
+#define ACOSH_I14 -0.02992466517857142857
+
+#define sec(x) (1.0 / cos(x))
+#define asec(x) acos(1.0 / x)
+
+// Used for SGN function
+static const double table[] = {-1.0, 1.0};
+
+// Method of Calculation
+enum FastMethod {
+    DEF = 0,
+    STL = 0,         // STL from <math.h>
+    FAST = 1,        // fastX from fastapprox.h
+    FASTER = 2,      // fasterX from fastapprox.h
+    BITWISE = 3,     // Bitwise approximation
+    CHEBYSHEV = 4,   // Chebyshev series approximation
+    INTEGRATION = 5, // Integration of binomial approximation
+    BOOST = 6,       // Boost library function
+    EXACT = 7        // Exact solution
+};
+
+// Defines Number of Terms in Series for
+// Selected Power Series Approximations
+enum Precision {
+    DEFAULT = 0,
+    LOW_PRECISION = 0,
+    HIGH_PRECISION = 1,
+    VERY_HIGH_PRECISION = 2
+};
+
+// Type of transformation used for 2F1
+struct HyperType {
+    HyperType() : w(0.0), type(0) {}
+
+    double w;
+    int type;
+};
+
+/////////////////////
+// Power Functions //
+/////////////////////
+
+inline double POW2(const double x) { return x * x; }
+
+inline double POW2(const double x, const enum FastMethod fm) {
 #if FM_DEBUG
     assert(fm == STL || fm == FAST || fm == FASTER || fm == EXACT);
 #endif
@@ -58,10 +191,9 @@ double POW2(const double x, const enum FastMethod fm) {
     return y;
 }
 
-// Approximation of x^3
-double POW3(const double x) { return x * x * x; }
+inline double POW3(const double x) { return x * x * x; }
 
-double POW3(const double x, const enum FastMethod fm) {
+inline double POW3(const double x, const enum FastMethod fm) {
 #if FM_DEBUG
     assert(fm == STL || fm == FAST || fm == FASTER || fm == EXACT);
 #endif
@@ -93,8 +225,7 @@ double POW3(const double x, const enum FastMethod fm) {
     return y;
 }
 
-// Approximation of x^p
-double POW(const double x, const double p, const enum FastMethod fm) {
+inline double POW(const double x, const double p, const enum FastMethod fm) {
 #if FM_DEBUG
     assert(fm == STL || fm == FAST || fm == FASTER);
 #endif
@@ -120,8 +251,7 @@ double POW(const double x, const double p, const enum FastMethod fm) {
     return y;
 }
 
-// Approximation of x^(1/2)
-double SQRT(const double x, const enum FastMethod fm) {
+inline double SQRT(const double x, const enum FastMethod fm) {
 #if FM_DEBUG
     assert(fm == STL || fm == BITWISE);
     assert(x >= 0.0);
@@ -155,8 +285,11 @@ double SQRT(const double x, const enum FastMethod fm) {
     return y;
 }
 
-// Approximation of |x|
-double ABS(const double x, const enum FastMethod fm) {
+///////////////////////////////////////////
+// Absolute Value, Natural Log, and Sign //
+///////////////////////////////////////////
+
+inline double ABS(const double x, const enum FastMethod fm) {
 #if FM_DEBUG
     assert(fm == STL || fm == BITWISE);
 #endif
@@ -188,8 +321,7 @@ double ABS(const double x, const enum FastMethod fm) {
     return y;
 }
 
-// Approximation of ln(x)
-double LOG(const double x, const enum FastMethod fm) {
+inline double LOG(const double x, const enum FastMethod fm) {
 #if FM_DEBUG
     assert(fm == STL || fm == FAST || fm == FASTER);
     assert(x > 0.0);
@@ -214,10 +346,9 @@ double LOG(const double x, const enum FastMethod fm) {
     return y;
 }
 
-// Returns sign(x)
-double SGN(const double x) { return table[x > 0.0]; }
+inline double SGN(const double x) { return table[x > 0.0]; }
 
-double SGN(const double x, const enum FastMethod fm) {
+inline double SGN(const double x, const enum FastMethod fm) {
 #if FM_DEBUG
     assert(fm == DEF || fm == BITWISE);
 #endif
@@ -247,8 +378,8 @@ double SGN(const double x, const enum FastMethod fm) {
     return y;
 }
 
-// Approximation of sine(x)
-double SIN(const double x, const enum FastMethod fm) {
+// Trigonometric Functions
+inline double SIN(const double x, const enum FastMethod fm) {
 #if FM_DEBUG
     assert(fm == STL || fm == FAST || fm == FASTER);
 #endif
@@ -282,8 +413,7 @@ double SIN(const double x, const enum FastMethod fm) {
     return y;
 }
 
-// Approximation of cosine(x)
-double COS(const double x, const enum FastMethod fm) {
+inline double COS(const double x, const enum FastMethod fm) {
 #if FM_DEBUG
     assert(fm == STL || fm == FAST || fm == FASTER);
 #endif
@@ -317,8 +447,7 @@ double COS(const double x, const enum FastMethod fm) {
     return y;
 }
 
-// Approximation of tangent(x)
-double TAN(const double x, const enum FastMethod fm) {
+inline double TAN(const double x, const enum FastMethod fm) {
 #if FM_DEBUG
     assert(fm == STL || fm == FAST || fm == FASTER);
 #endif
@@ -352,8 +481,11 @@ double TAN(const double x, const enum FastMethod fm) {
     return y;
 }
 
-// Approximation of arccosine(x)
-double ACOS(const double x, const enum FastMethod fm, const enum Precision p) {
+/////////////////////////////////////
+// Inverse Trigonometric Functions //
+/////////////////////////////////////
+
+inline double ACOS(const double x, const enum FastMethod fm, const enum Precision p) {
 #if FM_DEBUG
     assert(fm == STL || fm == CHEBYSHEV || fm == INTEGRATION);
     assert(ABS(x, STL) < 1.0);
@@ -419,8 +551,7 @@ double ACOS(const double x, const enum FastMethod fm, const enum Precision p) {
     return y;
 }
 
-// Approximation of arctangent(x)
-double ATAN(const double x, const enum FastMethod fm, const enum Precision p) {
+inline double ATAN(const double x, const enum FastMethod fm, const enum Precision p) {
 #if FM_DEBUG
     assert(fm == STL || fm == CHEBYSHEV || fm == INTEGRATION);
 #endif
@@ -525,8 +656,11 @@ double ATAN(const double x, const enum FastMethod fm, const enum Precision p) {
     return y;
 }
 
-// Approximation of sinh(x)
-double SINH(const double x, const enum FastMethod fm) {
+//////////////////////////
+// Hyperbolic Functions //
+//////////////////////////
+
+inline double SINH(const double x, const enum FastMethod fm) {
 #if FM_DEBUG
     assert(fm == STL || fm == FAST || fm == FASTER);
 #endif
@@ -554,8 +688,7 @@ double SINH(const double x, const enum FastMethod fm) {
     return y;
 }
 
-// Approximation of cosh(x)
-double COSH(const double x, const enum FastMethod fm) {
+inline double COSH(const double x, const enum FastMethod fm) {
 #if FM_DEBUG
     assert(fm == STL || fm == FAST || fm == FASTER);
 #endif
@@ -583,8 +716,11 @@ double COSH(const double x, const enum FastMethod fm) {
     return y;
 }
 
-// Approximation of arcsinh(x)
-double ASINH(const double x, const enum FastMethod fm, const enum Precision p) {
+//////////////////////////////////
+// Inverse Hyperbolic Functions //
+//////////////////////////////////
+
+inline double ASINH(const double x, const enum FastMethod fm, const enum Precision p) {
 #if FM_DEBUG
     assert(fm == STL || fm == INTEGRATION);
 #endif
@@ -633,8 +769,7 @@ double ASINH(const double x, const enum FastMethod fm, const enum Precision p) {
     return y;
 }
 
-// Approximation of arccosh(x)
-double ACOSH(const double x, const enum FastMethod fm, const enum Precision p) {
+inline double ACOSH(const double x, const enum FastMethod fm, const enum Precision p) {
 #if FM_DEBUG
     assert(fm == STL || fm == INTEGRATION);
 #endif
@@ -690,10 +825,13 @@ double ACOSH(const double x, const enum FastMethod fm, const enum Precision p) {
     return y;
 }
 
-// Approximation of the Gamma Function
-double GAMMA(const double x) { return boost::math::tgamma<double>(x); }
+///////////////////////////
+// Statistical Functions //
+///////////////////////////
 
-double GAMMA(const double x, const enum FastMethod fm) {
+inline double GAMMA(const double x) { return boost::math::tgamma<double>(x); }
+
+inline double GAMMA(const double x, const enum FastMethod fm) {
 #if FM_DEBUG
     assert(fm == STL || fm == BOOST);
     // Gamma(0) is undefined
@@ -730,10 +868,9 @@ double GAMMA(const double x, const enum FastMethod fm) {
     return y;
 }
 
-// Approximation of ln(gamma(x))
-double LOGGAMMA(const double x) { return boost::math::lgamma(x); }
+inline double LOGGAMMA(const double x) { return boost::math::lgamma(x); }
 
-double LOGGAMMA(const double x, const enum FastMethod fm) {
+inline double LOGGAMMA(const double x, const enum FastMethod fm) {
 #if FM_DEBUG
     assert(fm == STL || fm == BOOST);
     // Gamma(0) is undefined
@@ -768,9 +905,10 @@ double LOGGAMMA(const double x, const enum FastMethod fm) {
     return y;
 }
 
-// Ratio of Gamma functions
 // Returns gamma(x)/gamma(y)
-double GAMMA_RATIO(const double x, const double y) {
+// Logarithms are used when gamma(x) and gamma(y)
+// are each large but the ratio is small
+inline double GAMMA_RATIO(const double x, const double y) {
 #if FM_DEBUG
     assert(x != 0.0);
     assert(y != 0.0);
@@ -809,23 +947,7 @@ double GAMMA_RATIO(const double x, const double y) {
 // Approximation of the Pochhammer symbol (x)_j = gamma(x+j)/gamma(x)
 // The coefficient j must be a non-negative integer by definition
 
-// This is the fast version, assumes both arguments are non-negative
-double POCHHAMMER_F(const double x, const int j) {
-#if FM_DEBUG
-    assert(x > 0.0);
-    assert(j >= 0);
-#endif
-
-    double y;
-    if (x + j <= 10)
-        y = tgamma(x + j) / tgamma(x);
-    else
-        y = exp(lgamma(x + j) - lgamma(x));
-
-    return y;
-}
-
-double POCHHAMMER(const double x, const int j) {
+inline double POCHHAMMER(const double x, const int j) {
 #if FM_DEBUG
     assert(j >= 0);
 #endif
@@ -848,12 +970,32 @@ double POCHHAMMER(const double x, const int j) {
     return y;
 }
 
+// This is a faster version, assuming both arguments are non-negative
+inline double POCHHAMMER_F(const double x, const int j) {
+#if FM_DEBUG
+    assert(x > 0.0);
+    assert(j >= 0);
+#endif
+
+    double y;
+    if (x + j <= 10)
+        y = tgamma(x + j) / tgamma(x);
+    else
+        y = exp(lgamma(x + j) - lgamma(x));
+
+    return y;
+}
+
+///////////////////////////////////
+// Gauss Hypergeometric Function //
+///////////////////////////////////
+
 // Coefficient for the Gauss Hypergeometric function 2F1:
 //	A_n = (a)_n * (b)_n / ((c)_n * n!)
 
-// This version is the 'fast' version
+// This is the fastest version
 // It assumes a, b, c, and n are positive
-double _2F1_An_F(const double a, const double b, const double c, const int n) {
+inline double _2F1_An_F(const double a, const double b, const double c, const int n) {
 #if FM_DEBUG
     assert(a > 0.0);
     assert(b > 0.0);
@@ -874,7 +1016,7 @@ double _2F1_An_F(const double a, const double b, const double c, const int n) {
 }
 
 // This version permits negative values but takes longer to evaluate
-double _2F1_An(const double a, const double b, const double c, const int n) {
+inline double _2F1_An(const double a, const double b, const double c, const int n) {
 #if FM_DEBUG
     assert(n >= 0);
 #endif
@@ -968,7 +1110,7 @@ double _2F1_An(const double a, const double b, const double c, const int n) {
 // The number of terms used in the power series is given by 'nterms'
 // Specify a desired error instead by setting nterms = -1 and passing a non-zero
 // err
-void _2F1(const double a, const double b, const double c, const double z,
+inline void _2F1(const double a, const double b, const double c, const double z,
           double *const sol, double *const err, int *const nterms,
           const bool check) {
 #if FM_DEBUG
@@ -1016,9 +1158,9 @@ void _2F1(const double a, const double b, const double c, const double z,
     }
 }
 
-// Faster algorithm
 // Uses a recursion relation for Hypergeometric coefficients
-void _2F1_F(const double a, const double b, const double c, const double z,
+// Faster than the generic _2F1 function defined above
+inline void _2F1_F(const double a, const double b, const double c, const double z,
             double *const sol, double *const err, int *const nterms) {
 #if FM_DEBUG
     assert(sol != NULL);
@@ -1048,7 +1190,7 @@ void _2F1_F(const double a, const double b, const double c, const double z,
 
 // Approximates the number of terms needed in 2F1 to
 // achieve an error of 'err'
-int getNumTerms(const double &z, const double &err) {
+inline int getNumTerms(const double &z, const double &err) {
 #if FM_DEBUG
     assert(err > 0.0);
 #endif
@@ -1056,13 +1198,14 @@ int getNumTerms(const double &z, const double &err) {
     return static_cast<int>(log(err) / log(fabs(z))) + 1;
 }
 
+// Hypergeometric Transformation Type
 // Used to find the proper transformation
 // so that the series approximation to 2F1
 // is valid for any |z| instead of just
 //|z|<1 like in GSL.
 // See the paper 'Computing the Hypergeometric
 // Function' by R. Forrey for details
-HyperType getHyperType(const double &z) {
+inline HyperType getHyperType(const double &z) {
     HyperType ht = HyperType();
 
     if (z >= 0.0 && z <= 0.5) {
@@ -1088,4 +1231,6 @@ HyperType getHyperType(const double &z) {
     return ht;
 }
 
-} // namespace fastmath
+}
+
+#endif

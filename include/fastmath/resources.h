@@ -1,15 +1,20 @@
 /* Copyright 2014-2022 Will Cunningham
- *
+ * 
  * This file is part of FastMath.
  *
- * Licensed under the MIT License (the "License"). A copy of the
- * License may be obtained with this software package or at
+ * Licensed under the GNU General Public License 3.0 (the "License").
+ * A copy of the License may be obtained with this software package or at
  *
- *     https://opensource.org/licenses/MIT
+ *      https://www.gnu.org/licenses/gpl-3.0.en.html
  *
- * FastMath is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. */
+ * Use of this file is prohibited except in compliance with the License. Any
+ * modifications or derivative works of this file must retain this copyright
+ * notice, and modified files must contain a notice indicating that they have
+ * been altered from the originals.
+ *
+ * FastMath is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+ * FITNESS FOR A PARTICULAR PURPOSE. See the License for more details. */
 
 #ifndef FASTMATH_RESOURCES_H
 #define FASTMATH_RESOURCES_H
@@ -236,10 +241,42 @@ VFREE(std::vector<T, thrust::system::cuda::experimental::pinned_allocator<T>>
 }
 #endif
 
-int printf_mpi(int rank, const char *format, ...);
-int printf_dbg(const char *format, ...);
-void printFinish(const char **argv, const int &exename_start, const int &rank,
-                 int iStatus);
+// MPI Print Variadic Function
+// Allows only the master process to print to stdout
+// If MPI is not enabled, rank == 0
+inline int printf_mpi(int rank, const char *format, ...) {
+    int retval = 0;
+
+    if (rank == 0) {
+        va_list argp;
+        va_start(argp, format);
+        vprintf(format, argp);
+        va_end(argp);
+    }
+
+    return retval;
+}
+
+// Debug Print Variadic Function
+inline int printf_dbg(const char *format, ...) {
+    printf_mag();
+    va_list argp;
+    va_start(argp, format);
+    vprintf(format, argp);
+    va_end(argp);
+    printf_std();
+    fflush(stdout);
+
+    return 0;
+}
+
+inline void printFinish(const char **argv, const int &exename_start, const int &rank,
+                 int iStatus) {
+    const char *sStatus[] = {"FAILED", "PASSED", "WAIVED", NULL};
+    printf_mpi(rank, "[%s] results...\n%s\n\n", &(argv[0][exename_start]),
+               sStatus[iStatus]);
+    fflush(stdout);
+}
 
 inline int findExeNameStart(const char *exec_name) {
     int exename_start = (int)strlen(exec_name);

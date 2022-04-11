@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [UNRELEASED]
 
+### Changed
+
+- FastMath is now a header-only package
+- License is updated to GPLv3 for compliance with GSL.
+
 ### Docs
 
 - Added badges to readme

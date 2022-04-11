@@ -4,14 +4,19 @@
 #
 # This file is part of FastMath.
 #
-# Licensed under the MIT License (the "License"). A copy of the
-# License may be obtained with this software package or at
+# Licensed under the GNU General Public License 3.0 (the "License").
+# A copy of the License may be obtained with this software package or at
 #
-#     https://opensource.org/licenses/MIT
+#     https://www.gnu.org/licenses/gpl-3.0.en.html
 #
-# FastMath is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# Use of this file is prohibited except in compliance with the License. Any
+# modifications or derivative works of this file must retain this copyright
+# notice, and modified files must contain a notice indicating that they have
+# been altered from the originals.
+#
+# FastMath is distributed in the hope that it will be useful, but WITHOUT 
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+# FITNESS FOR A PARTICULAR PURPOSE. See the License for more details.
 
 set -eu -o pipefail
 

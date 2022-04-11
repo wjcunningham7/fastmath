@@ -2,23 +2,49 @@
 #
 # This file is part of FastMath.
 #
-# Licensed under the MIT License (the "License"). A copy of the
-# License may be obtained with this software package or at
+# Licensed under the GNU General Public License 3.0 (the "License").
+# A copy of the License may be obtained with this software package or at
 #
-#     https://opensource.org/licenses/MIT
+#     https://www.gnu.org/licenses/gpl-3.0.en.html
 #
-# FastMath is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# Use of this file is prohibited except in compliance with the License. Any
+# modifications or derivative works of this file must retain this copyright
+# notice, and modified files must contain a notice indicating that they have
+# been altered from the originals.
+#
+# FastMath is distributed in the hope that it will be useful, but WITHOUT 
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+# FITNESS FOR A PARTICULAR PURPOSE. See the License for more details.
 
 AUTOMAKE_OPTIONS = foreign
-ACLOCAL_AMFLAGS = -I m4 --install
+ACLOCAL_AMFLAGS = --install
 
-SUBDIRS = src inc test
-
-lib_LIBRARIES = libfastmath@PLATFORM@.a
-libfastmath@PLATFORM@_a_LIBADD = src/nint.o src/printcolor.o src/fastmath.o src/integration.o src/stopwatch.o src/progressbar.o src/resources.o
-libfastmath@PLATFORM@_a_SOURCES =
+sourcedir = include/fastmath
+pkginclude_HEADERS = \
+	$(sourcedir)/config.h \
+	$(sourcedir)/fastapprox.h \
+	$(sourcedir)/fastbitset.h \
+	$(sourcedir)/fastmath.h \
+	$(sourcedir)/integration.h \
+	$(sourcedir)/mersenne.h \
+	$(sourcedir)/nint.h \
+	$(sourcedir)/printcolor.h \
+	$(sourcedir)/progressbar.h \
+	$(sourcedir)/stopwatch.h \
+	$(sourcedir)/resources.h
 
 distclean-local:
-	rm -rf $(top_builddir)/{autom4te.cache,aclocal.m4,AUTHORS,ChangeLog,config.guess,config.log,config.status,config.sub,configure,depcomp,install-sh,Makefile,Makefile.in,missing,NEWS,.deps,inc/config.h*,inc/Makefile.in,src/.dirstamp,src/Makefile.in,test/Makefile.in,compile,fastmath}
+	rm -rf $(top_builddir)/{\
+autom4te.cache,\
+aclocal.m4,\
+AUTHORS,\
+ChangeLog,\
+configure,\
+configure~,\
+install-sh,\
+Makefile.in,\
+missing,\
+NEWS,\
+$(sourcedir)/config.h.in,\
+$(sourcedir)/config.h.in~\
+}

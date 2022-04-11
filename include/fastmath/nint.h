@@ -1,35 +1,37 @@
 /* Copyright 2014-2022 Will Cunningham
- *
+ * 
  * This file is part of FastMath.
  *
- * Licensed under the MIT License (the "License"). A copy of the
- * License may be obtained with this software package or at
+ * Licensed under the GNU General Public License 3.0 (the "License").
+ * A copy of the License may be obtained with this software package or at
  *
- *     https://opensource.org/licenses/MIT
+ *      https://www.gnu.org/licenses/gpl-3.0.en.html
  *
- * FastMath is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. */
+ * Use of this file is prohibited except in compliance with the License. Any
+ * modifications or derivative works of this file must retain this copyright
+ * notice, and modified files must contain a notice indicating that they have
+ * been altered from the originals.
+ *
+ * FastMath is distributed in the hope that it will be useful, but WITHOUT 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+ * FITNESS FOR A PARTICULAR PURPOSE. See the License for more details. */
 
-// This file has been borrowed from nintlib and modified. See
+// These methods have been borrowed from nintlib. See
 // https://people.math.sc.edu/Burkardt/cpp_src/nintlib/nintlib.html
 // for details.
-//
+
+#ifndef FASTMATH_NINT_H
+#define FASTMATH_NINT_H
+
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
 #include <iomanip>
 #include <iostream>
 
-using namespace std;
-
-#include <fastmath/nint.h>
-
 namespace fastmath {
 
-//****************************************************************************80
-
-double box_nd(double func(int dim_num, double x[]), int dim_num, int order,
+inline double box_nd(double func(int dim_num, double x[]), int dim_num, int order,
               double xtab[], double weight[], int *eval_num)
 
 //****************************************************************************80
@@ -140,9 +142,8 @@ double box_nd(double func(int dim_num, double x[]), int dim_num, int order,
 
     return result;
 }
-//****************************************************************************80
 
-int i4_huge(void)
+inline int i4_huge(void)
 
 //****************************************************************************80
 //
@@ -169,9 +170,8 @@ int i4_huge(void)
 {
     return 2147483647;
 }
-//****************************************************************************80
 
-int i4_power(int i, int j)
+inline int i4_power(int i, int j)
 
 //****************************************************************************80
 //
@@ -231,9 +231,8 @@ int i4_power(int i, int j)
     }
     return value;
 }
-//****************************************************************************80
 
-double monte_carlo_nd(double func(int dim_num, double x[], double *params),
+inline double monte_carlo_nd(double func(int dim_num, double x[], double *params),
                       int dim_num, double a[], double b[], double *params,
                       int eval_num, int *seed)
 
@@ -317,9 +316,8 @@ double monte_carlo_nd(double func(int dim_num, double x[], double *params),
 
     return result;
 }
-//****************************************************************************80
 
-double p5_nd(double func(int dim_num, double x[]), int dim_num, double a[],
+inline double p5_nd(double func(int dim_num, double x[]), int dim_num, double a[],
              double b[], int *eval_num)
 
 //****************************************************************************80
@@ -477,9 +475,8 @@ double p5_nd(double func(int dim_num, double x[]), int dim_num, double a[],
 
     return result;
 }
-//****************************************************************************80
 
-double r8_abs(double x)
+inline double r8_abs(double x)
 
 //****************************************************************************80
 //
@@ -515,9 +512,8 @@ double r8_abs(double x)
     }
     return value;
 }
-//****************************************************************************80
 
-double r8_epsilon(void)
+inline double r8_epsilon(void)
 
 //****************************************************************************80
 //
@@ -562,9 +558,8 @@ double r8_epsilon(void)
 
     return value;
 }
-//****************************************************************************80
 
-double *r8vec_uniform_01_new(int n, int *seed)
+inline double *r8vec_uniform_01_new(int n, int *seed)
 
 //****************************************************************************80
 //
@@ -648,9 +643,8 @@ double *r8vec_uniform_01_new(int n, int *seed)
 
     return r;
 }
-//****************************************************************************80
 
-double romberg_nd(double func(int dim_num, double x[]), double a[], double b[],
+inline double romberg_nd(double func(int dim_num, double x[]), double a[], double b[],
                   int dim_num, int sub_num[], int it_max, double tol, int *ind,
                   int *eval_num)
 
@@ -910,9 +904,8 @@ double romberg_nd(double func(int dim_num, double x[]), double a[], double b[],
 
     return result;
 }
-//****************************************************************************80
 
-void sample_nd(double func(int dim_num, double x[]), int k1, int k2,
+inline void sample_nd(double func(int dim_num, double x[]), int k1, int k2,
                int dim_num, double est1[], double err1[], double dev1[],
                double est2[], double err2[], double dev2[], int *eval_num)
 
@@ -1189,9 +1182,8 @@ void sample_nd(double func(int dim_num, double x[]), int k1, int k2,
     return;
 #undef DIM_MAX
 }
-//****************************************************************************80
 
-double sum2_nd(double func(int dim_num, double x[]), double xtab[],
+inline double sum2_nd(double func(int dim_num, double x[]), double xtab[],
                double weight[], int order[], int dim_num, int *eval_num)
 
 //****************************************************************************80
@@ -1324,9 +1316,8 @@ double sum2_nd(double func(int dim_num, double x[]), double xtab[],
 
     return result;
 }
-//****************************************************************************80
 
-void timestamp(void)
+inline void timestamp(void)
 
 //****************************************************************************80
 //
@@ -1372,9 +1363,8 @@ void timestamp(void)
     return;
 #undef TIME_SIZE
 }
-//****************************************************************************80
 
-void tuple_next(int m1, int m2, int n, int *rank, int x[])
+inline void tuple_next(int m1, int m2, int n, int *rank, int x[])
 
 //****************************************************************************80
 //
@@ -1480,4 +1470,6 @@ void tuple_next(int m1, int m2, int n, int *rank, int x[])
     return;
 }
 
-} // namespace fastmath
+}
+
+#endif
