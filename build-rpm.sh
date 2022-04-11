@@ -3,19 +3,24 @@
 set -eu -o pipefail
 
 PKG_ROOT=`dirname $0`
+VERSION=`cat $PKG_ROOT/VERSION`
 BUILD=$PKG_ROOT/build
 mkdir -p $BUILD/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
-VERSION=`cat $PKG_ROOT/VERSION`
+tar cvzf fastmath-$VERSION.tar.gz $PKG_ROOT/{\
+include,\
+Makefile.am,\
+configure.ac,\
+LICENSE\
+}
 
-tar cvzf fastmath-$VERSION.tar.gz $PKG_ROOT/{include,Makefile.am,configure.ac,LICENSE}
 mv fastmath-$VERSION.tar.gz $BUILD/SOURCES
 
 cat <<-EOF > $BUILD/SPECS/fastmath.spec
 Name:		fastmath
 Version:	$VERSION
 Release:	1
-Summary:	Numerical approximations and compact data structures for fast math operations.
+Summary:	FastMath Toolkit
 
 License:	GPLv3
 URL: 		https://github.com/wjcunningham7/%{name}
@@ -28,10 +33,13 @@ BuildRequires:	make
 Requires:	boost >= 1.55.0
 Requires:	gsl-devel >= 1.13
 
+%description
+The FastMath toolkit provides efficient numerical approximations and compact data structures
+
 %build
 touch NEWS AUTHORS ChangeLog
 autoreconf -vfi
-./configure $@
+./configure \$@
 
 %install
 make install
