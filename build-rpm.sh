@@ -4,7 +4,7 @@ set -eu -o pipefail
 
 PKG_ROOT=`dirname $0`
 VERSION=`cat $PKG_ROOT/VERSION`
-BUILD=$HOME/rpmbuild
+BUILD=$PWD/rpmbuild
 mkdir -p $BUILD/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
 tmpdir=$(mktemp -d)
