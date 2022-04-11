@@ -4,16 +4,17 @@ set -eu -o pipefail
 
 PKG_ROOT=`dirname $0`
 VERSION=`cat $PKG_ROOT/VERSION`
-BUILD=$PKG_ROOT/build
+BUILD=$HOME/rpmbuild
 mkdir -p $BUILD/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
-tar cvzf fastmath-$VERSION.tar.gz $PKG_ROOT/{\
-include,\
-configure,\
-LICENSE\
-}
+tmpdir=$(mktemp -d)
+mkdir $tmpdir/fastmath-$VERSION
+cp -r $PKG_ROOT/{include,configure,LICENSE} $tmpdir
 
-mv fastmath-$VERSION.tar.gz $BUILD/SOURCES
+(cd $tmpdir && tar cvzf fastmath-$VERSION.tar.gz fastmath-$VERSION)
+
+mv $tmpdir/fastmath-$VERSION.tar.gz $BUILD/SOURCES
+rm -rf $tmpdir
 
 cat <<-EOF > $BUILD/SPECS/fastmath.spec
 Name:		fastmath
