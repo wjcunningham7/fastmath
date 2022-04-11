@@ -16,7 +16,7 @@ cp -r $PKG_ROOT/{include,configure,LICENSE} $tmpdir
 mv $tmpdir/fastmath-$VERSION.tar.gz $BUILD/SOURCES
 rm -rf $tmpdir
 
-cat <<-EOF > $BUILD/SPECS/fastmath.spec
+cat <<-EOF > fastmath.spec
 Name:		fastmath
 Version:	$VERSION
 Release:	1
@@ -24,7 +24,6 @@ Summary:	FastMath Toolkit
 
 License:	GPLv3
 URL: 		https://github.com/wjcunningham7/fastmath
-Source0:	fastmath-$VERSION.tar.gz
 
 BuildArch:	x86_64
 
@@ -35,9 +34,6 @@ Requires:	gsl-devel >= 1.13
 
 %description
 The FastMath toolkit provides efficient numerical approximations and compact data structures
-
-%prep
-%setup -q
 
 %build
 %configure --prefix=/usr/local
