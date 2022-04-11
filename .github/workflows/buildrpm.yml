@@ -15,7 +15,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Generate spec
-        run: bash ./build-rpm.sh
+        run: bash ./build-rpm-spec.sh
       - name: Build RPM
         id: rpm
         uses: naveenrajm7/rpmbuild@master
