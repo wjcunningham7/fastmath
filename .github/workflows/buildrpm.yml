@@ -17,12 +17,12 @@ jobs:
       - name: Generate spec
         run: |
           bash ./build-rpm.sh
-          ls -la build/SPEC
+          ls -la build/SPECS
       - name: Build RPM
         id: rpm
         uses: naveenrajm7/rpmbuild@master
         with:
-          spec_file: "build/SPEC/fastmath.spec"
+          spec_file: "build/SPECS/fastmath.spec"
       - name: Upload artifact
         uses: actions/upload-artifact@v1.0.0
         with:
