@@ -38,10 +38,10 @@ depcomp
 install-sh
 missing
 NEWS
-inc/stamp-h1
-inc/config.h
-inc/config.h.in
-inc/config.h.in~
+**/stamp-h1
+**/config.h
+**/config.h.in
+**/config.h.in~
 **/Makefile
 **/Makefile.in
 **/.deps/**

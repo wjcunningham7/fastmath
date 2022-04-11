@@ -1,0 +1,30 @@
+name: buildrpm
+
+on:
+  push:
+    branches:
+      - master
+      - add-rpm-build-recipe
+
+jobs:
+  buildrpm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out master
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+      - name: Generate spec
+        run: |
+          cd recipes
+          sh ./build-rpm.sh
+      - name: Build RPM
+        id: rpm
+        uses: naveenrajm7/rpmbuild@master
+        with:
+          spec_file: "./build/SPEC/fastmath.spec"
+      - name: Upload artifact
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: FastMath RPM
+          path: ${{ steps.rpm.outputs.rpm_dir_path }}

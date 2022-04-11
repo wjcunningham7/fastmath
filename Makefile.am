@@ -46,5 +46,6 @@ Makefile.in,\
 missing,\
 NEWS,\
 $(sourcedir)/config.h.in,\
-$(sourcedir)/config.h.in~\
+$(sourcedir)/config.h.in~,\
+$(sourcedir)/stamp-h1\
 }
