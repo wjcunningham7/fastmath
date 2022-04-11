@@ -1,19 +1,5 @@
-#!/bin/bash
-
-set -eu -o pipefail
-
-PKG_ROOT=`dirname $0`/../
-BUILD=$PKG_ROOT/build
-mkdir -p $BUILD/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
-
-VERSION=$PKG_ROOT/VERSION
-
-tar cvzf fastmath-$VERSION.tar.gz $PKG_ROOT/{include,Makefile.am,configure.ac,LICENSE}
-mv fastmath-$VERSION.tar.gz $BUILD/SOURCES
-
-cat <<-EOF > $BUILD/SPECS/fastmath.spec
 Name:		fastmath
-Version:	$VERSION
+Version:	1.0.0
 Release:	1
 Summary:	Numerical approximations and compact data structures for fast math operations.
 
@@ -31,7 +17,7 @@ Requires:	gsl-devel >= 1.13
 %build
 touch NEWS AUTHORS ChangeLog
 autoreconf -vfi
-./configure $@
+./configure 
 
 %install
 make install
@@ -39,4 +25,3 @@ make install
 %changelog
 * Sun Apr 11 2022 Will Cunningham <wjcunningham7@gmail.com> - 0.0.1
 - First package version
-EOF
