@@ -36,11 +36,10 @@ Requires:	gsl-devel >= 1.13
 The FastMath toolkit provides efficient numerical approximations and compact data structures
 
 %build
-ls -la
-./configure
+%configure --prefix=/usr/local
 
 %install
-make install
+%makeinstall
 
 %changelog
 * Sun Apr 11 2022 Will Cunningham <wjcunningham7@gmail.com> - 0.0.1
