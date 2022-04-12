@@ -13,6 +13,7 @@ Summary:	FastMath Toolkit
 
 License:	GPLv3
 URL: 		https://github.com/wjcunningham7/fastmath
+Source0:	fastmath-$VERSION.tar.gz
 
 BuildArch:	x86_64
 
