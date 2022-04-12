@@ -37,7 +37,7 @@ jobs:
       - name: Test RPM installation
         run: rpm -ivvh $HOME/rpmbuild/SRPMS/fastmath-$VERSION-1.src.rpm
       - name: Upload artifact
-        uses: actions/upload-artifact@v1.0.0
+        uses: actions/upload-artifact@v3
         with:
           name: FastMath RPM
           path: /github/home/rpmbuild/SRPMS/fastmath-${{ env.VERSION }}-1.src.rpm
