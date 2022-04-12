@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [UNRELEASED]
 
+## [1.2.4] - 2022-04-12
+
 ### Fixed
 
 - `config.h.in` was previously excluded via gitignore
