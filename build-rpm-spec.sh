@@ -17,8 +17,6 @@ Source0:	fastmath-$VERSION.tar.gz
 
 BuildArch:	x86_64
 
-BuildRequires:	make
-
 Requires:	boost >= 1.55.0
 Requires:	gsl-devel >= 1.13
 
@@ -29,26 +27,26 @@ The FastMath toolkit provides efficient numerical approximations and compact dat
 %setup -q
 
 %build
-%configure --prefix=/usr/local
+%configure
 
 %install
 %makeinstall
 
 %files
 %defattr(-,root,root,-)
-/usr/local/include/fastmath/config.h
-/usr/local/include/fastmath/fastapprox.h
-/usr/local/include/fastmath/fastbitset.h
-/usr/local/include/fastmath/fastmath.h
-/usr/local/include/fastmath/integration.h
-/usr/local/include/fastmath/mersenne.h
-/usr/local/include/fastmath/nint.h
-/usr/local/include/fastmath/printcolor.h
-/usr/local/include/fastmath/progressbar.h
-/usr/local/include/fastmath/resources.h
-/usr/local/include/fastmath/stopwatch.h
+/usr/include/fastmath/config.h
+/usr/include/fastmath/fastapprox.h
+/usr/include/fastmath/fastbitset.h
+/usr/include/fastmath/fastmath.h
+/usr/include/fastmath/integration.h
+/usr/include/fastmath/mersenne.h
+/usr/include/fastmath/nint.h
+/usr/include/fastmath/printcolor.h
+/usr/include/fastmath/progressbar.h
+/usr/include/fastmath/resources.h
+/usr/include/fastmath/stopwatch.h
 
 %changelog
 * Sun Apr 11 2022 Will Cunningham <wjcunningham7@gmail.com> - 0.0.1
 - First package version
-
+EOF
