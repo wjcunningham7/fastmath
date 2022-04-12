@@ -40,4 +40,4 @@ jobs:
         uses: actions/upload-artifact@v1.0.0
         with:
           name: FastMath RPM
-          path: ${{ env.HOME }}/rpmbuild/SRPMS/fastmath-${{ env.VERSION }}-1.src.rpm
+          path: /github/home/rpmbuild/SRPMS/fastmath-${{ env.VERSION }}-1.src.rpm
