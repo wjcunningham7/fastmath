@@ -1,0 +1,55 @@
+# Copyright 2014-2022 Will Cunningham
+#
+# This file is part of FastMath.
+#
+# Licensed under the GNU General Public License 3.0 (the "License").
+# A copy of the License may be obtained with this software package or at
+#
+#     https://www.gnu.org/licenses/gpl-3.0.en.html
+#
+# Use of this file is prohibited except in compliance with the License. Any
+# modifications or derivative works of this file must retain this copyright
+# notice, and modified files must contain a notice indicating that they have
+# been altered from the originals.
+#
+# FastMath is distributed in the hope that it will be useful, but WITHOUT 
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+# FITNESS FOR A PARTICULAR PURPOSE. See the License for more details.
+
+name: tests
+
+on:
+  pull_request:
+  workflow_run:
+    workflows: [changelog]
+    types: [completed]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out head
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+      - name: Run unit tests
+        run: echo "No unit tests!"
+      - name: Get latest release
+        uses: actions-ecosystem/action-get-latest-tag@v1
+        id: get-latest-tag
+        if: github.ref == 'refs/heads/develop'
+        with:
+          semver_only: true
+      - name: Push to master
+        if: github.ref == 'refs/heads/develop'
+        run: |
+          MASTER_VERSION="$(echo ${{ steps.get-latest-tag.outputs.tag }} | cut -c2- )"
+          VERSION="$(cat ./VERSION)"
+          if [ "$MASTER_VERSION" = "$VERSION" ] ; then
+            echo "$VERSION has been previously released."
+          else
+            git config user.name "FastMathOpsBot"
+            git config user.email "fastmathopsbot@users.noreply.github.com"
+            git remote set-url origin https://${{ secrets.FASTMATH_OPS_BOT_TOKEN }}@github.com/wjcunningham7/fastmath.git
+            git push origin HEAD:master
+          fi
