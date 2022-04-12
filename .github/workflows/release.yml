@@ -38,6 +38,8 @@ jobs:
   release:
     name: Create Release
     runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
       - name: Check out master
         uses: actions/checkout@v2
@@ -67,6 +69,7 @@ jobs:
           tail +$begin ./CHANGELOG.md | head -$end >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
       - name: Create release
+        id: create_release
         if: ${{ steps.push.outcome == 'success' && steps.message.outcome == 'success' }}
         uses: ncipollo/release-action@v1
         with:
