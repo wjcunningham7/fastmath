@@ -89,7 +89,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Install rpmbuild
-        run: yum install -y rpm-build
+        run: yum install -y make rpm-build
       - name: Read version
         run: |
           VERSION=`cat VERSION`

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [UNRELEASED]
 
+### Fixed
+
+- `make` now installed in release action
+
 ## [1.2.4] - 2022-04-12
 
 ### Fixed
