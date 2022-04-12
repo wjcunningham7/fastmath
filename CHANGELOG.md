@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [UNRELEASED]
 
+### Added
+
+- Release, rpmbuild, and tests actions
+
 ### Changed
 
 - FastMath is now a header-only package

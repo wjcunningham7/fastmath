@@ -23,5 +23,5 @@ set -eu -o pipefail
 touch NEWS AUTHORS ChangeLog
 autoreconf -vfi
 ./configure $@
-#make install
-#make distclean
+make install
+make distclean
