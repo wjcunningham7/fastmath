@@ -34,8 +34,10 @@ jobs:
           mv fastmath.spec $HOME/rpmbuild/SPECS
       - name: Build RPM
         run: rpmbuild -bs $HOME/rpmbuild/SPECS/fastmath.spec
+      - name: Test RPM installation
+        run: rpm -ivvh $HOME/rpmbuild/SRPMS/fastmath-$VERSION-1.src.rpm
       - name: Upload artifact
         uses: actions/upload-artifact@v1.0.0
         with:
           name: FastMath RPM
-          path: /github/home/rpmbuild/SRPMS/fastmath-$VERSION-1.src.rpm
+          path: ${{ env.HOME }}/rpmbuild/SRPMS/fastmath-${{ env.VERSION }}-1.src.rpm
