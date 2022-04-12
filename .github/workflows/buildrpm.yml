@@ -23,6 +23,7 @@ on:
     workflows: ["release"]
     branches: [master]
     types: [completed]
+  pull_request:
 
 jobs:
   buildrpm:
