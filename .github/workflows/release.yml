@@ -98,7 +98,7 @@ jobs:
         run: |
           mkdir -p $HOME/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
           mkdir fastmath-$VERSION
-          cp -r include configure LICENSE Makefile.in missing fastmath-$VERSION
+          cp -r include configure configure.ac install-sh LICENSE Makefile.am Makefile.in missing VERSION fastmath-$VERSION
           tar cvzf fastmath-$VERSION.tar.gz fastmath-$VERSION
           mv fastmath-$VERSION.tar.gz $HOME/rpmbuild/SOURCES
       - name: Generate spec
@@ -106,15 +106,15 @@ jobs:
           bash ./build-rpm-spec.sh
           mv fastmath.spec $HOME/rpmbuild/SPECS
       - name: Build RPM
-        run: rpmbuild -bs $HOME/rpmbuild/SPECS/fastmath.spec
+        run: rpmbuild -ba $HOME/rpmbuild/SPECS/fastmath.spec
       - name: Test RPM installation
-        run: rpm -ivvh $HOME/rpmbuild/SRPMS/fastmath-$VERSION-1.src.rpm
+        run: rpm -ivvh $HOME/rpmbuild/RPMS/x86_64/fastmath-$VERSION-1.x86_64.rpm
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_name: fastmath-${{ env.VERSION }}-1.src.rpm
-          asset_path: /github/home/rpmbuild/SRPMS/fastmath-${{ env.VERSION }}-1.src.rpm
+          asset_name: fastmath-${{ env.VERSION }}-1.x86_64.rpm
+          asset_path: /github/home/rpmbuild/RPMS/fastmath-${{ env.VERSION }}-1.x86_64.rpm
           asset_content_type: application/x-rpm
