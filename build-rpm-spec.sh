@@ -17,6 +17,8 @@ Source0:	fastmath-$VERSION.tar.gz
 
 BuildArch:	x86_64
 
+BuildRequires:	make
+
 Requires:	boost >= 1.55.0
 Requires:	gsl-devel >= 1.13
 
