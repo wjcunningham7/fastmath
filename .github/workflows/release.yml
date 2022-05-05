@@ -33,9 +33,11 @@ on:
   push:
     branches:
       - master
+      - add-autotools
 
 jobs:
   release:
+    if: false
     name: Create Release
     runs-on: ubuntu-latest
     outputs:
