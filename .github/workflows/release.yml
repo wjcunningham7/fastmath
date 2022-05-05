@@ -91,7 +91,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Install build tools
-        run: yum install -y make rpm-build automake autoconf
+        run: yum install -y make rpm-build automake autoconf boost gsl
       - name: Read version
         run: |
           VERSION=`cat VERSION`
