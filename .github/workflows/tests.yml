@@ -38,13 +38,13 @@ jobs:
           version: 11
       - name: Install gtest
         run: |
-          apt-get install -y libgtest-dev
+          sudo apt-get install -y libgtest-dev
           cd /usr/src/gtest
-          cmake CMakeLists.txt
-          make
-          cp *.a /usr/lib
-          ln -s /usr/lib/libgtest.a /usr/local/lib/libgtest.a
-          ln -s /usr/lib/libgtest_main.a /usr/local/lib/libgtest_main.a
+          sudo cmake CMakeLists.txt
+          sudo make
+          sudo cp *.a /usr/lib
+          sudo ln -s /usr/lib/libgtest.a /usr/local/lib/libgtest.a
+          sudo ln -s /usr/lib/libgtest_main.a /usr/local/lib/libgtest_main.a
       - name: Run unit tests
         run: |
           cd tests
