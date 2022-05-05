@@ -89,7 +89,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Install build tools
-        run: yum install -y make rpm-build automake autoconf
+        run: yum install -y make rpm-build automake autoconf gsl-devel boost
       - name: Read version
         run: |
           VERSION=`cat VERSION`
@@ -98,13 +98,13 @@ jobs:
         run: |
           mkdir -p $HOME/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
           mkdir fastmath-$VERSION
-          cp -r include configure configure.ac install-sh LICENSE Makefile.am Makefile.in missing VERSION fastmath-$VERSION
+          cp -r include configure.ac LICENSE Makefile.am VERSION fastmath-$VERSION
           tar cvzf fastmath-$VERSION.tar.gz fastmath-$VERSION
           mv fastmath-$VERSION.tar.gz $HOME/rpmbuild/SOURCES
       - name: Generate spec
         run: |
-          bash ./build-rpm-spec.sh
-          mv fastmath.spec $HOME/rpmbuild/SPECS
+          bash ./pkg/build-rpm-spec.sh
+          mv pkg/fastmath.spec $HOME/rpmbuild/SPECS
       - name: Build RPM
         run: rpmbuild -ba $HOME/rpmbuild/SPECS/fastmath.spec
       - name: Test RPM installation

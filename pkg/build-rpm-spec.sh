@@ -2,7 +2,7 @@
 
 set -eu -o pipefail
 
-PKG_ROOT=`dirname $0`
+PKG_ROOT=`dirname $0`/..
 VERSION=`cat $PKG_ROOT/VERSION`
 
 cat <<-EOF > fastmath.spec
@@ -19,7 +19,7 @@ BuildArch:	x86_64
 
 BuildRequires:	make
 
-Requires:	boost >= 1.55.0
+Requires:	boost
 Requires:	gsl-devel >= 1.13
 
 %description
@@ -27,6 +27,8 @@ The FastMath toolkit provides efficient numerical approximations and compact dat
 
 %prep
 %setup -q
+touch NEWS AUTHORS ChangeLog
+autoreconf -vfi
 
 %build
 %configure
