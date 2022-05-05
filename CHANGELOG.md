@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Release RPM build action
+
+## [1.3.1] - 2022-05-05
+
+### Fixed
+
 - Added autotools to release action
 
 ## [1.3.0] - 2022-05-05
