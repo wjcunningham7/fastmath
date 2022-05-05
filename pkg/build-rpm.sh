@@ -2,7 +2,7 @@
 
 set -eu -o pipefail
 
-PKG_ROOT=`dirname $0`
+PKG_ROOT=`dirname $0`/..
 VERSION=`cat $PKG_ROOT/VERSION`
 
 BUILD=$HOME/rpmbuild
@@ -17,7 +17,7 @@ cp -r $PKG_ROOT/{include,configure.ac,LICENSE,Makefile.am,VERSION} $tmpdir/fastm
 mv $tmpdir/fastmath-$VERSION.tar.gz $BUILD/SOURCES
 rm -rf $tmpdir
 
-. $PKG_ROOT/build-rpm-spec.sh
-mv $PKG_ROOT/fastmath.spec $BUILD/SPECS
+. $PKG_ROOT/pkg/build-rpm-spec.sh
+mv $PKG_ROOT/pkg/fastmath.spec $BUILD/SPECS
 
 rpmbuild -ba $BUILD/SPECS/fastmath.spec

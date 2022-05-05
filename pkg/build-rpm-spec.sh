@@ -2,7 +2,7 @@
 
 set -eu -o pipefail
 
-PKG_ROOT=`dirname $0`
+PKG_ROOT=`dirname $0`/..
 VERSION=`cat $PKG_ROOT/VERSION`
 
 cat <<-EOF > fastmath.spec
