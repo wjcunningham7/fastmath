@@ -19,7 +19,7 @@ BuildArch:	x86_64
 
 BuildRequires:	make
 
-Requires:	boost >= 1.55.0
+Requires:	boost
 Requires:	gsl-devel >= 1.13
 
 %description
