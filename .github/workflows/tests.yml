@@ -41,7 +41,6 @@ jobs:
         with:
           boost_version: 1.76.0
           platform_version: 20.04
-          toolset: gcc
       - name: Install gtest
         run: |
           sudo apt-get install -y libgtest-dev
