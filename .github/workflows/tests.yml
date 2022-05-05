@@ -51,6 +51,8 @@ jobs:
           sudo ln -s /usr/lib/libgtest.a /usr/local/lib/libgtest.a
           sudo ln -s /usr/lib/libgtest_main.a /usr/local/lib/libgtest_main.a
       - name: Run unit tests
+        env:
+          BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
         run: |
           cd tests
           make
