@@ -1,5 +1,5 @@
 all:
-	g++ -I ../include/fastmath -Wno-narrowing -lgtest -lgtest_main -o fastmath_test fastmath_test.cpp
+	g++ -I ../include/fastmath -Wno-narrowing -lgtest -o fastmath_test fastmath_test.cpp
 
 clean:
 	@rm -f fastmath_test
