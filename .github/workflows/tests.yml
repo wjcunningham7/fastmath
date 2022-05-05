@@ -39,7 +39,7 @@ jobs:
       - name: Install boost
         uses: MarkusJx/install-boost@v2.3.0
         with:
-          boost_version: 1.55.0
+          boost_version: 1.71.0
           platform_version: 20.04
           toolset: gcc
       - name: Install gtest
