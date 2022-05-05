@@ -37,6 +37,7 @@ jobs:
         with:
           version: 11
       - name: Install boost
+        id: boost
         uses: MarkusJx/install-boost@v2.3.0
         with:
           boost_version: 1.76.0
@@ -52,9 +53,10 @@ jobs:
           sudo ln -s /usr/lib/libgtest_main.a /usr/local/lib/libgtest_main.a
       - name: Run unit tests
         env:
-          CPATH: ${{ steps.install-boost.outputs.BOOST_ROOT }}
+          CPATH: ${{ steps.boost.outputs.BOOST_ROOT }}
         run: |
           cd tests
+          echo $CPATH
           make
           ./fastmath_test
       - name: Get latest release
