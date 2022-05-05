@@ -82,7 +82,7 @@ jobs:
 
   buildrpm:
     name: Build RPM Package
-    needs: release
+#    needs: release
     runs-on: ubuntu-latest
     container: centos:centos7
     steps:
@@ -111,12 +111,12 @@ jobs:
         run: rpmbuild -ba $HOME/rpmbuild/SPECS/fastmath.spec
       - name: Test RPM installation
         run: rpm -ivvh $HOME/rpmbuild/RPMS/x86_64/fastmath-$VERSION-1.x86_64.rpm
-      - name: Upload release asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_name: fastmath-${{ env.VERSION }}-1.x86_64.rpm
-          asset_path: /github/home/rpmbuild/RPMS/fastmath-${{ env.VERSION }}-1.x86_64.rpm
-          asset_content_type: application/x-rpm
+#      - name: Upload release asset
+#        uses: actions/upload-release-asset@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          upload_url: ${{ needs.release.outputs.upload_url }}
+#          asset_name: fastmath-${{ env.VERSION }}-1.x86_64.rpm
+#          asset_path: /github/home/rpmbuild/RPMS/fastmath-${{ env.VERSION }}-1.x86_64.rpm
+#          asset_content_type: application/x-rpm
