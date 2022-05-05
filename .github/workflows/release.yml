@@ -98,7 +98,7 @@ jobs:
         run: |
           mkdir -p $HOME/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
           mkdir fastmath-$VERSION
-          cp -r include configure configure.ac install-sh LICENSE Makefile.am Makefile.in missing VERSION fastmath-$VERSION
+          cp -r include configure.ac LICENSE Makefile.am VERSION fastmath-$VERSION
           tar cvzf fastmath-$VERSION.tar.gz fastmath-$VERSION
           mv fastmath-$VERSION.tar.gz $HOME/rpmbuild/SOURCES
       - name: Generate spec

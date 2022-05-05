@@ -34,8 +34,12 @@ AUTHORS
 ChangeLog
 config.log
 config.status
+configure
 configure~
 depcomp
+install-sh
+Makefile.in
+missing
 NEWS
 **/stamp-h1
 **/config.h

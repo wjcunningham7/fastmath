@@ -27,6 +27,8 @@ The FastMath toolkit provides efficient numerical approximations and compact dat
 
 %prep
 %setup -q
+touch NEWS AUTHORS ChangeLog
+autoreconf -vfi
 
 %build
 %configure

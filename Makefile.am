@@ -39,7 +39,11 @@ autom4te.cache,\
 aclocal.m4,\
 AUTHORS,\
 ChangeLog,\
+configure,\
 configure~,\
+install-sh,\
+Makefile.in,\
+missing,\
 NEWS,\
 $(sourcedir)/config.h.in~,\
 $(sourcedir)/stamp-h1\
