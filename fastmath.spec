@@ -1,19 +1,11 @@
-#!/bin/bash
-
-set -eu -o pipefail
-
-PKG_ROOT=`dirname $0`/..
-VERSION=`cat $PKG_ROOT/VERSION`
-
-cat <<-EOF > $PKG_ROOT/pkg/fastmath.spec
 Name:		fastmath
-Version:	$VERSION
+Version:	1.3.2
 Release:	1
 Summary:	FastMath Toolkit
 
 License:	GPLv3
 URL: 		https://github.com/wjcunningham7/fastmath
-Source0:	fastmath-$VERSION.tar.gz
+Source0:	fastmath-1.3.2.tar.gz
 
 BuildArch:	x86_64
 
@@ -53,4 +45,3 @@ autoreconf -vfi
 %changelog
 * Sun Apr 11 2022 Will Cunningham <wjcunningham7@gmail.com> - 0.0.1
 - First package version
-EOF
