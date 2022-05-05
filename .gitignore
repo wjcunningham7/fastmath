@@ -41,6 +41,7 @@ NEWS
 **/config.h
 **/config.h.in~
 **/Makefile
+!tests/Makefile
 **/.deps/**
 **/.dirstamp
 
