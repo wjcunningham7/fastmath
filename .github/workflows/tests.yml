@@ -58,11 +58,11 @@ jobs:
           cd tests
           echo $CPATH
           make run
-          gcov -abcfu *.cpp
+          gcov -abcfur *.cpp
       - name: Upload report to Codecov
         uses: codecov/codecov-action@v2
         with:
-          files: ./tests/*.h.gcov
+          files: ./tests/fastmath.h.gcov,./tests/fastapprox.h.gcov
           flags: unittests
       - name: Get latest release
         uses: actions-ecosystem/action-get-latest-tag@v1
