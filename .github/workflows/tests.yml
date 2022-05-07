@@ -57,12 +57,12 @@ jobs:
         run: |
           cd tests
           echo $CPATH
-          make run
-          gcov -abcfur *.cpp
+          make coverage
       - name: Upload report to Codecov
         uses: codecov/codecov-action@v2
         with:
-          files: ./tests/fastmath.h.gcov,./tests/fastapprox.h.gcov
+#          files: ./tests/fastmath.h.gcov,./tests/fastapprox.h.gcov
+          files: ./tests/coverage.info
           flags: unittests
       - name: Get latest release
         uses: actions-ecosystem/action-get-latest-tag@v1
