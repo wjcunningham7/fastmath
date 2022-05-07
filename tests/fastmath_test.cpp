@@ -12,6 +12,7 @@ TEST (POW2, Pow2)
 {
 	ASSERT_EQ (fastmath::POW2(0, fastmath::EXACT), 0);
 	ASSERT_EQ (fastmath::POW2(0.5, fastmath::EXACT), 0.25);
+	ASSERT_NEAR (fastmath::POW2(0.5, fastmath::FAST), 0.25, 0.0001);
 }
 
 int main(int argc, char **argv)
