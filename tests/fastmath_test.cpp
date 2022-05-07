@@ -13,3 +13,10 @@ int main(int argc, char **argv)
 	::testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();
 }
+
+void instantiate()
+{	
+	fastmath::POW2(0);
+	fastmath::POW2(0, fastmath::EXACT);
+	fastmath::POW3(0);
+}

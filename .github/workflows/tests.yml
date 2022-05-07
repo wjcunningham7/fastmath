@@ -42,9 +42,9 @@ jobs:
         with:
           boost_version: 1.76.0
           platform_version: 20.04
-      - name: Install gtest
+      - name: Install gtest and lcov
         run: |
-          sudo apt-get install -y libgtest-dev
+          sudo apt-get install -y libgtest-dev lcov
           cd /usr/src/gtest
           sudo cmake CMakeLists.txt
           sudo make
@@ -57,8 +57,13 @@ jobs:
         run: |
           cd tests
           echo $CPATH
-          make
-          ./fastmath_test
+          make coverage
+      - name: Upload report to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+#          files: ./tests/fastmath.h.gcov,./tests/fastapprox.h.gcov
+          files: ./tests/coverage.info
+          flags: unittests
       - name: Get latest release
         uses: actions-ecosystem/action-get-latest-tag@v1
         id: get-latest-tag

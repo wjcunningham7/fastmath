@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [UNRELEASED]
 
+### Added
+
+- Codecov support for test coverage
+
 ## [1.3.2] - 2022-05-05
 
 ### Fixed
