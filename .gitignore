@@ -55,4 +55,5 @@ build/**
 # Coverage files
 *.gcda
 *.gcno
+*.gcov
 coverage.info
