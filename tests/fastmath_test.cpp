@@ -8,6 +8,12 @@ TEST (POW2, Pow2Simple)
 	ASSERT_EQ (fastmath::POW2(-0.5), 0.25);
 }
 
+TEST (POW2, Pow2)
+{
+	ASSERT_EQ (fastmath::POW2(0, fastmath::EXACT), 0);
+	ASSERT_EQ (fastmath::POW2(0.5, fastmath::EXACT), 0.25);
+}
+
 int main(int argc, char **argv)
 {
 	::testing::InitGoogleTest(&argc, argv);
