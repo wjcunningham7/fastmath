@@ -42,9 +42,9 @@ jobs:
         with:
           boost_version: 1.76.0
           platform_version: 20.04
-      - name: Install gtest
+      - name: Install gtest and lcov
         run: |
-          sudo apt-get install -y libgtest-dev
+          sudo apt-get install -y libgtest-dev lcov
           cd /usr/src/gtest
           sudo cmake CMakeLists.txt
           sudo make
