@@ -13,5 +13,8 @@ coverage: run
 	lcov --remove $(COVERAGE) '*/tests/*' --output-file $(COVERAGE)
 	lcov --list $(COVERAGE)
 
+gcov: run
+	gcov -abcfru *.cpp
+
 clean:
 	@rm -f fastmath_test *.gcov *.gcda *.gcno $(COVERAGE)
