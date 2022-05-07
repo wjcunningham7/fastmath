@@ -57,8 +57,11 @@ jobs:
         run: |
           cd tests
           echo $CPATH
-          make
-          ./fastmath_test
+          make coverage
+      - name: Upload report to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./tests/coverage.info
       - name: Get latest release
         uses: actions-ecosystem/action-get-latest-tag@v1
         id: get-latest-tag

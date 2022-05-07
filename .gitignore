@@ -51,3 +51,8 @@ NEWS
 
 # Build files
 build/**
+
+# Coverage files
+*.gcda
+*.gcno
+coverage.info
