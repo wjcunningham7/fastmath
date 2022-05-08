@@ -5,6 +5,8 @@ FastMath Library
 
 [![version](https://img.shields.io/github/v/tag/wjcunningham7/fastmath?include_prereleases&label=version)](https://github.com/wjcunningham7/fastmath)
 ![platform](https://img.shields.io/badge/platform-linux-lightgrey)
+[![tests](https://github.com/wjcunningham7/fastmath/actions/workflows/tests.yml/badge.svg)](https://github.com/wjcunningham7/fastmath/actions/workflows/tests.yml)
+<!--[![codecov](https://codecov.io/gh/wjcunningham7/fastmath/branch/develop/graph/badge.svg?token=L6H7Y03EOJ)](https://codecov.io/gh/wjcunningham7/fastmath)-->
 [![license](https://img.shields.io/github/license/wjcunningham7/fastmath)](https://opensource.org/licenses/MIT)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6432268.svg)](https://doi.org/10.5281/zenodo.6432268)
 
