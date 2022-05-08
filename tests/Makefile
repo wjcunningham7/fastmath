@@ -1,7 +1,7 @@
 COVERAGE	:= coverage.info
 
 all:
-	g++ -o fastmath_test fastmath_test.cpp -I ../include/fastmath -O0 -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline -Wno-narrowing -lgtest -lpthread
+	g++ -o fastmath_test fastmath_test.cpp -I ../include/fastmath -O0 -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline -Wno-narrowing --coverage -lgtest -lpthread
 
 run: all
 	./fastmath_test
