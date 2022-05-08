@@ -15,7 +15,7 @@ TEST (POW2, Pow2)
 	ASSERT_EQ (fastmath::POW2(0.5, fastmath::STL), 0.25);
 	ASSERT_NEAR (fastmath::POW2(0.5, fastmath::FAST), 0.25, 0.00001);
 	ASSERT_NEAR (fastmath::POW2(0.5, fastmath::FASTER), 0.25, 0.015);
-	x = fastmath::POW2(0.5, fastmath::DEF);
+	double x = fastmath::POW2(0.5, fastmath::DEF);
 	ASSERT_NE (x, x);
 }
 
